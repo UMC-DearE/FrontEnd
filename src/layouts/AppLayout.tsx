@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import BottomNav from "../components/bottomBar/BottomNav";
+import BottomNav from "../components/bottomNav/BottomNav";
 import HeaderBar from "../components/header/Header";
 
 export const AppLayout = () => {
