@@ -29,7 +29,9 @@ function NavItem({ to, label, Icon }: NavItemProps) {
     >
       {({ isActive }) => (
         <>
-          <Icon active={isActive} />
+          <div className="h-[18px] flex items-center justify-center">
+            <Icon active={isActive} className="block" />
+          </div>
           <span
             className={`text-xs ${
               isActive ? "font-medium text-primary" : "text-[#C2C4C7]"
