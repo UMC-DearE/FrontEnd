@@ -68,7 +68,7 @@ export default function HomePage() {
       />
 
       <div className="absolute bottom-32 left-[282px]">
-        <AddLetterButton onClick={() => {}} />
+        <AddLetterButton />
       </div>
     </div>
   );

@@ -1,14 +1,22 @@
-import plusIcon from '../../assets/homePage/plusIcon.svg';
+import { useNavigate } from "react-router-dom";
+import plusIcon from "../../assets/homePage/plusIcon.svg";
 
 interface AddLetterButtonProps {
   onClick?: () => void;
 }
 
 export default function AddLetterButton({ onClick }: AddLetterButtonProps) {
+  const navigate = useNavigate();
+
+  function handleClick() {
+    if (onClick) return onClick();
+    navigate("/create");
+  }
+
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={handleClick}
       className="flex items-center gap-[6px] rounded-[17px] bg-black px-[12px] py-[9px]"
     >
       <img src={plusIcon} alt="편지 추가" className="h-[11px] w-[11px]" />
