@@ -1,10 +1,10 @@
 export type HeaderPresetKey =
   | "LEFT_ONLY"
   | "BACK_TITLE"
-  | "CREATE_REVIEW"
+  | "CREATE_DETAIL"
   | "RIGHT_BUTTON"
   | "NONE"
-  | "CREATE_FROM"
+  | "SET_FROM"
   | "LETTER_BOX";
 
 export const ROUTE_META: Array<{
@@ -51,15 +51,15 @@ export const ROUTE_META: Array<{
 
     // 편지 추가 내용 확인
   {
-    match: (pathname) => pathname === "/create/review",
-    header: "CREATE_REVIEW",
+    match: (pathname) => pathname === "/create/detail",
+    header: "CREATE_DETAIL",
     bg: "white",
   },
 
     // 편지 추가 프롬 선택
   {
     match: (pathname) => pathname === "/create/from",
-    header: "CREATE_FROM",
+    header: "SET_FROM",
     bg: "white",
   },
 

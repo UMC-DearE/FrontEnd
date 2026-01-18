@@ -11,11 +11,11 @@ const BackTitleHeader = lazy(
 const RightButtonHeader = lazy(
   () => import("@/components/header/presets/RightButtonHeader")
 );
-const CreateReviewHeader = lazy(
-  () => import("@/components/header/CreateReviewHeader")
+const CreateDetailHeader = lazy(
+  () => import("@/components/header/CreateDetailHeader")
 );
-const CreateFromHeader = lazy(
-  () => import("@/components/header/CreateFromHeader")
+const SetFromHeader = lazy(
+  () => import("@/components/header/SetFromHeader")
 );
 const LetterBoxHeader = lazy(
   () => import("@/components/header/LetterBoxHeader")
@@ -39,8 +39,8 @@ export const HEADER_REGISTRY: Record<
     <RightButtonHeader title={title} />
   ),
 
-  CREATE_REVIEW: () => <CreateReviewHeader />,
-  CREATE_FROM: () => <CreateFromHeader />,
+  CREATE_DETAIL: () => <CreateDetailHeader />,
+  SET_FROM: () => <SetFromHeader />,
   LETTER_BOX: ({ title }) => <LetterBoxHeader title={title} />,
 
   NONE: null,

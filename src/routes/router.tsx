@@ -15,7 +15,7 @@ import HomePage from "@/pages/HomePage";
 
 import LetterCreatePage from "@/pages/create/LetterCreatePage";
 import CreateDetailPage from "@/pages/create/CreateDetailPage";
-import CreateFromPage from "@/pages/create/CreateFromPage";
+import SetFromPage from "@/pages/create/SetFromPage";
 
 import LetterBoxPage from "@/pages/letter/LetterBoxPage";
 import LetterDetailPage from "@/pages/letter/LetterDetailPage";
@@ -59,8 +59,8 @@ const router = createBrowserRouter([
                 path: "create",
                 children: [
                   { index: true, element: <LetterCreatePage /> },
-                  { path: "review", element: <CreateDetailPage /> },
-                  { path: "from", element: <CreateFromPage /> },
+                  { path: "detail", element: <CreateDetailPage /> },
+                  { path: "from", element: <SetFromPage /> },
                 ],
               },
 

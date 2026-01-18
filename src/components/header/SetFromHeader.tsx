@@ -1,7 +1,7 @@
 import TopSection from "@/components/header/TopSection";
 import BackButton from "../common/header/BackButton";
 
-export default function CreateFromHeader() {
+export default function SetFromHeader() {
   return (
     <>
       <TopSection

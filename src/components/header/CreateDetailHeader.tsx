@@ -2,7 +2,7 @@ import TopSection from "@/components/header/TopSection";
 import CancelButton from "@/components/common/header/CancelButton";
 import LetterThumbnail from "@/components/common/header/LetterThumbnail";
 
-export default function CreateReviewHeader() {
+export default function CreateDetailHeader() {
   return (
     <>
       <TopSection
