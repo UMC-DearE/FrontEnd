@@ -1,6 +1,6 @@
 import TopSection from "./TopSection";
 import type { JSX } from "react";
-import SearchButton from "@/components/common/SearchButton";
+import SearchButton from "@/components/common/header/SearchButton";
 
 export default function LetterBoxHeader({
   title,
