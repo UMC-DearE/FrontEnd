@@ -9,7 +9,7 @@ interface ProfileCardProps {
 
 export default function ProfileCard({ nickname, bio, onClickSettings }: ProfileCardProps) {
   return (
-    <div className="relative flex h-[202px] w-[361px] flex-col items-center rounded-4 bg-white shadow-md">
+    <div className="relative flex h-[202px] w-[361px] flex-col items-center rounded-[16px] bg-white shadow-md">
       <button type="button" onClick={onClickSettings} className="absolute left-81 top-4">
         <img src={setIcon} alt="set-icon" className="h-[19px] w-[19px]" />
       </button>
