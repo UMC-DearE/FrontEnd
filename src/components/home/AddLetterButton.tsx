@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import plusIcon from "../../assets/homePage/plusIcon.svg";
+import plusIcon from "@/assets/homePage/plusIcon.svg";
 
 interface AddLetterButtonProps {
   onClick?: () => void;

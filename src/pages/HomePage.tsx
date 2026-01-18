@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import ProfileCard from '../components/home/ProfileCard';
-import ConfirmModal from '../components/common/ConfirmModal';
-import LetterCard, { type Letter } from '../components/home/LetterCard';
-import AddLetterButton from '../components/home/AddLetterButton';
-import ProfileCustomSheet from '../components/home/ProfileCustomSheet';
+import ProfileCard from '@/components/home/ProfileCard';
+import ConfirmModal from '@/components/common/ConfirmModal';
+import LetterCard, { type Letter } from '@/components/home/LetterCard';
+import AddLetterButton from '@/components/home/AddLetterButton';
+import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 
 export default function HomePage() {
   const [letter, setLetter] = useState<Letter | null>({

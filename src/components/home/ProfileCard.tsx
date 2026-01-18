@@ -1,5 +1,5 @@
-import defaultProfile from '../../assets/homePage/defaultProfile.svg';
-import setIcon from '../../assets/homePage/settingIcon.svg';
+import defaultProfile from '@/assets/homePage/defaultProfile.svg';
+import setIcon from '@/assets/homePage/settingIcon.svg';
 
 interface ProfileCardProps {
   nickname: string;

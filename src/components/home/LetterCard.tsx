@@ -1,5 +1,5 @@
-import pinOffIcon from '../../assets/homePage/pin-outline.svg';
-import pinOnIcon from '../../assets/homePage/pin-filled.svg';
+import pinOffIcon from '@/assets/homePage/pin-outline.svg';
+import pinOnIcon from '@/assets/homePage/pin-filled.svg';
 
 export interface Letter {
   id: number;
