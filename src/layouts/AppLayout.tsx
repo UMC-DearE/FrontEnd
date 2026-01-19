@@ -20,7 +20,7 @@ export function AppLayout() {
         {Header && <Header title={matched?.title} />}
       </Suspense>
 
-      <main className="px-4 py-4 pb-[95px]">
+      <main className={`px-4 py-4 ${!hideBottomNav ? "pb-[95px]" : ""}`}>
         <Outlet />
       </main>
 

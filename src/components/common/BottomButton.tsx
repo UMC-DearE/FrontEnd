@@ -13,16 +13,17 @@ export function BottomButton({
 
   return (
     <button
-      disabled={disabled}
-      onClick={onClick}
-      style={{ boxShadow }}
-      className={`
-        w-[361px] h-[50px] rounded-xl font-bold text-white transition-colors text-base
-        ${disabled ? "bg-[#E6E7E9] text-white" : "bg-[#FF5F2F] text-white cursor-pointer"}
-      `}
-    >
-      {children}
-    </button>
-  );
+    type="button"
+    disabled={disabled}
+    onClick={onClick}
+    style={{ boxShadow }}
+    className={`
+      w-[361px] h-[50px] rounded-xl font-bold text-white transition-colors text-base
+      ${disabled ? "bg-[#E6E7E9] text-white" : "bg-[#FF5F2F] text-white cursor-pointer"}
+    `}
+  >
+    {children}
+  </button>
+);
 }
 
