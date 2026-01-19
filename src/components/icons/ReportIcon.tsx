@@ -1,5 +1,5 @@
-import reportOutline from '../../assets/bottomNav/report-outline.svg';
-import reportFilled from '../../assets/bottomNav/report-filled.svg';
+import reportOutline from '@/assets/bottomNav/report-outline.svg';
+import reportFilled from '@/assets/bottomNav/report-filled.svg';
 
 export default function ReportIcon({ active = false, className }: { active?: boolean; className?: string }) {
   const src = active ? reportFilled : reportOutline;

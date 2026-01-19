@@ -1,37 +1,92 @@
 import { createBrowserRouter } from "react-router-dom";
-import { BaseLayout } from "../layouts/BaseLayout";
-import { AppLayout } from "../layouts/AppLayout";
 
-import HomePage from "../pages/HomePage";
-import LetterPage from "../pages/LetterPage";
-import ReportPage from "../pages/ReportPage";
-import MyPage from "../pages/MyPage";
-import SignupPage from "../pages/SignupPage";
+import { BaseLayout } from "@/layouts/BaseLayout";
+import { AppLayout } from "@/layouts/AppLayout";
+import NotFoundPage from "@/pages/NotFoundPage";
 import ProtectedRoute from "./ProtectedRoute";
-import NotFoundPage from "../pages/NotFoundPage";
+
+import LoginPage from "@/pages/onboarding/LoginPage";
+import SplashPage from "@/pages/onboarding/SplashPage";
+
+import TermsPage from "@/pages/setup/TermsPage";
+import SetNamePage from "@/pages/setup/SetNamePage";
+
+import HomePage from "@/pages/HomePage";
+
+import LetterCreatePage from "@/pages/create/LetterCreatePage";
+import CreateDetailPage from "@/pages/create/CreateDetailPage";
+import SetFromPage from "@/pages/create/SetFromPage";
+
+import LetterBoxPage from "@/pages/letter/LetterBoxPage";
+import LetterDetailPage from "@/pages/letter/LetterDetailPage";
+
+import ReportPage from "@/pages/report/ReportPage";
+
+import MyHomePage from "@/pages/my/MyhomePage";
+import ProfilePage from "@/pages/my/ProfilePage";
+import AccountPage from "@/pages/my/AccountPage";
+import FromPage from "@/pages/my/FromPage";
+import StylePage from "@/pages/my/StylePage";
+import ThemePage from "@/pages/my/ThemePage";
+import MyTermsPage from "@/pages/my/TermsPage";
+import PrivacyPage from "@/pages/my/PrivacyPage";
 
 const router = createBrowserRouter([
   {
     element: <BaseLayout />,
     errorElement: <NotFoundPage />,
-    children: [
+    children: [ /* 헤더 따로 */
+      { path: "login", element: <LoginPage /> },
+      { path: "splash", element: <SplashPage /> },
+
       {
-        path: "/signup",
-        element: <SignupPage />,
-      },
-      {
-        element: <AppLayout />,
+        element: <ProtectedRoute />,
         children: [
           {
-            element: <ProtectedRoute />,
+            element: <AppLayout />,
             children: [
               {
-                index: true,
-                element: <HomePage />,
+                path: "setup",
+                children: [
+                  { path: "terms", element: <TermsPage /> },
+                  { path: "setname", element: <SetNamePage /> },
+                ],
               },
-              { path: "/letter", element: <LetterPage /> },
-              { path: "/report", element: <ReportPage /> },
-              { path: "/my", element: <MyPage /> },
+
+              { index: true, element: <HomePage /> },
+
+              {
+                path: "create",
+                children: [
+                  { index: true, element: <LetterCreatePage /> },
+                  { path: "detail", element: <CreateDetailPage /> },
+                  { path: "from", element: <SetFromPage /> },
+                ],
+              },
+
+              {
+                path: "letter",
+                children: [
+                  { index: true, element: <LetterBoxPage /> },
+                  { path: ":id", element: <LetterDetailPage /> },
+                ],
+              },
+
+              { path: "report", element: <ReportPage /> },
+
+              {
+                path: "my",
+                children: [
+                  { index: true, element: <MyHomePage /> },
+                  { path: "profile", element: <ProfilePage /> },
+                  { path: "account", element: <AccountPage /> },
+                  { path: "from", element: <FromPage /> },
+                  { path: "style", element: <StylePage /> },
+                  { path: "theme", element: <ThemePage /> },
+                  { path: "terms", element: <MyTermsPage /> },
+                  { path: "privacy", element: <PrivacyPage /> },
+                ],
+              },
             ],
           },
         ],
@@ -41,3 +96,4 @@ const router = createBrowserRouter([
 ]);
 
 export default router;
+

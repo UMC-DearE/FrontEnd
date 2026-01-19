@@ -1,5 +1,5 @@
-import stickerIcon from '../../assets/homePage/stickerIcon.svg';
-import bgIcon from '../../assets/homePage/bgIcon.svg';
+import stickerIcon from '@/assets/homePage/stickerIcon.svg';
+import bgIcon from '@/assets/homePage/bgIcon.svg';
 
 interface ProfileCustomSheetProps {
   open: boolean;
