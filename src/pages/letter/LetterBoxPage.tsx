@@ -1,3 +1,5 @@
+// 편지함 페이지
+
 import { useMemo, useState } from 'react';
 import FolderList from '@/components/letterBox/FolderList';
 import FolderSettingSheet from '@/components/letterBox/FolderSettingSheet';

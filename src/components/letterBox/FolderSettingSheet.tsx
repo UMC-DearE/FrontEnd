@@ -1,3 +1,5 @@
+// 편지함 폴더 설정 모달
+
 interface FolderSettingSheetProps {
   open: boolean;
   onClose: () => void;

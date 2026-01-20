@@ -1,3 +1,5 @@
+// 편지함 폴더 리스트
+
 import likeIcon from '@/assets/letterFolder/likeIcon.svg';
 import plusIcon from '@/assets/letterFolder/plusIcon.svg';
 import folderSetIcon from '@/assets/letterFolder/folderSetIcon.svg';

@@ -1,3 +1,4 @@
+// 검색창
 import { useState } from 'react';
 
 export default function SearchBar({ onClose }: { onClose: () => void }) {

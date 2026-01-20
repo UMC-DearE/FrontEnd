@@ -4,7 +4,7 @@ import { useState } from 'react';
 import TopSection from './TopSection';
 import type { JSX } from 'react';
 import SearchButton from '@/components/common/header/SearchButton';
-import SearchBar from '../letterBox/SearchBar';
+import SearchBar from '@/components/letterBox/SearchBar';
 
 export default function LetterBoxHeader({ title }: { title?: string }): JSX.Element {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -13,11 +13,19 @@ export default function LetterBoxHeader({ title }: { title?: string }): JSX.Elem
     <div className="relative">
       <TopSection
         left={
-          <div className="flex items-center text-xl font-semibold leading-none text-primary">
-            {title}
-          </div>
+          isSearchOpen ? null : (
+            <h1 className="flex items-center text-xl font-semibold leading-none text-primary">
+              {title}
+            </h1>
+          )
         }
-        right={<SearchButton />}
+        right={
+          isSearchOpen ? null : (
+            <div onClick={() => setIsSearchOpen(true)}>
+              <SearchButton />
+            </div>
+          )
+        }
       />
 
       {isSearchOpen && (

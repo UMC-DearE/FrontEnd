@@ -1,3 +1,5 @@
+// 편지함 폴더 모달 (새 폴더, 폴더 수정)
+
 import { useState, type ChangeEvent } from 'react';
 import resetIcon from '@/assets/letterFolder/resetIcon.svg';
 
