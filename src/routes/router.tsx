@@ -9,7 +9,7 @@ import LoginPage from "@/pages/onboarding/LoginPage";
 import SplashPage from "@/pages/onboarding/SplashPage";
 
 import TermsPage from "@/pages/setup/TermsPage";
-import SetNamePage from "@/pages/setup/SetNamePage";
+import SetNickamePage from "@/pages/setup/SetNicknamePage";
 
 import HomePage from "@/pages/HomePage";
 
@@ -49,7 +49,7 @@ const router = createBrowserRouter([
                 path: "setup",
                 children: [
                   { path: "terms", element: <TermsPage /> },
-                  { path: "setname", element: <SetNamePage /> },
+                  { path: "setnickname", element: <SetNickamePage /> },
                 ],
               },
 

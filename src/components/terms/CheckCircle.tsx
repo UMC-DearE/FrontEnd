@@ -1,4 +1,3 @@
-import React from "react";
 import checkOn from "@/assets/terms/check_on.svg";
 import checkOff from "@/assets/terms/check_off.svg";
 
