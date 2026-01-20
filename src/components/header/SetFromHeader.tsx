@@ -13,7 +13,7 @@ export default function SetFromHeader() {
           <div className="flex items-center space-x-2">
             <button
               type="button"
-              className="text-base font-regular text-[#555557]"
+              className="text-base font-normal text-[#555557]"
               aria-label="관리"
             >
               관리
