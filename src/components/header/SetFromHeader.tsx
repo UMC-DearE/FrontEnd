@@ -1,3 +1,5 @@
+// 편지 추가 - 프롬 선택 페이지 헤더
+
 import TopSection from "@/components/header/TopSection";
 import BackButton from "../common/header/BackButton";
 
@@ -6,7 +8,7 @@ export default function SetFromHeader() {
     <>
       <TopSection
         left={<BackButton />}
-        center={<h1 className="text-lg font-semibold">From 선택</h1>}
+        center={<div className="text-lg font-semibold">From 선택</div>}
         right={
           <div className="flex items-center space-x-2">
             <button

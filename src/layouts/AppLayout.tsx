@@ -15,21 +15,28 @@ export function AppLayout() {
     matched?.bg === "white" ? "bg-white" : "bg-[#F8F8F8]";
 
   return (
-    <div className={`min-h-screen ${bgClass}`}>
-      <Suspense fallback={null}>
-        {Header && <Header title={matched?.title} />}
-      </Suspense>
+    <div className={`h-screen flex flex-col ${bgClass}`}>
+      {Header && (
+        <div className="shrink-0">
+          <Header title={matched?.title} />
+        </div>
+      )}
 
-      <main className={`px-4 py-4 ${!hideBottomNav ? "pb-[95px]" : ""}`}>
-        <Outlet />
+      <main
+        className={`
+          flex-1 overflow-y-auto px-4 py-4
+          ${!hideBottomNav ? "pb-[95px]" : ""}
+        `}
+      >
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
       </main>
-
+      
       {!hideBottomNav && <BottomNav />}
     </div>
   );
 }
-
-
 
 
 

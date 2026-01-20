@@ -10,9 +10,9 @@ export default function RightButtonHeader({
   return (
     <TopSection
       center={
-        <h1 className="flex items-center text-lg font-semibold leading-none text-black">
+        <div className="flex items-center text-lg font-semibold leading-none text-primary">
           {title}
-        </h1>
+        </div>
       }
       right={<CloseButton />}
     />
