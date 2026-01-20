@@ -17,9 +17,11 @@ export function AppLayout() {
   return (
     <div className={`h-screen flex flex-col ${bgClass}`}>
       {Header && (
-        <div className="shrink-0">
-          <Header title={matched?.title} />
-        </div>
+        <Suspense fallback={null}>
+          <div className="shrink-0">
+            <Header title={matched?.title} />
+          </div>
+        </Suspense>
       )}
 
       <main
@@ -28,15 +30,14 @@ export function AppLayout() {
           ${!hideBottomNav ? "pb-[95px]" : ""}
         `}
       >
-        <Suspense fallback={null}>
-          <Outlet />
-        </Suspense>
+        <Outlet />
       </main>
       
       {!hideBottomNav && <BottomNav />}
     </div>
   );
 }
+
 
 
 

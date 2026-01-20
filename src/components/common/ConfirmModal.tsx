@@ -39,7 +39,7 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onCancel}
-                className="h-[38px] w-[122px] rounded-[8px] border border-[#E6E7E9] text-[14px] font-regular text-primary"
+                className="h-[38px] w-[122px] rounded-[8px] border border-[#E6E7E9] text-[14px] font-normal text-primary"
               >
                 {cancelText}
               </button>

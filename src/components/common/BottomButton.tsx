@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 interface BottomButtonProps {
   disabled?: boolean;
   onClick?: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function BottomButton({
@@ -28,4 +30,5 @@ export function BottomButton({
     </button>
   );
 }
+
 
