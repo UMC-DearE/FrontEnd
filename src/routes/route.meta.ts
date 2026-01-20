@@ -28,7 +28,7 @@ export const ROUTE_META: Array<{
     bg: "white",
   },
   {
-    match: (pathname) => pathname === "/setup/setname",
+    match: (pathname) => pathname === "/setup/setnickname",
     header: "BACK_TITLE",
     title: "회원 가입",
     bg: "white",
