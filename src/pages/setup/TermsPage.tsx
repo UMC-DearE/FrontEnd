@@ -49,15 +49,14 @@ export default function TermsPage() {
 
   const onNext = () => {
     if (!canProceed) return;
-    navigate("/setup/setname");
+    navigate("/setup/setnickname");
   };
 
 
   return (
-    <div className="relative min-h-[calc(100vh-var(--header-height))] px-[13px] pt-[4px]">
-      {/* 전체 동의 */}
+    <div>
       <div
-        className="flex items-center gap-3 py-[13px] cursor-pointer"
+        className="flex items-center gap-3 pt-[19px] pb-[15px] px-[13px] cursor-pointer"
         onClick={toggleAll}
       >
         <CheckCircle
@@ -74,21 +73,20 @@ export default function TermsPage() {
 
       <div className="h-px bg-[#E6E7E9]" />
 
-      {/* 약관 목록 */}
-      {TERMS_ITEMS.map((item) => (
-        <div key={item.key}>
+      <div className="mt-[10px]">
+        {TERMS_ITEMS.map((item) => (
           <TermsRow
+            key={item.key}
             checked={terms[item.key]}
             onToggle={() => toggleOne(item.key)}
             title={item.title}
             required={item.required}
             onView={() => {}}
           />
-        </div>
-      ))}
+        ))}
+      </div>
 
-      {/* 하단 버튼 */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white px-4 pb-[36px] pt-3 flex justify-center">
+      <div className="fixed bottom-0 left-1/2 w-full max-w-[393px] -translate-x-1/2 bg-white px-4 pb-[52px] pt-3">
         <BottomButton disabled={!canProceed} onClick={onNext}>
           다음
         </BottomButton>

@@ -14,7 +14,7 @@ export default function TermsRow({
   onView: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between py-[13px] px-[3px]">
+    <div className="flex items-center justify-between py-[13px] px-[16px]">
       <div className="flex items-center gap-3 min-w-0">
         <CheckCircle checked={checked} onClick={onToggle} ariaLabel={title} />
 
