@@ -21,7 +21,7 @@ export function getHarmoniousTextColor(bgHex: string): string {
 
   let h = 0;
   let s = 0;
-  let l = (cmax + cmin) / 2;
+  const l = (cmax + cmin) / 2;
 
   if (delta !== 0) {
     s = delta / (1 - Math.abs(2 * l - 1));
