@@ -4,6 +4,7 @@ interface ConfirmModalProps {
   description?: string;
   cancelText?: string;
   confirmText?: string;
+  titleClassName?: string;
   onCancel: () => void;
   onConfirm: () => void;
 }
@@ -25,13 +26,9 @@ export default function ConfirmModal({
         <div className="h-[151px] w-[294px] rounded-[17px] bg-white px-[18px] pt-[26px] pb-[20px]">
           <div className="flex flex-col gap-[20px]">
             <div className="flex flex-col items-center gap-[8px]">
-              <p className="text-center text-[16px] font-semibold text-primary">
-                {title}
-              </p>
+              <p className="text-center text-[16px] font-semibold text-primary">{title}</p>
               {description ? (
-                <p className="text-center text-[12px] font-medium text-[#9D9D9F]">
-                  {description}
-                </p>
+                <p className="text-center text-[12px] font-medium text-[#9D9D9F]">{description}</p>
               ) : null}
             </div>
 

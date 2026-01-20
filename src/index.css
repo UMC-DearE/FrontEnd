@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --header-height: 105px;
@@ -6,9 +6,9 @@
   --color-primary: #141517;
   --color-secondary: #555557;
 
-  --color-orange-point: #FF5F2F;
-  --color-red: #FF1D0D;
-  --color-white: #FFFFFF;
+  --color-orange-point: #ff5f2f;
+  --color-red: #ff1d0d;
+  --color-white: #ffffff;
 }
 
 @font-face {
@@ -52,4 +52,14 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+}
+
+/* 편지함 폴더 스크롤 바 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
