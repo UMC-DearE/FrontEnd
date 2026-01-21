@@ -10,7 +10,7 @@ export function AppLayout() {
   const matched = ROUTE_META.find((r) => r.match(pathname));
   const Header = matched ? HEADER_REGISTRY[matched.header] : null;
 
-  const hideBottomNav = pathname.startsWith("/setup");
+  const hideBottomNav = pathname.startsWith("/setup") || pathname.startsWith("/create");
   const bgClass =
     matched?.bg === "white" ? "bg-white" : "bg-[#F8F8F8]";
 
