@@ -13,7 +13,7 @@ export default function ConfirmModal({
   title,
   description,
   cancelText = '취소',
-  confirmText = '확인',
+  confirmText = '해제',
   onCancel,
   onConfirm,
 }: ConfirmModalProps) {
@@ -25,11 +25,11 @@ export default function ConfirmModal({
         <div className="h-[151px] w-[294px] rounded-[17px] bg-white px-[18px] pt-[26px] pb-[20px]">
           <div className="flex flex-col gap-[20px]">
             <div className="flex flex-col items-center gap-[8px]">
-              <p className="w-[257.44px] text-center text-[16px] font-semibold text-black">
+              <p className="text-center text-[16px] font-semibold text-primary">
                 {title}
               </p>
               {description ? (
-                <p className="w-[257.44px] text-center text-[13px] font-medium text-[#9D9D9F]">
+                <p className="text-center text-[12px] font-medium text-[#9D9D9F]">
                   {description}
                 </p>
               ) : null}
@@ -39,7 +39,7 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onCancel}
-                className="h-[38px] w-[122px] rounded-[8px] border border-[#E5E5E5] text-[14px] font-medium text-[#555557]"
+                className="h-[38px] w-[122px] rounded-[8px] border border-[#E6E7E9] text-[14px] font-normal text-primary"
               >
                 {cancelText}
               </button>
@@ -47,7 +47,7 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onConfirm}
-                className="h-[38px] w-[122px] rounded-[8px] bg-[#111111] text-[14px] font-semibold text-white"
+                className="h-[38px] w-[122px] rounded-[8px] bg-primary text-[14px] font-medium text-white"
               >
                 {confirmText}
               </button>

@@ -20,6 +20,12 @@ const SetFromHeader = lazy(
 const LetterBoxHeader = lazy(
   () => import("@/components/header/LetterBoxHeader")
 );
+const MyFromHeader = lazy(
+  () => import("@/components/header/MyFromHeader")
+);
+const MyStyleHeader = lazy(
+  () => import("@/components/header/MyStyleHeader")
+);
 
 export type HeaderRenderContext = {
   title?: string;
@@ -42,7 +48,9 @@ export const HEADER_REGISTRY: Record<
   CREATE_DETAIL: () => <CreateDetailHeader />,
   SET_FROM: () => <SetFromHeader />,
   LETTER_BOX: ({ title }) => <LetterBoxHeader title={title} />,
-
+  MY_FROM: () => <MyFromHeader />,
+  MY_STYLE: () => <MyStyleHeader />,
+  
   NONE: null,
 };
 
