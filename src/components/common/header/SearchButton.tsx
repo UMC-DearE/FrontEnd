@@ -12,7 +12,7 @@ export default function SearchButton({ className = "", onClick }: Props) {
       type="button"
       aria-label="검색"
       onClick={onClick}
-      className={`w-6 h-6 p-0 rounded-md flex items-center justify-center cursor-pointer ${className}`}
+      className={`rounded-md flex items-center justify-center cursor-pointer ${className}`}
     >
       <img src={searchIcon} alt="검색" className="w-5 h-5" />
     </button>

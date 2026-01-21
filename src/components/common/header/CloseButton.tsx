@@ -12,7 +12,7 @@ export default function CloseButton() {
       className="
         w-12.1 h-12.1
         flex items-center justify-center
-        text-gray-900
+        text-primary
       "
     >
       <CloseIcon />

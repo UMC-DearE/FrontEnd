@@ -1,0 +1,21 @@
+interface PremiumBadgeProps {
+  label?: string;
+}
+
+export function PremiumBadge({ label = "UPGRADE" }: PremiumBadgeProps) {
+  return (
+    <span
+      className="
+        inline-flex items-center justify-center
+        h-[18px]
+        px-[7px] py-[3px]
+        rounded-[4px]
+        text-[10px] font-semibold text-white
+        bg-gradient-to-r from-[#5B53F1] to-[#FB49A6]
+      "
+    >
+      {label}
+    </span>
+  );
+}
+

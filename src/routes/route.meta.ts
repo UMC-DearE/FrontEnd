@@ -5,7 +5,9 @@ export type HeaderPresetKey =
   | "RIGHT_BUTTON"
   | "NONE"
   | "SET_FROM"
-  | "LETTER_BOX";
+  | "LETTER_BOX"
+  | "MY_FROM"
+  | "MY_STYLE";
 
 export const ROUTE_META: Array<{
   match: (pathname: string) => boolean;
@@ -87,17 +89,52 @@ export const ROUTE_META: Array<{
     bg: "gray",
   },
 
-    // 마이
+    // 마이 - 따로 만들어야 함
   {
     match: (pathname) => pathname === "/my",
     header: "LEFT_ONLY",
     title: "MY",
     bg: "gray",
   },
-
+    // 마이 - 프로필 수정
   {
-    match: (pathname) => pathname.startsWith("/my/"),
-    header: "LEFT_ONLY",
+    match: (pathname) => pathname === "/my/profile",
+    header: "BACK_TITLE",
+    title: "프로필 수정",
+    bg: "white",
+  },
+    // 마이 - 계정 관리
+  {
+    match: (pathname) => pathname === "/my/account",
+    header: "BACK_TITLE",
+    title: "계정 관리",
+    bg: "white",
+  },
+    // 마이 - 프롬 관리
+  {
+    match: (pathname) => pathname === "/my/from",
+    header: "MY_FROM",
+    title: "FROM 관리",
+    bg: "white",
+  },
+    // 마이 - 프롬 생성
+    {
+    match: (pathname) => pathname === "/my/from/create",
+    header: "RIGHT_BUTTON",
+    title: "FROM 생성",
+    bg: "white",
+  },
+    // 마이 - 프롬 수정
+    {
+    match: (pathname) => pathname === "/my/from/edit",
+    header: "BACK_TITLE",
+    title: "FROM 수정",
+    bg: "white",
+  },
+    // 마이 - 스타일
+  {
+    match: (pathname) => pathname === "/my/style",
+    header: "MY_STYLE",
     bg: "white",
   },
 ];

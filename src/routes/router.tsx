@@ -26,6 +26,8 @@ import MyHomePage from "@/pages/my/MyhomePage";
 import ProfilePage from "@/pages/my/ProfilePage";
 import AccountPage from "@/pages/my/AccountPage";
 import FromPage from "@/pages/my/FromPage";
+import FromCreatePage from "@/pages/my/FromCreatePage";
+import FromEditPage from "@/pages/my/FromEditPage";
 import StylePage from "@/pages/my/StylePage";
 import ThemePage from "@/pages/my/ThemePage";
 import MyTermsPage from "@/pages/my/TermsPage";
@@ -80,7 +82,14 @@ const router = createBrowserRouter([
                   { index: true, element: <MyHomePage /> },
                   { path: "profile", element: <ProfilePage /> },
                   { path: "account", element: <AccountPage /> },
-                  { path: "from", element: <FromPage /> },
+                  {
+                    path: "from",
+                    children: [
+                      { index: true, element: <FromPage /> },
+                      { path: "create", element: <FromCreatePage /> },
+                      { path: ":id/edit", element: <FromEditPage /> },
+                    ],
+                  },
                   { path: "style", element: <StylePage /> },
                   { path: "theme", element: <ThemePage /> },
                   { path: "terms", element: <MyTermsPage /> },
