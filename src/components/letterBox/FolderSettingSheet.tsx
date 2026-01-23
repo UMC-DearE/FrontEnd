@@ -4,7 +4,6 @@ interface FolderSettingSheetProps {
   open: boolean;
   onClose: () => void;
   onSelect: (type: 'editFolder' | 'deleteFolder') => void;
-  onComplete?: () => void;
 }
 
 export default function FolderSettingSheet({ open, onClose, onSelect }: FolderSettingSheetProps) {

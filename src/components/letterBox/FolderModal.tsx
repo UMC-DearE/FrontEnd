@@ -1,14 +1,18 @@
-// 편지함 폴더 모달 (새 폴더, 폴더 수정)
+// 편지함 폴더 모달
 
 import { useState, type ChangeEvent } from 'react';
-import resetIcon from '@/assets/letterFolder/resetIcon.svg';
+import resetIcon from '@/assets/letterPage/resetIcon.svg';
 
 interface FolderModalProps {
   title?: string;
   initialName?: string;
   initialImageUrl?: string | null;
   onCancel: () => void;
-  onConfirm: (data: { name: string; image: File | null }) => void;
+  onConfirm: (data: {
+    folder_name: string;
+    image_id: number | null;
+    previewUrl: string | null;
+  }) => void;
 }
 
 export default function FolderModal({
@@ -20,25 +24,30 @@ export default function FolderModal({
 }: FolderModalProps) {
   const [folderName, setFolderName] = useState(initialName);
   const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageId, setImageId] = useState<number | null>(null);
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setImageFile(file);
     setImageUrl(URL.createObjectURL(file));
+    setImageId(116);
     e.target.value = '';
   };
 
   const handleImageDelete = () => {
     setImageUrl(null);
-    setImageFile(null);
+    setImageId(null);
   };
 
   const handleConfirm = () => {
     if (!folderName.trim()) return;
-    onConfirm({ name: folderName.trim(), image: imageFile });
+
+    onConfirm({
+      folder_name: folderName.trim(),
+      image_id: imageId,
+      previewUrl: imageUrl,
+    });
   };
 
   const isFormValid = folderName.trim().length > 0;
@@ -100,7 +109,6 @@ export default function FolderModal({
                 value={folderName}
                 onChange={(e) => setFolderName(e.target.value)}
                 maxLength={6}
-                style={{ caretColor: 'transparent' }}
                 className="h-12 w-[258px] rounded-[9px] bg-[#F4F5F6] px-3 text-center text-[15px] outline-none"
               />
             </div>

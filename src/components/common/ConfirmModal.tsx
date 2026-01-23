@@ -14,7 +14,8 @@ export default function ConfirmModal({
   title,
   description,
   cancelText = '취소',
-  confirmText = '해제',
+  confirmText = '확인',
+  titleClassName,
   onCancel,
   onConfirm,
 }: ConfirmModalProps) {
@@ -24,11 +25,19 @@ export default function ConfirmModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="relative flex w-[393px] min-h-screen items-center justify-center bg-[#B0B0B0]">
         <div className="h-[151px] w-[294px] rounded-[17px] bg-white px-[18px] pt-[26px] pb-[20px]">
-          <div className="flex flex-col gap-[20px]">
-            <div className="flex flex-col items-center gap-[8px]">
-              <p className="text-center text-[16px] font-semibold text-primary">{title}</p>
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-col items-center gap-2">
+              <p
+                className={`w-[257.44px] text-center text-[16px] font-semibold ${
+                  titleClassName ?? 'text-black'
+                }`}
+              >
+                {title}
+              </p>
               {description ? (
-                <p className="text-center text-[12px] font-medium text-[#9D9D9F]">{description}</p>
+                <p className="w-[257.44px] text-center text-[13px] font-medium text-[#9D9D9F] cursor-pointer">
+                  {description}
+                </p>
               ) : null}
             </div>
 
@@ -36,7 +45,7 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onCancel}
-                className="h-[38px] w-[122px] rounded-[8px] border border-[#E6E7E9] text-[14px] font-normal text-primary"
+                className="h-[38px] w-[122px] rounded-lg border border-[#E5E5E5] text-[14px] font-medium text-[#555557]"
               >
                 {cancelText}
               </button>
@@ -44,7 +53,7 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onConfirm}
-                className="h-[38px] w-[122px] rounded-[8px] bg-primary text-[14px] font-medium text-white"
+                className="h-[38px] w-[122px] rounded-lg bg-[#111111] text-[14px] font-semibold text-white cursor-pointer"
               >
                 {confirmText}
               </button>
