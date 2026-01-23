@@ -1,7 +1,7 @@
 // 편지함 편지 카드 뷰 모드 설정
 
-import LetterCardDefault from '../LetterCardDefault';
-import LetterCardCompact from '../LetterCardCompact';
+import LetterCardDefault from './LetterCardDefault';
+import LetterCardCompact from './LetterCardCompact';
 
 export type ViewMode = '기본 보기' | '간편 보기' | '앨범 보기';
 
