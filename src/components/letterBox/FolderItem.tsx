@@ -1,3 +1,5 @@
+// 편지함 폴더
+
 import folderSetIcon from '@/assets/letterPage/folderSetIcon.svg';
 import defaultFolderImage from '@/assets/letterPage/default-folder.svg';
 import type { FolderType } from '@/types/folder';

@@ -1,3 +1,5 @@
+// 편지함 드롭다운
+
 import { useEffect } from 'react';
 
 const options = ['기본 보기', '간편 보기', '앨범 보기'] as const;

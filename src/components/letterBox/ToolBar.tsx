@@ -1,3 +1,5 @@
+// 편지함 툴바
+
 import { useMemo, useState } from 'react';
 import fromIcon from '@/assets/letterPage/fromIcon.svg';
 import dropdownIcon from '@/assets/letterPage/dropDownIcon.svg';

@@ -1,3 +1,5 @@
+// 편지함 편지 카드 기본 보기
+
 import heartOutlineIcon from '@/assets/letterPage/heart-outline.svg';
 import heartFillIcon from '@/assets/letterPage/heart-filled.svg';
 import { useEffect, useRef, useState } from 'react';

@@ -1,3 +1,5 @@
+// 편지함 편지 카드 뷰 모드 설정
+
 import LetterCardDefault from './LetterCardDefault';
 import LetterCardCompact from './LetterCardCompact';
 

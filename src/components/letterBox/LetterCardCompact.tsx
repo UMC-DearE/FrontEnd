@@ -1,3 +1,5 @@
+// 편지함 편지 카드 간편 보기
+
 import roundIcon from '@/assets/letterPage/roundIcon.svg';
 
 type LetterCardCompactProps = {
