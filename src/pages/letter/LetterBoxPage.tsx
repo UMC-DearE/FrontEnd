@@ -1,14 +1,14 @@
 // 편지함 페이지
 
 import { useMemo, useState, useEffect } from 'react';
-import FolderList from '@/components/letterBox/FolderList';
+import FolderList from '@/components/letterBox/letterFolder/FolderList';
 import FolderSettingSheet from '@/components/letterBox/FolderSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import FolderModal from '@/components/letterBox/FolderModal';
 import type { FolderType } from '@/types/folder';
 import type { Letter } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
-import LetterCard from '@/components/letterBox/LetterCard';
+import LetterCard from '@/components/letterBox/letterCard/LetterCard';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기' | '앨범 보기';
