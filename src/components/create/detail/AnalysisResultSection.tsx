@@ -6,19 +6,24 @@ import { useState } from "react";
 interface Props {
   content: string;
   aiResult: AiAnalyzeResult;
+  recipient?: string;
+  onSelectRecipient?: () => void;
   onNext?: () => void;
 }
 
 export default function AnalysisResultSection({
   content,
   aiResult,
+  recipient = "",
+  onSelectRecipient,
   onNext,
 }: Props) {
-  const [recipient, setRecipient] = useState("");
   const [date, setDate] = useState("");
   const [unknownDate, setUnknownDate] = useState(false);
 
-  const canProceed = recipient.trim().length > 0 && (unknownDate || date.trim().length > 0);
+  const recipientText = (recipient ?? "").toString();
+  const hasRecipient = recipientText.trim().length > 0;
+  const canProceed = hasRecipient && (unknownDate || date.trim().length > 0); // trim 문제 해결
 
   return (
     <div className="flex flex-col h-full pt-2">
@@ -29,13 +34,20 @@ export default function AnalysisResultSection({
       <div className="mb-6">
         <p className="text-base font-semibold text-primary mb-2">누구에게 받은 편지인가요?</p>
         <div className="relative">
-          <input
-            value={recipient}
-            onChange={(e) => setRecipient(e.target.value)}
-            placeholder="이름을 생성하거나 선택하세요"
-            className="w-full h-[45px] border border-[#E6E7E9] rounded-xl px-4 text-sm font-medium outline-none"
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#C7C7CC]">▼</span>
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => onSelectRecipient?.()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") onSelectRecipient?.();
+            }}
+            className="w-full h-[45px] border border-[#E6E7E9] rounded-xl px-4 text-sm font-medium outline-none flex items-center justify-between cursor-pointer"
+          >
+            <span className={`${hasRecipient ? "px-[11px] py-[4px] bg-[#FEEFEF] rounded-lg text-primary text-sm font-medium" : "text-[#C7C7CC]"}`}>
+              {recipientText || "이름을 생성하거나 선택하세요"}
+            </span>
+            <span className="text-[#C7C7CC]">▼</span>
+          </div>
         </div>
       </div>
 
