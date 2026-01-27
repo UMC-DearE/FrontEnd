@@ -7,6 +7,7 @@ import { PremiumBadge } from "@/components/common/PremiumBadge";
 import MenuItem from "@/components/my/MenuItem";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon";
 import ProfilePlaceholderIcon from "@/components/icons/ProfilePlaceholderIcon";
+import ConfirmModal from "@/components/common/ConfirmModal";
 
 function MyProfileSection({ isPlus }: { isPlus: boolean }) {
   const navigate = useNavigate();
@@ -54,7 +55,17 @@ function MyProfileSection({ isPlus }: { isPlus: boolean }) {
 export default function MyhomePage() {
   const [isPlus, setIsPlus] = useState(false);
   const [isPlusModalOpen, setIsPlusModalOpen] = useState(false);
+  const [openLogoutModal, setOpenLogoutModal] = useState(false);
+
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+  
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+
+  navigate("/login", { replace: true });
+  };
 
   return (
     <>
@@ -83,7 +94,10 @@ export default function MyhomePage() {
 
         <MenuItem label="계정 관리" onClick={() => navigate("/my/account")}/>
         <MenuItem label="From 관리"/>
-        <button className="w-full px-[22px] pt-[18px] pb-[17px] flex justify-between items-center border-b border-[#E6E7E9]">
+        <button
+        type="button"
+        onClick={() => setOpenLogoutModal(true)}
+        className="w-full px-[22px] pt-[18px] pb-[17px] flex justify-between items-center border-b border-[#E6E7E9]">
           <span className="font-medium text-[16px]">로그아웃</span>
         </button>
 
@@ -128,6 +142,16 @@ export default function MyhomePage() {
           setIsPlusModalOpen(false);
         }}
       />
+
+      <ConfirmModal
+        open={openLogoutModal}
+        title="로그아웃 할까요?"
+        cancelText="취소"
+        confirmText="해제"
+        onCancel={() => setOpenLogoutModal(false)}
+        onConfirm={handleLogout}
+      />
+
     </>
   );
 }
