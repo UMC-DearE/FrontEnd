@@ -35,7 +35,7 @@ export default function ConfirmModal({
                 {title}
               </p>
               {description ? (
-                <p className="w-[257.44px] text-center text-[13px] font-medium text-[#9D9D9F] cursor-pointer">
+                <p className="w-[257.44px] text-center text-[12px] font-medium text-[#9D9D9F] cursor-pointer">
                   {description}
                 </p>
               ) : null}
@@ -45,7 +45,7 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onCancel}
-                className="h-[38px] w-[122px] rounded-lg border border-[#E5E5E5] text-[14px] font-medium text-[#555557]"
+                className="h-[38px] w-[122px] rounded-lg border border-[#E5E5E5] text-[14px] font-normal text-[#555557]"
               >
                 {cancelText}
               </button>
@@ -53,7 +53,7 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onConfirm}
-                className="h-[38px] w-[122px] rounded-lg bg-[#111111] text-[14px] font-semibold text-white cursor-pointer"
+                className="h-[38px] w-[122px] rounded-lg bg-[#111111] text-[14px] font-medium text-white cursor-pointer"
               >
                 {confirmText}
               </button>

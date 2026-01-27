@@ -1,5 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import closebtn from "@/assets/create/closebtn.svg";
 
 interface Props {
   id: string;
@@ -35,19 +36,16 @@ export default function ImagePreviewItem({
       style={style}
       {...attributes}
       {...listeners}
-      className="relative shrink-0 cursor-grab active:cursor-grabbing"
+      className="relative shrink-0 cursor-grab active:cursor-grabbing rounded-sm overflow-hidden"
     >
-      <img
-        src={url}
-        alt=""
-        className="w-[70px] h-[70px] object-cover rounded-sm"
-      />
+      <img src={url} alt="이미지 미리보기" className="w-[70px] h-[70px] object-cover" />
 
       <button
         onClick={onDelete}
-        className="absolute top-1 right-1 w-4 h-4 bg-[#6C6C6C] text-white rounded-full text-xs"
+        aria-label="이미지 삭제"
+        className="absolute top-1 right-1 w-4 h-4 bg-black/60 flex items-center justify-center text-white rounded-full"
       >
-        ×
+        <img src={closebtn} alt="삭제" className="w-2 h-2" />
       </button>
     </div>
   );

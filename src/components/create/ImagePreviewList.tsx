@@ -14,6 +14,7 @@ import {
 import { useRef } from "react";
 
 import ImagePreviewItem from "./ImagePreviewItem";
+import uploadImage from "@/assets/create/image-upload.svg";
 
 interface Props {
   images: File[];
@@ -22,12 +23,6 @@ interface Props {
 
 export default function ImagePreviewList({ images, setImages }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  // drag-to-scroll state
-  const isDownRef = useRef(false);
-  const startXRef = useRef(0);
-  const startScrollRef = useRef(0);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -88,42 +83,7 @@ export default function ImagePreviewList({ images, setImages }: Props) {
           items={images.map((_, i) => i.toString())}
           strategy={horizontalListSortingStrategy}
         >
-          <div
-            ref={containerRef}
-            className="flex gap-2 mt-5 overflow-hidden"
-            onPointerDown={(e) => {
-              const el = containerRef.current;
-              if (!el) return;
-              isDownRef.current = true;
-              startXRef.current = e.clientX;
-              startScrollRef.current = el.scrollLeft;
-              (e.target as Element).setPointerCapture?.(e.pointerId);
-            }}
-            onPointerMove={(e) => {
-              const el = containerRef.current;
-              if (!el) return;
-              if (!isDownRef.current) return;
-              const dx = e.clientX - startXRef.current;
-              el.scrollLeft = startScrollRef.current - dx;
-            }}
-            onPointerUp={(e) => {
-              isDownRef.current = false;
-              try {
-                (e.target as Element).releasePointerCapture?.(e.pointerId);
-              } catch {}
-            }}
-            onPointerCancel={() => {
-              isDownRef.current = false;
-            }}
-            onWheel={(e) => {
-              const el = containerRef.current;
-              if (!el) return;
-              if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-                e.preventDefault();
-                el.scrollLeft += e.deltaY;
-              }
-            }}
-          >
+          <div className="flex gap-2 mt-5 overflow-x-auto">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
@@ -131,6 +91,7 @@ export default function ImagePreviewList({ images, setImages }: Props) {
                          flex flex-col items-center justify-center
                          text-[#6C6C6C] shrink-0"
             >
+              <img src={uploadImage} alt="upload" className="w-[25px] h-[19px] mb-2" />
               <div className="text-[11px] font-medium">
                 {images.length}/10
               </div>

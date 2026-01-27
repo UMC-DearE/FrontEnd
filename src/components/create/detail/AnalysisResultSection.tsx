@@ -1,12 +1,16 @@
+import { useState } from "react";
 import type { AiAnalyzeResult } from "@/types/letter";
+import type { CreateFrom } from "@/types/from";
 import { EmotionTag } from "@/components/common/EmotionTag";
 import { BottomButton } from "@/components/common/BottomButton";
-import { useState } from "react";
+import aiSummary from "@/assets/create/ai-summary.svg";
+import selectFrom from "@/assets/create/select-from.svg";
+import { FromBadge } from "@/components/common/FromBadge";
 
 interface Props {
   content: string;
   aiResult: AiAnalyzeResult;
-  recipient?: string;
+  from?: CreateFrom;
   onSelectRecipient?: () => void;
   onNext?: () => void;
 }
@@ -14,40 +18,33 @@ interface Props {
 export default function AnalysisResultSection({
   content,
   aiResult,
-  recipient = "",
+  from,
   onSelectRecipient,
   onNext,
 }: Props) {
   const [date, setDate] = useState("");
   const [unknownDate, setUnknownDate] = useState(false);
 
-  const recipientText = (recipient ?? "").toString();
-  const hasRecipient = recipientText.trim().length > 0;
-  const canProceed = hasRecipient && (unknownDate || date.trim().length > 0); // trim 문제 해결
+  const canProceed = Boolean(from) && (unknownDate || date);
 
   return (
     <div className="flex flex-col h-full pt-2">
-      <div className="border border-[#E6E7E9] rounded-xl p-4 text-sm leading-relaxed text-[#555557] mb-6 max-h-[176px] overflow-y-auto">
-        {content}
-      </div>
+      <div className="border border-[#E6E7E9] rounded-xl p-4 text-sm leading-relaxed text-[#555557] mb-6 max-h-[176px] overflow-y-auto">{content}</div>
 
       <div className="mb-6">
         <p className="text-base font-semibold text-primary mb-2">누구에게 받은 편지인가요?</p>
-        <div className="relative">
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => onSelectRecipient?.()}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") onSelectRecipient?.();
-            }}
-            className="w-full h-[45px] border border-[#E6E7E9] rounded-xl px-4 text-sm font-medium outline-none flex items-center justify-between cursor-pointer"
-          >
-            <span className={`${hasRecipient ? "px-[11px] py-[4px] bg-[#FEEFEF] rounded-lg text-primary text-sm font-medium" : "text-[#C7C7CC]"}`}>
-              {recipientText || "이름을 생성하거나 선택하세요"}
-            </span>
-            <span className="text-[#C7C7CC]">▼</span>
-          </div>
+
+        <div
+          role="button"
+          onClick={onSelectRecipient}
+          className="w-full h-[45px] border border-[#E6E7E9] rounded-xl px-4 text-sm font-medium outline-none flex items-center justify-between cursor-pointer"
+        >
+          {from ? (
+            <FromBadge name={from.name} backgroundColor={from.backgroundColor} />
+          ) : (
+            <span className="text-[#C7C7CC]">이름을 생성하거나 선택하세요</span>
+          )}
+          <img src={selectFrom} alt="" className="w-5 h-5" />
         </div>
       </div>
 
@@ -80,9 +77,9 @@ export default function AnalysisResultSection({
 
       <div className="mb-6">
         <p className="text-base font-semibold text-primary mb-2">AI 한 줄 요약</p>
-        <div className="flex items-start gap-2 bg-[#F7F7F7] rounded-xl p-4 text-sm text-[#555557] leading-relaxed">
-          <span>✨</span>
-          <p>{aiResult.summary}</p>
+        <div className="flex items-center gap-2 bg-[#F7F7F7] rounded-xl p-4 text-sm text-[#555557] leading-relaxed">
+          <img src={aiSummary} alt="ai summary" className="w-[19px] h-[19px] flex-shrink-0" />
+          <p className="ml-2">{aiResult.summary}</p>
         </div>
       </div>
 

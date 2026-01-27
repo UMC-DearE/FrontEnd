@@ -2,24 +2,32 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AnalysisResultSection from "@/components/create/detail/AnalysisResultSection";
 import type { CreateResultPayload } from "@/types/create";
+import type { CreateFrom } from "@/types/from";
+
+type LocationState =
+  | (CreateResultPayload & {
+      selectedFromDraft?: CreateFrom;
+    })
+  | null;
 
 export default function CreateDetailPage() {
-  const location = useLocation();
-  const { state } = location as {
-    state: (CreateResultPayload & { selectedRecipient?: string }) | null;
-  };
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as LocationState;
 
-  const [recipient, setRecipient] = useState<string>(state?.selectedRecipient ?? "");
+  const [fromDraft, setFromDraft] = useState<CreateFrom | undefined>(
+    state?.selectedFromDraft
+  );
 
   useEffect(() => {
     if (!state) {
-      navigate("/create");
+      navigate("/create", { replace: true });
       return;
     }
-    const selected = (location.state as any)?.selectedRecipient;
-    if (selected) setRecipient(selected);
-  }, [location.state]);
+    if (state.selectedFromDraft) {
+      setFromDraft(state.selectedFromDraft);
+    }
+  }, [state, navigate]);
 
   if (!state) return null;
 
@@ -27,10 +35,20 @@ export default function CreateDetailPage() {
     <AnalysisResultSection
       content={state.content}
       aiResult={state.aiResult}
-      recipient={recipient}
-      onSelectRecipient={() => navigate("/create/from", { state })}
-      onNext={() => { // 편지 추가하기 버튼 누르면 편지 생성 api 호출
+      from={fromDraft}
+      onSelectRecipient={() =>
+        navigate("/create/from", {
+        state: {
+          ...(state ?? {}),
+          selectedFromDraft: fromDraft,
+        },
+      })
+
+      }
+      onNext={() => {
+        // 프롬 생성 + 편지 생성 api 호출
       }}
     />
   );
 }
+
