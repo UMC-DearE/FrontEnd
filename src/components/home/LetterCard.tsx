@@ -1,3 +1,5 @@
+// 홈 편지 카드
+
 import pinOffIcon from '@/assets/homePage/pin-outline.svg';
 import pinOnIcon from '@/assets/homePage/pin-filled.svg';
 
@@ -32,7 +34,7 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
   };
 
   return (
-    <div className="relative mt-[20px] flex h-[97px] w-[361px] items-center rounded-[16px] bg-white shadow-[0_0_4px_0_rgba(217,217,217,0.5)]">
+    <div className="relative mt-5 flex h-[97px] w-[361px] items-center rounded-[16px] bg-white shadow-[0_0_4px_0_rgba(217,217,217,0.5)]">
       <div className="mx-[12px] flex h-[57px] w-[47px] flex-col items-center justify-center rounded-[16px] bg-[#FF4F181A]">
         <span className="text-[10px] font-medium text-[#FF5F2F]">{letter?.month ?? ''}</span>
         <span className="text-[15px] font-bold text-[#FF5F2F]">{letter?.day ?? ''}</span>
@@ -56,7 +58,7 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
         type="button"
         onClick={handlePinClick}
         disabled={!letterId}
-        className="absolute top-[8px] left-[339px] cursor-pointer"
+        className="absolute top-2 left-[339px] cursor-pointer"
       >
         <img
           src={isPinned ? pinOnIcon : pinOffIcon}

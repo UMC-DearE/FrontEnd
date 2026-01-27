@@ -1,3 +1,5 @@
+// 홈 프로필 카드
+
 import defaultProfile from '@/assets/homePage/defaultProfile.svg';
 import setIcon from '@/assets/homePage/settingIcon.svg';
 
