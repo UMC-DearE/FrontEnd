@@ -15,7 +15,7 @@ export default function HomePage() {
     dayOfWeek: '월',
   });
 
-  const [pinnedLetterId, setPinnedLetterId] = useState<number | null>(1);
+  const [pinnedLetterId, setPinnedLetterId] = useState<number | null>(null);
   const [pendingUnpinId, setPendingUnpinId] = useState<number | null>(null);
   const [openSheet, setOpenSheet] = useState(false);
 
@@ -73,4 +73,3 @@ export default function HomePage() {
     </div>
   );
 }
-

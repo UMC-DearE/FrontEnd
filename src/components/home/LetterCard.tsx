@@ -56,7 +56,7 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
         type="button"
         onClick={handlePinClick}
         disabled={!letterId}
-        className="absolute top-[8px] left-[339px]"
+        className="absolute top-[8px] left-[339px] cursor-pointer"
       >
         <img
           src={isPinned ? pinOnIcon : pinOffIcon}
