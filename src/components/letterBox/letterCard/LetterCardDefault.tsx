@@ -11,6 +11,7 @@ type LetterCardDefaultProps = {
   fromName: string;
   fromBgColor: string;
   fromFontColor: string;
+  onLikeChange?: (liked: boolean) => void;
 };
 
 export default function LetterCardDefault({
