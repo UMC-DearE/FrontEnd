@@ -1,12 +1,16 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import ProfileCard from '@/components/home/ProfileCard';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import LetterCard, { type Letter } from '@/components/home/LetterCard';
 import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
+import type { AppLayoutContext } from '@/layouts/AppLayout';
 
 export default function HomePage() {
-  const [letter, setLetter] = useState<Letter | null>({
+  const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
+
+  const [letter] = useState<Letter | null>({
     id: 1,
     content:
       '책은 우리 안의 얼어붙은 바다를 깨부수는 도끼여야 한다. 우리가 책을 읽는 이유는 바로 그 때문이다.',
@@ -18,6 +22,8 @@ export default function HomePage() {
   const [pinnedLetterId, setPinnedLetterId] = useState<number | null>(null);
   const [pendingUnpinId, setPendingUnpinId] = useState<number | null>(null);
   const [openSheet, setOpenSheet] = useState(false);
+
+  const colorInputRef = useRef<HTMLInputElement>(null);
 
   const handlePin = (letterId: number) => {
     setPinnedLetterId(letterId);
@@ -36,6 +42,12 @@ export default function HomePage() {
     setPendingUnpinId(null);
   };
 
+  const handleSelectTool = (type: 'sticker' | 'bg') => {
+    if (type === 'bg') {
+      colorInputRef.current?.click();
+    }
+  };
+
   return (
     <div>
       <ProfileCard
@@ -47,7 +59,16 @@ export default function HomePage() {
       <ProfileCustomSheet
         open={openSheet}
         onClose={() => setOpenSheet(false)}
-        onSelect={() => {}}
+        onSelect={handleSelectTool}
+        onComplete={() => setOpenSheet(false)}
+      />
+
+      <input
+        ref={colorInputRef}
+        type="color"
+        value={homeBgColor}
+        onChange={(e) => setHomeBgColor(e.target.value)}
+        className="hidden"
       />
 
       <LetterCard

@@ -19,7 +19,7 @@ export default function ProfileCustomSheet({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="relative w-[393px] min-h-screen bg-[#B0B0B0]/50 overflow-hidden">
-        <button type="button" onClick={onClose} className="absolute inset-0 bg-[#B0B0B0]" />
+        <button type="button" onClick={onClose} className="absolute inset-0" />
 
         <button
           type="button"
