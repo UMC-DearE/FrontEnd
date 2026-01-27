@@ -1,4 +1,4 @@
-export type AddMode = "IMAGE" | "TEXT";
+import type { AddMode } from "@/types/create";
 
 interface Props {
   mode: AddMode;
