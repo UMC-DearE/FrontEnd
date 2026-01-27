@@ -2,9 +2,9 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import FolderList from '@/components/letterBox/letterFolder/FolderList';
-import FolderSettingSheet from '@/components/letterBox/FolderSettingSheet';
+import FolderSettingSheet from '@/components/letterBox/letterFolder/FolderSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
-import FolderModal from '@/components/letterBox/FolderModal';
+import FolderModal from '@/components/letterBox/letterFolder/FolderModal';
 import type { FolderType } from '@/types/folder';
 import type { Letter } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
