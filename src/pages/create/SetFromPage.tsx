@@ -7,6 +7,8 @@ import ColorPicker from "@/assets/create/color-picker.svg";
 import { HexColorPicker } from "react-colorful";
 import Plusbtn from "@/assets/create/plusbtn.svg";
 import { FromBadge } from "@/components/common/FromBadge";
+import { InputField } from "@/components/common/InputField";
+import erasebtn from "@/assets/create/erasebtn.svg";
 
 type FromItem = CreateFrom & { fromId: number };
 
@@ -69,12 +71,25 @@ export default function SetFromPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <input
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="이름을 생성하거나 선택하세요"
-        className="w-full bg-[#F7F7F7] h-[50px] border border-[#C2C4C7] rounded-xl px-4 mt-3 text-base font-medium outline-none flex items-center justify-between cursor-pointer focus:ring-1 focus:ring-primary focus:bg-white"
-      />
+      <div className="p-0 mt-3 px-0">
+          <InputField
+            value={input}
+            onChange={(v) => setInput(v)}
+            placeholder="이름을 생성하거나 선택하세요"
+            useGrayWhenBlurred
+            inputClassName="h-[50px] rounded-xl px-4 text-base font-medium outline-none cursor-text focus:bg-white focus:ring-1 focus:ring-primary"
+            rightElement={
+              input ? (
+                <button
+                  onClick={() => setInput("")}
+                  className="flex items-center justify-center w-6 h-6"
+                >
+                  <img src={erasebtn} alt="clear" />
+                </button>
+              ) : undefined
+            }
+          />
+      </div>
 
       <div className="p-4 mt-3">
         <div className="text-sm text-[#555557] font-medium mb-4">기존 목록</div>
