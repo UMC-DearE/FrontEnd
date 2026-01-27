@@ -54,6 +54,7 @@ function MyProfileSection({ isPlus }: { isPlus: boolean }) {
 export default function MyhomePage() {
   const [isPlus, setIsPlus] = useState(false);
   const [isPlusModalOpen, setIsPlusModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -80,7 +81,7 @@ export default function MyhomePage() {
           )}
         </button>
 
-        <MenuItem label="계정 관리"/>
+        <MenuItem label="계정 관리" onClick={() => navigate("/my/account")}/>
         <MenuItem label="From 관리"/>
         <button className="w-full px-[22px] pt-[18px] pb-[17px] flex justify-between items-center border-b border-[#E6E7E9]">
           <span className="font-medium text-[16px]">로그아웃</span>

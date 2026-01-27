@@ -35,7 +35,7 @@ export default function ConfirmModal({
                 {title}
               </p>
               {description ? (
-                <p className="w-[257.44px] text-center text-[13px] font-medium text-[#9D9D9F] cursor-pointer">
+                <p className="w-[257.44px] text-center text-[13px] font-medium text-[#9D9D9F] whitespace-pre-line">
                   {description}
                 </p>
               ) : null}

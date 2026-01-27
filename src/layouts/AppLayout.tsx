@@ -10,11 +10,13 @@ export function AppLayout() {
   const matched = ROUTE_META.find((r) => r.match(pathname));
   const Header = matched ? HEADER_REGISTRY[matched.header] : null;
 
-  const hideBottomNav = pathname.startsWith("/setup")|| pathname.startsWith("/my/profile");
+  const hideBottomNav = pathname.startsWith("/setup")|| pathname.startsWith("/my/profile")
+                        || pathname.startsWith("/my/account");
   const bgClass =
     matched?.bg === "white" ? "bg-white" : "bg-[#F8F8F8]";
 
-  const noMainPadding = pathname === "/my";
+  const NO_MAIN_PADDING_PATHS = ["/my", "/my/account"];
+  const noMainPadding = NO_MAIN_PADDING_PATHS.includes(pathname);
 
   return (
     <div className={`h-screen flex flex-col ${bgClass}`}>
