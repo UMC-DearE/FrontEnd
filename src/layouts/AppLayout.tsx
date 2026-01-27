@@ -14,6 +14,8 @@ export function AppLayout() {
   const bgClass =
     matched?.bg === "white" ? "bg-white" : "bg-[#F8F8F8]";
 
+  const noMainPadding = pathname === "/my";
+
   return (
     <div className={`h-screen flex flex-col ${bgClass}`}>
       {Header && (
@@ -25,10 +27,11 @@ export function AppLayout() {
       )}
 
       <main
-        className={`
-          flex-1 overflow-y-auto px-4 py-4
-          ${!hideBottomNav ? "pb-[95px]" : ""}
-        `}
+        className={[
+          "flex-1 overflow-y-auto",
+          noMainPadding ? "" : "px-4 py-4",
+          !hideBottomNav ? "pb-[95px]" : "",
+        ].join(" ")}
       >
         <Outlet />
       </main>
