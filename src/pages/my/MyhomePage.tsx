@@ -1,10 +1,55 @@
-// 마이페이지 화면
+// 마이페이지
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PlusModal from "@/components/my/PlusModal";
 import { PremiumBadge } from "@/components/common/PremiumBadge";
 import MenuItem from "@/components/my/MenuItem";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon";
+import ProfilePlaceholderIcon from "@/components/icons/ProfilePlaceholderIcon";
+
+function MyProfileSection({ isPlus }: { isPlus: boolean }) {
+  const navigate = useNavigate();
+
+  return (
+    <section
+      role="button"
+      tabIndex={0}
+      onClick={() => navigate("/my/profile")}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") navigate("/my/profile");
+      }}
+      className="
+        px-[22px] py-[20px]
+        border-b border-[#E6E7E9]
+        cursor-pointer
+        active:bg-[#F7F7F8]
+        focus:outline-none
+      "
+    >
+      <div className="flex items-center gap-[15px]">
+        <div className="w-[60px] h-[60px] rounded-full bg-[#F2F3F5] flex items-center justify-center overflow-hidden">
+          <ProfilePlaceholderIcon size={28} />
+        </div>
+
+        <div className="flex-1">
+          <div className="flex items-center gap-[10px]">
+            <span className="font-medium text-[16px] truncate">
+              닉네임여러글자실험
+            </span>
+            {isPlus && <PremiumBadge label="Plus" />}
+          </div>
+
+          <p className="font-medium text-[12px] text-[#9D9D9F] mt-2">
+            프로필 수정
+          </p>
+        </div>
+
+        <ChevronRightIcon />
+      </div>
+    </section>
+  );
+}
 
 export default function MyhomePage() {
   const [isPlus, setIsPlus] = useState(false);
@@ -13,23 +58,7 @@ export default function MyhomePage() {
   return (
     <>
       <main className="bg-white">
-
-        <section className="px-[22px] py-[20px] border-b border-[#E6E7E9]">
-          <div className="flex items-center gap-[15px]">
-            <div className="w-15 h-15 bg-gray-200 rounded-full" />
-
-            <div className="flex-1">
-              <div className="flex items-center gap-[10px]">
-                <span className="font-medium text-[16px]">닉네임여러글자실험</span>
-
-                {isPlus && <PremiumBadge label="Plus" />}
-              </div>
-              <p className="font-medium text-[12px] text-[#9D9D9F] mt-2">프로필 수정</p>
-            </div>
-
-            <ChevronRightIcon/>
-          </div>
-        </section>
+        <MyProfileSection isPlus={isPlus} />
 
         <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9.33px] font-medium text-[13px] text-[#9D9D9F]">설정</div>
 
