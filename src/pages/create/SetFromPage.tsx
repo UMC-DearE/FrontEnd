@@ -127,8 +127,10 @@ export default function SetFromPage() {
               <button
                 key={c}
                 onClick={() => setSelectedColor(c)}
-                className={`w-[32px] h-[32px] rounded-full border-2 ${
-                  selectedColor === c ? "border-black scale-110" : "border-transparent"
+                className={`w-[32px] h-[32px] rounded-full transition-all ${
+                  selectedColor === c
+                    ? "scale-100 shadow-[0_0_8px_rgba(0,0,0,0.2)]"
+                    : "shadow-none"
                 }`}
                 style={{ background: c }}
               />
