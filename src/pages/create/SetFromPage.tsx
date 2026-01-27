@@ -50,10 +50,13 @@ export default function SetFromPage() {
   };
 
   const handleCreate = () => {
-    if (!input.trim()) return;
+    const trimmed = input.trim();
+    if (!trimmed) return;
+
+    const name = trimmed.slice(0, 7); // 7자 제한
 
     const draft: CreateFrom = {
-      name: input.trim(),
+      name,
       backgroundColor: selectedColor,
       textColor: getHarmoniousTextColor(selectedColor),
     };
@@ -77,6 +80,7 @@ export default function SetFromPage() {
             onChange={(v) => setInput(v)}
             placeholder="이름을 생성하거나 선택하세요"
             useGrayWhenBlurred
+            maxLength={7}
             inputClassName="h-[50px] rounded-xl px-4 text-base font-medium outline-none cursor-text focus:bg-white focus:ring-1 focus:ring-primary"
             rightElement={
               input ? (
