@@ -1,3 +1,5 @@
+// 홈 프로필 카드
+
 import defaultProfile from '@/assets/homePage/defaultProfile.svg';
 import setIcon from '@/assets/homePage/settingIcon.svg';
 
@@ -10,7 +12,11 @@ interface ProfileCardProps {
 export default function ProfileCard({ nickname, bio, onClickSettings }: ProfileCardProps) {
   return (
     <div className="relative flex h-[202px] w-[361px] flex-col items-center rounded-[16px] bg-white shadow-[0_0_4px_0.5px_rgba(0,0,0,0.15)]">
-      <button type="button" onClick={onClickSettings} className="absolute left-81 top-4">
+      <button
+        type="button"
+        onClick={onClickSettings}
+        className="absolute left-81 top-4 cursor-pointer"
+      >
         <img src={setIcon} alt="set-icon" className="h-[19px] w-[19px]" />
       </button>
 
