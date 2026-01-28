@@ -1,6 +1,6 @@
 import type { LetterDetailResponse } from "@/types/letter";
 
-export function getMockLetterDetail(letterId: number): Promise<LetterDetailResponse> {
+export function getMockLetterDetail(_letterId: number): Promise<LetterDetailResponse> {
   return Promise.resolve({
     success: true,
     code: "200",

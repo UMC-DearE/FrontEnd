@@ -22,7 +22,6 @@ export default function SetFromPage() {
   const [showPicker, setShowPicker] = useState(false);
 
   const [fromList, setFromList] = useState<FromItem[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // 기존 From 목록 불러오기 api 호출 - textColor 응답에서 받아오기(계산 다시 할 필요 없음)
   useEffect(() => {
@@ -32,7 +31,6 @@ export default function SetFromPage() {
         { fromId: 2, name: '아빠', backgroundColor: '#EAF6FF', textColor: '#333333' },
       ];
       setFromList(res);
-      setLoading(false);
     };
 
     fetchFromList();

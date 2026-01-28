@@ -10,14 +10,13 @@ export default function LetterDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<LetterDetailData | null>(null);
   
-
   useEffect(() => {
     let mounted = true;
 
     async function load() {
       try {
         setLoading(true);
-        const res = await getMockLetterDetail(Number(id));
+        const res = await getMockLetterDetail(Number(id)); // 편지 상세 조회 api 호출
         if (!mounted) return;
 
         if (!res.success) {
@@ -47,7 +46,6 @@ export default function LetterDetailPage() {
     <LetterDetailSection
       content={data.content}
       aiResult={{
-        letterId: Number(id),
         summary: data.aiSummary ?? "",
         emotions: data.emotions ?? [],
       }}

@@ -36,8 +36,8 @@ export interface Emotion {
   category: EmotionCategory;
 }
 
+// AI 편지 내용 분석 결과(letterID는 params로 전달 - UI에서 몰라도 됨)
 export interface AiAnalyzeResult {
-  letterId: number;
   summary: string;
   emotions: Emotion[];
 }
