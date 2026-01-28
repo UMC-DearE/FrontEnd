@@ -28,8 +28,8 @@ export default function AnalysisResultSection({
   const canProceed = Boolean(from) && (unknownDate || date);
 
   return (
-    <div className="flex flex-col h-full pt-2">
-      <div className="border border-[#E6E7E9] rounded-xl p-4 text-sm leading-relaxed text-[#555557] mb-6 max-h-[176px] overflow-y-auto">{content}</div>
+    <div className="flex flex-col h-full pt-1">
+      <div className="border border-[#E6E7E9] rounded-xl px-4 py-[14px] text-sm leading-relaxed text-[#555557] mb-6 max-h-[176px] overflow-y-auto">{content}</div>
 
       <div className="mb-6">
         <p className="text-base font-semibold text-primary mb-2">누구에게 받은 편지인가요?</p>
@@ -37,10 +37,10 @@ export default function AnalysisResultSection({
         <div
           role="button"
           onClick={onSelectRecipient}
-          className="w-full h-[45px] border border-[#E6E7E9] rounded-xl px-4 text-sm font-medium outline-none flex items-center justify-between cursor-pointer"
+          className="w-full h-[45px]  border border-[#E6E7E9] rounded-xl px-4 text-sm font-medium outline-none flex items-center justify-between cursor-pointer"
         >
           {from ? (
-            <FromBadge name={from.name} backgroundColor={from.backgroundColor} />
+            <FromBadge name={from.name} backgroundColor={from.backgroundColor} textColor={from.textColor} />
           ) : (
             <span className="text-[#C7C7CC]">이름을 생성하거나 선택하세요</span>
           )}

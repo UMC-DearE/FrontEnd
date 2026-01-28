@@ -2,7 +2,7 @@ import loadingImg from "@/assets/create/loading.svg";
 
 export default function LoadingSection() {
   return (
-    <div className="h-full flex flex-col items-center justify-center gap-[20px]">
+    <div className="h-full flex flex-col items-center justify-center gap-[20px] mb-[100px]">
       <img src={loadingImg} alt="loading" className="w-[71px] h-[65px] shake" />
       <div className="flex flex-col items-center">
       <p className="text-base text-[#555557] font-medium">편지를 읽고 있어요</p>

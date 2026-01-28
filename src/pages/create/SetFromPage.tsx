@@ -24,7 +24,7 @@ export default function SetFromPage() {
   const [fromList, setFromList] = useState<FromItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 기존 From 목록 불러오기 api 호출
+  // 기존 From 목록 불러오기 api 호출 - textColor 응답에서 받아오기(계산 다시 할 필요 없음)
   useEffect(() => {
     const fetchFromList = async () => {
       const res: FromItem[] = [
@@ -59,7 +59,7 @@ export default function SetFromPage() {
       name,
       backgroundColor: selectedColor,
       textColor: getHarmoniousTextColor(selectedColor),
-    };
+    }; // 프롬 생성할 때 텍스트 색상 계산해서 백엔드에 넘겨줌, 프롬 생성하는 api는 여기서 호출 안 하고 편지 추가할 때 같이 호출
 
     goBackWithDraft(draft);
   };
@@ -102,7 +102,7 @@ export default function SetFromPage() {
           {fromList.map((from) => (
             <div key={from.fromId} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FromBadge name={from.name} backgroundColor={from.backgroundColor} />
+                <FromBadge name={from.name} backgroundColor={from.backgroundColor} textColor={from.textColor} />
               </div>
               <button
                 onClick={() => handleSelect(from)}
@@ -164,9 +164,9 @@ export default function SetFromPage() {
             )}
           </div>
 
-          <button onClick={handleCreate} className="flex items-center gap-2 font-medium text-base text-primary">
+          <button onClick={handleCreate} className="flex items-center gap-2 font-medium text-lg text-primary">
             <img src={Plusbtn} alt="upload" />
-            <FromBadge name={input} backgroundColor={selectedColor} />
+            <FromBadge name={input} backgroundColor={selectedColor} textColor={getHarmoniousTextColor(selectedColor)} />
             생성하기
           </button>
         </div>

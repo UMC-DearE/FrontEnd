@@ -93,7 +93,12 @@ export default function ImagePreviewList({ images, setImages }: Props) {
             >
               <img src={uploadImage} alt="upload" className="w-[25px] h-[19px] mb-2" />
               <div className="text-[11px] font-medium">
-                {images.length}/10
+                {images.length > 0 ? (
+                  <span className="text-[#FF7A00]">{images.length}</span>
+                ) : (
+                  <span>{images.length}</span>
+                )}
+                /10
               </div>
             </button>
             

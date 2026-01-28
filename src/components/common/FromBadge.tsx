@@ -1,16 +1,14 @@
-import { getHarmoniousTextColor } from "@/utils/color";
-
 interface FromBadgeProps {
   name: string;
-  backgroundColor?: string;
+  backgroundColor: string;
+  textColor: string;
 }
 
 export function FromBadge({
   name,
-  backgroundColor = "#FFFFFF",
+  backgroundColor,
+  textColor,
 }: FromBadgeProps) {
-  const textColor = getHarmoniousTextColor(backgroundColor);
-
   return (
     <span
       style={{

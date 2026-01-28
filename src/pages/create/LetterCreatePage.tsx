@@ -34,7 +34,7 @@ export default function LetterCreatePage() {
       }
 
       if (mode === "IMAGE") {
-        // 1. 이미지 s3 업로드(api 호출)
+        // 1. 이미지 s3 업로드(api 호출) - 이거 url 받아서 뒤에 띄워도 되고 상태로 관리
         // 2. OCR -> text 변환(api 호출)
         finalContent = "OCR로 추출된 편지 내용";
       }
