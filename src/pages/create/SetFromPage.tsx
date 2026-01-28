@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { getHarmoniousTextColor } from "@/utils/color";
-import type { CreateResultPayload } from "@/types/create";
-import type { CreateFrom } from "@/types/from";
-import ColorPicker from "@/assets/create/color-picker.svg";
-import { HexColorPicker } from "react-colorful";
-import Plusbtn from "@/assets/create/plusbtn.svg";
-import { FromBadge } from "@/components/common/FromBadge";
-import { InputField } from "@/components/common/InputField";
-import erasebtn from "@/assets/create/erasebtn.svg";
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { getHarmoniousTextColor } from '@/utils/color';
+import type { CreateResultPayload } from '@/types/create';
+import type { CreateFrom } from '@/types/from';
+import ColorPicker from '@/assets/create/color-picker.svg';
+import { HexColorPicker } from 'react-colorful';
+import Plusbtn from '@/assets/create/plusbtn.svg';
+import { FromBadge } from '@/components/common/FromBadge';
+import { InputField } from '@/components/common/InputField';
+import erasebtn from '@/assets/create/erasebtn.svg';
 
 type FromItem = CreateFrom & { fromId: number };
 
@@ -17,8 +17,8 @@ export default function SetFromPage() {
   const location = useLocation();
   const state = location.state as CreateResultPayload | null;
 
-  const [input, setInput] = useState("");
-  const [selectedColor, setSelectedColor] = useState("#FEEFEF");
+  const [input, setInput] = useState('');
+  const [selectedColor, setSelectedColor] = useState('#FEEFEF');
   const [showPicker, setShowPicker] = useState(false);
 
   const [fromList, setFromList] = useState<FromItem[]>([]);
@@ -28,8 +28,8 @@ export default function SetFromPage() {
   useEffect(() => {
     const fetchFromList = async () => {
       const res: FromItem[] = [
-        { fromId: 1, name: "엄마", backgroundColor: "#FEEFEF", textColor: "#333333" },
-        { fromId: 2, name: "아빠", backgroundColor: "#EAF6FF", textColor: "#333333" },
+        { fromId: 1, name: '엄마', backgroundColor: '#FEEFEF', textColor: '#333333' },
+        { fromId: 2, name: '아빠', backgroundColor: '#EAF6FF', textColor: '#333333' },
       ];
       setFromList(res);
       setLoading(false);
@@ -40,7 +40,7 @@ export default function SetFromPage() {
 
   // 생성 또는 선택한 From을 가지고 뒤로 이동 + 상태만 전달해서 바로 UI에 반영 +  뒤로 가기 해도 다시 프롬 선택 페이지 안 뜨게
   const goBackWithDraft = (draft: CreateFrom) => {
-    navigate("/create/detail", {
+    navigate('/create/detail', {
       replace: true,
       state: {
         ...(state ?? {}),
@@ -75,24 +75,24 @@ export default function SetFromPage() {
   return (
     <div className="flex flex-col h-full">
       <div className="p-0 mt-3 px-0">
-          <InputField
-            value={input}
-            onChange={(v) => setInput(v)}
-            placeholder="이름을 생성하거나 선택하세요"
-            useGrayWhenBlurred
-            maxLength={7}
-            inputClassName="h-[50px] rounded-xl px-4 text-base font-medium outline-none cursor-text focus:bg-white focus:ring-1 focus:ring-primary"
-            rightElement={
-              input ? (
-                <button
-                  onClick={() => setInput("")}
-                  className="flex items-center justify-center w-6 h-6"
-                >
-                  <img src={erasebtn} alt="clear" />
-                </button>
-              ) : undefined
-            }
-          />
+        <InputField
+          value={input}
+          onChange={(v) => setInput(v)}
+          placeholder="이름을 생성하거나 선택하세요"
+          useGrayWhenBlurred
+          maxLength={7}
+          inputClassName="h-[50px] rounded-xl px-4 text-base font-medium outline-none cursor-text focus:bg-white focus:ring-1 focus:ring-primary"
+          rightElement={
+            input ? (
+              <button
+                onClick={() => setInput('')}
+                className="flex items-center justify-center w-6 h-6"
+              >
+                <img src={erasebtn} alt="clear" />
+              </button>
+            ) : undefined
+          }
+        />
       </div>
 
       <div className="p-4 mt-3">
@@ -123,14 +123,12 @@ export default function SetFromPage() {
           </div>
 
           <div className="relative flex gap-3 mb-6 mt-4">
-            {["#FFE2DD", "#FFF3C4", "#EAF5FF", "#E4F7EB"].map((c) => (
+            {['#FFE2DD', '#FFF3C4', '#EAF5FF', '#E4F7EB'].map((c) => (
               <button
                 key={c}
                 onClick={() => setSelectedColor(c)}
                 className={`w-[32px] h-[32px] rounded-full transition-all ${
-                  selectedColor === c
-                    ? "scale-100 shadow-[0_0_8px_rgba(0,0,0,0.2)]"
-                    : "shadow-none"
+                  selectedColor === c ? 'scale-100 shadow-[0_0_8px_rgba(0,0,0,0.2)]' : 'shadow-none'
                 }`}
                 style={{ background: c }}
               />
@@ -164,7 +162,10 @@ export default function SetFromPage() {
             )}
           </div>
 
-          <button onClick={handleCreate} className="flex items-center gap-2 font-medium text-base text-primary">
+          <button
+            onClick={handleCreate}
+            className="flex items-center gap-2 font-medium text-base text-primary"
+          >
             <img src={Plusbtn} alt="upload" />
             <FromBadge name={input} backgroundColor={selectedColor} />
             생성하기
