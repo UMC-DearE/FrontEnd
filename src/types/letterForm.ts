@@ -15,7 +15,10 @@ export interface LetterFormProps {
     from: CreateFrom;
     date?: string;
     unknownDate: boolean;
+    content?: string;
   }) => void;
+
+  onContentChange?: (value: string) => void;
 
   onCancel?: () => void; // edit일 때만 사용
 }

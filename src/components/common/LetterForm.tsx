@@ -1,6 +1,6 @@
 // 편지 추가 - 내용 분석 및 편지 수정 공통 UI
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { EmotionTag } from "@/components/common/EmotionTag";
 import { BottomButton } from "@/components/common/BottomButton";
 import { FromBadge } from "@/components/common/FromBadge";
@@ -17,15 +17,62 @@ export default function LetterForm({
   initialUnknownDate = false,
   onSelectRecipient,
   onSubmit,
+  onContentChange,
 }: LetterFormProps) {
   const [date, setDate] = useState(initialDate);
   const [unknownDate, setUnknownDate] = useState(initialUnknownDate);
 
   const canProceed = Boolean(from) && (unknownDate || date);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // 초기 OCR 텍스트 높이 자동 조절 및 내용 변경 시 높이 재조절(+ 최대 높이 초과 시 스크롤 생김)
+  const MAX_HEIGHT = 176;
+
+  useLayoutEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+
+    el.style.height = "auto";
+
+    if (el.scrollHeight > MAX_HEIGHT) {
+      el.style.height = `${MAX_HEIGHT}px`;
+      el.style.overflowY = "auto";
+    } else {
+      el.style.height = `${el.scrollHeight}px`;
+      el.style.overflowY = "hidden";
+    }
+  }, [content]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onContentChange?.(e.target.value);
+  };
 
   return (
     <div className="flex flex-col h-full pt-1">
-      <div className="border border-[#E6E7E9] rounded-xl px-4 py-[14px] text-sm leading-relaxed text-[#555557] mb-6 max-h-[176px] overflow-y-auto">{content}</div>
+      {/* 편지 내용(이미지인 경우 - ocr 분석 텍스트 결과) 뿌리고 텍스트 영역 수정 가능 - 수정된 content 값을 서버로 전달(편지 생성할 때) */}
+      {onContentChange ? (
+        <textarea
+          ref={textareaRef}
+          value={content}
+          onChange={handleChange}
+          className="
+            box-border
+            border border-[#E6E7E9]
+            rounded-xl
+            px-4 py-[14px]
+            text-sm text-[#555557]
+            leading-relaxed
+            mb-6
+            resize-none
+            overflow-y-hidden
+
+            focus:outline-none
+            focus:ring-0
+            thin-scrollbar"
+        />
+      ) : (
+        <div className="border border-[#E6E7E9] rounded-xl px-4 py-[14px] text-sm leading-relaxed text-[#555557] mb-6 max-h-[176px] overflow-y-auto thin-scrollbar">{content}</div>
+      )}
 
       <div className="mb-6">
         <p className="text-base font-semibold text-primary mb-2">누구에게 받은 편지인가요?</p>
@@ -98,6 +145,7 @@ export default function LetterForm({
               from,
               date,
               unknownDate,
+              content,
             })
           }
         >

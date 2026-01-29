@@ -21,6 +21,7 @@ export default function EditLetterPage() {
 
   // 실제로 LetterForm에 내려줄 from (초기값 + 수정 반영용)
   const [fromDraft, setFromDraft] = useState<CreateFrom | undefined>(undefined);
+  const [content, setContent] = useState<string>("");
 
   useEffect(() => {
     let mounted = true;
@@ -37,6 +38,7 @@ export default function EditLetterPage() {
         }
 
         setData(res.data);
+        setContent(res.data.content ?? "");
 
         // 최초 진입 시 기본 from 세팅
         setFromDraft((prev) => {
@@ -76,7 +78,7 @@ export default function EditLetterPage() {
   return (
     <LetterForm
       mode="edit"
-      content={data.content}
+      content={content}
       aiResult={{
         summary: data.aiSummary ?? "",
         emotions: data.emotions ?? [],
@@ -84,6 +86,7 @@ export default function EditLetterPage() {
       from={fromDraft}
       initialDate={data.receivedAt ?? ""}
       initialUnknownDate={false}
+      onContentChange={(v) => setContent(v)}
       onSelectRecipient={() =>
         navigate("/create/from", {
           state: {
@@ -94,9 +97,12 @@ export default function EditLetterPage() {
         })
       }
       onSubmit={(payload) => {
-        console.log("편지 수정 payload", payload);
-        // 편지 수정 api 호출
+        console.log("편지 수정 payload", {
+          ...payload,
+          content, // 수정된 content
+        });
 
+        // 편지 수정 API 호출
         navigate(`/letter/${id}`);
       }}
     />

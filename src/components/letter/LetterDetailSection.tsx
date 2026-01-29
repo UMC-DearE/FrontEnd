@@ -72,7 +72,7 @@ export default function LetterDetailSection({
 
   return (
     <div className="flex flex-col h-full pt-1">
-      <div className="border border-[#E6E7E9] bg-white rounded-xl px-4 py-[14px] text-sm text-[#555557] mb-6">
+      <div className="border border-[#E6E7E9] bg-white rounded-xl px-4 py-[14px] text-sm text-[#555557] mb-6 scale-100 shadow-[0_0_6px_rgba(0,0,0,0.05)]">
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E6E7E9]">
           <FromBadge
             name={from.name}
