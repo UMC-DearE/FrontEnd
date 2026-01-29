@@ -24,7 +24,7 @@ interface Props {
 
 export default function ImagePreviewList({ images, setImages }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [previewFile, setPreviewFile] = useState<File | null>(null);
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -114,16 +114,18 @@ export default function ImagePreviewList({ images, setImages }: Props) {
                     prev.filter((_, i) => i !== index)
                   )
                 }
-                onPreview={(file) => setPreviewFile(file)}
+                onPreview={() => setPreviewIndex(index)}
               />
             ))}
 
-            {previewFile && (
+            {previewIndex !== null && (
               <ImageViewer
-                file={previewFile}
-                onClose={() => setPreviewFile(null)}
+                images={images}
+                initialIndex={previewIndex}
+                onClose={() => setPreviewIndex(null)}
               />
             )}
+
           </div>
         </SortableContext>
       </DndContext>
