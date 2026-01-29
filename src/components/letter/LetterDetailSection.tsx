@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FolderSelect from "@/components/letter/FolderSelect";
 import type { AiAnalyzeResult } from "@/types/letter";
 import type { CreateFrom } from "@/types/from";
@@ -10,6 +10,7 @@ import aiSummary from "@/assets/create/ai-summary.svg";
 import upBar from "@/assets/letter/up-bar.svg";
 import downBar from "@/assets/letter/down-bar.svg";
 import heartbtn from "@/assets/letter/heart.svg";
+import html2canvas from "html2canvas";
 
 interface Props {
   content: string;
@@ -23,6 +24,35 @@ interface Props {
   onAddToFolder?: (folderId: number) => void;
   onRemoveFromFolder?: () => void;
   onEdit: () => void;
+}
+
+// 캡처한 편지 카드를 둥근 모서리로 자르는 함수
+function roundCanvas(source: HTMLCanvasElement, radius = 16) {
+  const canvas = document.createElement("canvas");
+  canvas.width = source.width;
+  canvas.height = source.height;
+
+  const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingEnabled = true;
+
+  ctx.beginPath();
+  ctx.moveTo(radius, 0);
+  ctx.lineTo(canvas.width - radius, 0);
+  ctx.quadraticCurveTo(canvas.width, 0, canvas.width, radius);
+  ctx.lineTo(canvas.width, canvas.height - radius);
+  ctx.quadraticCurveTo(canvas.width, canvas.height, canvas.width - radius, canvas.height);
+  ctx.lineTo(radius, canvas.height);
+  ctx.quadraticCurveTo(0, canvas.height, 0, canvas.height - radius);
+  ctx.lineTo(0, radius);
+  ctx.quadraticCurveTo(0, 0, radius, 0);
+  ctx.closePath();
+  ctx.clip();
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.drawImage(source, 0, 0);
+  return canvas;
 }
 
 export default function LetterDetailSection({
@@ -39,6 +69,7 @@ export default function LetterDetailSection({
   onEdit,
 }: Props) {
   const [openSummary, setOpenSummary] = useState(false);
+  const cardRef = useRef<HTMLDivElement | null>(null);
   const [openMore, setOpenMore] = useState(false);
   const [openFolderSelect, setOpenFolderSelect] = useState(false);
   const [savedReply, setSavedReply] = useState(initialReply ?? "");
@@ -51,6 +82,70 @@ export default function LetterDetailSection({
     return () =>
       window.removeEventListener("open-letter-more", handleOpen as EventListener);
   }, []);
+
+  const handleSaveCard = async () => {
+    if (onSave) onSave();
+
+    const el = cardRef.current;
+    if (!el) return;
+
+    const originalCanvas = await html2canvas(el, {
+      backgroundColor: "#ffffff",
+      scale: Math.min(2, window.devicePixelRatio || 1),
+      useCORS: true,
+      onclone: (doc) => {
+        const clonedEl = doc.querySelector(
+          "[data-letter-card]"
+        ) as HTMLElement | null;
+
+        if (!clonedEl) return;
+
+        // 기존 shadow 제거해야지 안에 회색 비침 현상 방지
+        clonedEl.style.boxShadow = "none";
+        (clonedEl.style as any).webkitBoxShadow = "none";
+
+        clonedEl.style.overflow = "hidden";
+
+
+        const scrollArea = clonedEl.querySelector(
+          ".thin-scrollbar"
+        ) as HTMLElement | null;
+
+        if (scrollArea) {
+          scrollArea.style.maxHeight = "none";
+          scrollArea.style.overflow = "visible";
+        }
+
+        // 내부의 배경을 모두 흰색으로 강제하되 FromBadge는 유지
+        const all = Array.from(clonedEl.querySelectorAll<HTMLElement>("*"));
+        for (const ch of all) {
+          try {
+            if (ch.closest("[data-from-badge]")) continue;
+
+            ch.style.background = "#ffffff";
+            ch.style.backgroundColor = "#ffffff";
+            ch.style.backgroundImage = "none";
+            ch.style.boxShadow = "none";
+            (ch.style as any).webkitBoxShadow = "none";
+            if (!ch.style.borderColor) ch.style.borderColor = "#E6E7E9";
+          } catch (e) {
+          }
+        }
+      },
+    });
+
+    const roundedCanvas = roundCanvas(originalCanvas, 24);
+
+    roundedCanvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "letter-card.png";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  };
 
   // receivedAt 포맷
   const displayReceivedAt = (() => {
@@ -72,7 +167,7 @@ export default function LetterDetailSection({
 
   return (
     <div className="flex flex-col h-full pt-1">
-      <div className="border border-[#E6E7E9] bg-white rounded-xl px-4 py-[14px] text-sm text-[#555557] mb-6 scale-100 shadow-[0_0_6px_rgba(0,0,0,0.05)]">
+      <div ref={cardRef} data-letter-card className="border border-[#E6E7E9] bg-white rounded-xl p-4 text-sm text-[#555557] mb-6 scale-100 overflow-hidden shadow-[0_0_6px_rgba(0,0,0,0.05)]">
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E6E7E9]">
           <FromBadge
             name={from.name}
@@ -142,7 +237,7 @@ export default function LetterDetailSection({
 
         {/* 이미 답장이 있는 경우 */}
         {savedReply ? (
-          <div className="border border-[#E6E7E9] bg-white rounded-xl px-4 py-[14px] text-sm text-[#555557] bg-[#F7F7F7]">
+          <div className="border border-[#E6E7E9] bg-white rounded-xl px-4 py-[14px] text-sm text-[#555557]">
             {savedReply}
           </div>
         ) : (
@@ -190,10 +285,12 @@ export default function LetterDetailSection({
       </div>
 
       <div className="fixed bottom-0 left-1/2 w-full max-w-[393px] -translate-x-1/2 bg-[#F8F8F8] px-4 pb-[32px] pt-3">
-        <BottomButton onClick={onSave}>
+        <BottomButton onClick={handleSaveCard}>
           편지 카드 저장
         </BottomButton>
       </div>
+
+
 
       {/* 더보기 바텀시트 */}
       <LetterDetailBottomSheet

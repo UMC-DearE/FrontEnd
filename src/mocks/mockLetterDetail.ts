@@ -6,7 +6,7 @@ export function getMockLetterDetail(_letterId: number): Promise<LetterDetailResp
     code: "200",
     message: "편지 조회를 성공하였습니다.",
     data: {
-      content: "이것은 모의 편지 내용입니다. 편지 작성자가 전달하고자 하는 감정과 생각이 담겨 있습니다. 편지를 통해 소중한 사람과의 연결을 느껴보세요.",
+      content: "이것은 모의 편지 내용입니다. 편지 작성자가 전달하고자 하는 감정과 생각이 담겨 있습니다. 편지를 통해 소중한 사람과의 연결을 느껴보세요.이것은 모의 편지 내용입니다. 편지 작성자가 전달하고자 하는 감정과 생각이 담겨 있습니다. 편지를 통해 소중한 사람과의 연결을 느껴보세요.",
       receivedAt: "2026-01-01",
       aiSummary: "AI가 편지 내용을 한 줄로 요약해줍니다.",
       emotions: [
