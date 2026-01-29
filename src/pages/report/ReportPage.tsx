@@ -1,3 +1,5 @@
+// 리포트 페이지
+
 import report from '@/assets/report/report.svg';
 import goldIcon from '@/assets/report/goldIcon.svg';
 import silverIcon from '@/assets/report/silverIcon.svg';
@@ -5,9 +7,9 @@ import bronzeIcon from '@/assets/report/bronzeIcon.svg';
 
 export default function ReportPage() {
   const top3From = [
-    { rank: 1, name: '민서', count: 5, color: 'bg-[#FFF9C4]', textColor: 'text-[#7B6305]' }, // 노란색 계열
-    { rank: 2, name: '엄마', count: 3, color: 'bg-[#FFE0E0]', textColor: 'text-[#912020]' }, // 붉은색 계열
-    { rank: 3, name: '디어리', count: 1, color: 'bg-[#E8F5E9]', textColor: 'text-[#2E7D32]' }, // 초록색 계열
+    { rank: 1, name: '민서', count: 5, color: 'bg-[#FFF9C4]', textColor: 'text-[#7B6305]' },
+    { rank: 2, name: '엄마', count: 3, color: 'bg-[#FFE0E0]', textColor: 'text-[#912020]' },
+    { rank: 3, name: '디어리', count: 1, color: 'bg-[#E8F5E9]', textColor: 'text-[#2E7D32]' },
   ];
 
   const topPhrases = ['보고싶어', '힘내', '고마워', '사랑해'];
@@ -16,8 +18,8 @@ export default function ReportPage() {
     { emotion: '고마움', percent: 40, color: 'bg-[#FFE6D8]', textColor: 'text-[#F57542]' },
     { emotion: '즐거움', percent: 20, color: 'bg-[#FFF3C7]', textColor: 'text-[#FFB245]' },
     { emotion: '위로', percent: 20, color: 'bg-[#DDF0C8]', textColor: 'text-[#62BA65]' },
-    { emotion: '그리움', percent: 5, color: 'bg-[#F5E1F1]', textColor: 'text-[#E91E63]' },
-    { emotion: '고민', percent: 10, color: 'bg-[#E9D6E3]', textColor: 'text-[#D572B7]' },
+    { emotion: '그리움', percent: 5, color: 'bg-[#E9D6E3]', textColor: 'text-[#D572B7]' },
+    { emotion: '고민', percent: 10, color: 'bg-[#D0D9EE]', textColor: 'text-[#6B80B5]' },
   ];
 
   const medalIcons = [goldIcon, silverIcon, bronzeIcon];
@@ -56,7 +58,7 @@ export default function ReportPage() {
       <p className="absolute top-[491px] left-4 text-[#141517] font-semibold text-[16px]">
         가장 많이 들은 말
       </p>
-      <div className="absolute top-[530px] flex gap-[8px]">
+      <div className="absolute top-[530px] left-4 flex gap-[8px]">
         {topPhrases.map((phrase, index) => (
           <div
             key={index}
@@ -76,9 +78,9 @@ export default function ReportPage() {
           <div key={index} className="flex flex-col items-center gap-[2px]">
             <span className="text-[11px] text-[#9EA1A8]">{item.percent}%</span>
 
-            <div className="w-[48px] h-[72px] bg-[#F1F1F166]/40 rounded-[10px] relative overflow-hidden">
+            <div className="w-[48px] h-[72px] bg-[#F1F1F166] rounded-[10px] relative overflow-hidden">
               <div
-                className={`absolute bottom-0 w-full ${item.color}`}
+                className={`absolute bottom-0 w-full rounded-[10px] ${item.color}`}
                 style={{ height: `${item.percent}%` }}
               />
             </div>

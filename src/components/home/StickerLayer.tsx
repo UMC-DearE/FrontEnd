@@ -225,7 +225,7 @@ export default function StickerLayer({
                 <>
                   <button
                     type="button"
-                    className="absolute -top-3 -left-3 w-7 h-7 rounded-full bg-[#FF5F2F] text-white text-[14px] font-bold flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.25)]"
+                    className="absolute -top-3 -left-3 w-7 h-7 rounded-full bg-[#FF5F2F] text-white text-[14px] font-bold flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.25)] cursor-pointer"
                     onPointerDown={(e) => e.stopPropagation()}
                     onClick={() => onDelete(s.id)}
                   >
@@ -234,7 +234,7 @@ export default function StickerLayer({
 
                   <button
                     type="button"
-                    className="absolute -bottom-3 -right-3 w-7 h-7 rounded-full bg-white border-2 border-[#FF5F2F] text-[#FF5F2F] text-[12px] font-bold flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.25)]"
+                    className="absolute -bottom-3 -right-3 w-7 h-7 rounded-full bg-white border-2 border-[#FF5F2F] text-[#FF5F2F] text-[12px] font-bold flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.25)] cursor-pointer"
                     onPointerDown={(e) => startTransform(e, s.id)}
                   >
                     ⤡
