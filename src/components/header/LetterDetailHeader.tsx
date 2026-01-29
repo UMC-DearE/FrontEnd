@@ -9,7 +9,7 @@ export default function LetterDetailHeader() {
   return (
     <>
       <TopSection
-        left={<BackButton />}
+        left={<BackButton to="/letter" />}
         center={<div className="text-lg font-semibold">편지 상세</div>}
         right={
             <div className="flex items-center justify-center mr-2">
