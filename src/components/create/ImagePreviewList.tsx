@@ -29,8 +29,8 @@ export default function ImagePreviewList({ images, setImages }: Props) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        delay: 200,
-        tolerance: 5,
+        delay: 250,
+        tolerance: 10,
       },
     })
   );

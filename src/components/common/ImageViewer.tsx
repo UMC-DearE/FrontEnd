@@ -52,10 +52,12 @@ export function ImageViewer({
       className="absolute inset-0 z-50 bg-black/90
                  flex items-center justify-center"
       onClick={onClose}
+      onPointerDown={(e) => e.stopPropagation()}
 >
       <div
         className="relative w-full flex justify-center"
         onClick={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
