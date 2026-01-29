@@ -11,10 +11,11 @@ import {
   horizontalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import ImagePreviewItem from "./ImagePreviewItem";
 import uploadImage from "@/assets/create/image-upload.svg";
+import { ImageViewer } from "../common/ImageViewer";
 
 interface Props {
   images: File[];
@@ -23,6 +24,7 @@ interface Props {
 
 export default function ImagePreviewList({ images, setImages }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [previewFile, setPreviewFile] = useState<File | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -83,7 +85,7 @@ export default function ImagePreviewList({ images, setImages }: Props) {
           items={images.map((_, i) => i.toString())}
           strategy={horizontalListSortingStrategy}
         >
-          <div className="flex gap-2 mt-5 overflow-x-auto">
+          <div className="flex gap-2 mt-5 overflow-x-auto thin-scrollbar pb-1">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
@@ -112,8 +114,16 @@ export default function ImagePreviewList({ images, setImages }: Props) {
                     prev.filter((_, i) => i !== index)
                   )
                 }
+                onPreview={(file) => setPreviewFile(file)}
               />
             ))}
+
+            {previewFile && (
+              <ImageViewer
+                file={previewFile}
+                onClose={() => setPreviewFile(null)}
+              />
+            )}
           </div>
         </SortableContext>
       </DndContext>
