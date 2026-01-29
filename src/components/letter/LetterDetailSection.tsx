@@ -5,36 +5,38 @@ import type { CreateFrom } from "@/types/from";
 import { EmotionTag } from "@/components/common/EmotionTag";
 import { BottomButton } from "@/components/common/BottomButton";
 import { FromBadge } from "@/components/common/FromBadge";
+import LetterDetailBottomSheet from "./LetterDetailBottomSheet";
 import aiSummary from "@/assets/create/ai-summary.svg";
 import upBar from "@/assets/letter/up-bar.svg";
 import downBar from "@/assets/letter/down-bar.svg";
 import heartbtn from "@/assets/letter/heart.svg";
-import LetterDetailBottomSheet from "./LetterDetailBottomSheet";
 
 interface Props {
   content: string;
   aiResult: AiAnalyzeResult;
   from: CreateFrom;
-  createdAt?: string;
+  receivedAt?: string;
   inFolder?: boolean;
   folderName?: string | null;
   reply?: string;
   onSave?: () => void;
   onAddToFolder?: (folderId: number) => void;
   onRemoveFromFolder?: () => void;
+  onEdit: () => void;
 }
 
 export default function LetterDetailSection({
   content,
   aiResult,
   from,
-  createdAt = "2025.06.02",
+  receivedAt = "2025.06.02",
   inFolder = false,
   folderName,
+  reply: initialReply,
   onSave,
   onAddToFolder,
   onRemoveFromFolder,
-  reply: initialReply,
+  onEdit,
 }: Props) {
   const [openSummary, setOpenSummary] = useState(false);
   const [openMore, setOpenMore] = useState(false);
@@ -50,12 +52,12 @@ export default function LetterDetailSection({
       window.removeEventListener("open-letter-more", handleOpen as EventListener);
   }, []);
 
-  // createdAt 포맷
-  const displayCreatedAt = (() => {
-    if (!createdAt) return createdAt;
-    if (/^\d{4}\.\d{2}\.\d{2}$/.test(createdAt)) return createdAt;
+  // receivedAt 포맷
+  const displayReceivedAt = (() => {
+    if (!receivedAt) return receivedAt;
+    if (/^\d{4}\.\d{2}\.\d{2}$/.test(receivedAt)) return receivedAt;
 
-    const d = new Date(createdAt);
+    const d = new Date(receivedAt);
     if (!isNaN(d.getTime())) {
       const y = d.getFullYear();
       const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -63,9 +65,10 @@ export default function LetterDetailSection({
       return `${y}.${m}.${dd}`;
     }
 
-    const first10 = createdAt.slice(0, 10).replace(/-/g, ".");
+    const first10 = receivedAt.slice(0, 10).replace(/-/g, ".");
     return first10;
   })();
+
 
   return (
     <div className="flex flex-col h-full pt-1">
@@ -91,12 +94,12 @@ export default function LetterDetailSection({
 
         <div className="mt-2 flex justify-end">
           <span className="text-xs font-medium text-[#9D9D9F]">
-            {displayCreatedAt}
+            {displayReceivedAt}
           </span>
         </div>
       </div>
 
-      <div className="mb-6">
+       <div className="mb-6">
         <button
           onClick={() => setOpenSummary((v) => !v)}
           className="w-full flex items-center justify-between text-base font-semibold text-primary mb-2"
@@ -110,7 +113,7 @@ export default function LetterDetailSection({
             <img
               src={aiSummary}
               alt="ai summary"
-              className="w-[19px] h-[19px]flex-shrink-0"
+              className="w-[19px] h-[19px] flex-shrink-0"
             />
             <p className="ml-2">{aiResult.summary}</p>
           </div>
@@ -200,8 +203,10 @@ export default function LetterDetailSection({
         onClose={() => setOpenMore(false)}
         onAddToFolder={() => setOpenFolderSelect(true)}
         onRemoveFromFolder={() => onRemoveFromFolder?.()}
-        onDeleteLetter={() => {
-          console.log("편지 삭제 API 호출 준비");
+        onDeleteLetter={() => console.log("편지 삭제")}
+        onEdit={() => {
+          setOpenMore(false);
+          onEdit();
         }}
       />
 

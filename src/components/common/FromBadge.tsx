@@ -1,3 +1,5 @@
+// 프롬 뱃지 - 처음에 생성할 때만 textColor 넘기고 UI에서 사용할 때는 서버 응답으로 받아서 사용
+
 interface FromBadgeProps {
   name: string;
   backgroundColor: string;

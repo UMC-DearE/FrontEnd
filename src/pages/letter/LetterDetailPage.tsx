@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import LetterDetailSection from "@/components/letter/LetterDetailSection";
 import { getMockLetterDetail } from "@/mocks/mockLetterDetail";
-import type { LetterDetailData } from "@/types/letter";                                     
+import type { LetterDetailData } from "@/types/letter";
 
 export default function LetterDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<LetterDetailData | null>(null);
-  
+
   useEffect(() => {
     let mounted = true;
 
     async function load() {
       try {
         setLoading(true);
-        const res = await getMockLetterDetail(Number(id)); // 편지 상세 조회 api 호출
+        const res = await getMockLetterDetail(Number(id));
         if (!mounted) return;
 
         if (!res.success) {
@@ -54,20 +56,28 @@ export default function LetterDetailPage() {
         backgroundColor: data.fromBgColor ?? "#FFF",
         textColor: data.fromFontColor ?? "#000",
       }}
-      createdAt={data.createdAt}
+      receivedAt={data.receivedAt}
       inFolder={data.inFolder}
       folderName={data.folderName}
-      onAddToFolder={(folderId) => {
-        setData((prev) => (prev ? { ...prev, inFolder: true, folderId } : prev));
-      }}
-      onRemoveFromFolder={() => {
-        setData((prev) => (prev ? { ...prev, inFolder: false, folderId: null } : prev));
-      }}
       reply={data.reply}
       onSave={() => {
         console.log("편지 카드 저장");
       }}
+      onAddToFolder={(folderId) => {
+        setData((prev) =>
+          prev ? { ...prev, inFolder: true, folderId } : prev
+        );
+      }}
+      onRemoveFromFolder={() => {
+        setData((prev) =>
+          prev ? { ...prev, inFolder: false, folderId: null } : prev
+        );
+      }}
+      onEdit={() => {
+        navigate(`/letter/${id}/edit`);
+      }}
     />
   );
 }
+
 

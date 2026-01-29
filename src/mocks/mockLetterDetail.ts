@@ -34,8 +34,8 @@ export function getMockLetterDetail(_letterId: number): Promise<LetterDetailResp
       isLiked: false,
       reply: "공백 포함 100자, 하나의 편지당 1개의 답장을 저장할 수 있습니다.",
       fromName: "엄마",
-      fromBgColor: "#FFFF00",
-      fromFontColor: "#000000",
+      fromBgColor: "#FEEFEF",
+      fromFontColor: "#333333",
       createdAt: "2026-01-09T12:00:00",
       imageUrls: [
         "https://bucket.s3.ap-northeast-2.amazonaws.com/images/imgaasdf32579.jpg",

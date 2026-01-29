@@ -12,10 +12,21 @@ import erasebtn from '@/assets/create/erasebtn.svg';
 
 type FromItem = CreateFrom & { fromId: number };
 
+type SetFromPageState =
+  | (CreateResultPayload & {
+      selectedFromDraft?: CreateFrom;
+    })
+  | {
+      mode: "edit";
+      letterId: string;
+      selectedFromDraft?: CreateFrom;
+    }
+  | null;
+
 export default function SetFromPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as CreateResultPayload | null;
+  const state = location.state as SetFromPageState;
 
   const [input, setInput] = useState('');
   const [selectedColor, setSelectedColor] = useState('#FEEFEF');
@@ -38,7 +49,19 @@ export default function SetFromPage() {
 
   // 생성 또는 선택한 From을 가지고 뒤로 이동 + 상태만 전달해서 바로 UI에 반영 +  뒤로 가기 해도 다시 프롬 선택 페이지 안 뜨게
   const goBackWithDraft = (draft: CreateFrom) => {
-    navigate('/create/detail', {
+    // 수정 플로우
+    if (state && "mode" in state && state.mode === "edit") {
+      navigate(`/letter/${state.letterId}/edit`, {
+        replace: true,
+        state: {
+          selectedFromDraft: draft,
+        },
+      });
+      return;
+    }
+
+    // 생성 플로우
+    navigate("/create/detail", {
       replace: true,
       state: {
         ...(state ?? {}),

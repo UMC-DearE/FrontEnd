@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ConfirmModal from "@/components/common/ConfirmModal";
 
-interface LetterDetailBottomSheetProps {
+interface Props {
   open: boolean;
   inFolder: boolean;
   folderName?: string | null;
@@ -11,9 +11,10 @@ interface LetterDetailBottomSheetProps {
   onAddToFolder: () => void;
   onRemoveFromFolder: () => void;
   onDeleteLetter: () => void;
+  onEdit: () => void;
 }
 
-export default function LetterMoreBottomSheet({
+export default function LetterDetailBottomSheet({
   open,
   inFolder,
   folderName,
@@ -21,58 +22,56 @@ export default function LetterMoreBottomSheet({
   onAddToFolder,
   onRemoveFromFolder,
   onDeleteLetter,
-}: LetterDetailBottomSheetProps) {
+  onEdit,
+}: Props) {
   if (!open) return null;
 
-  const [confirmRemoveFromFolderOpen, setConfirmRemoveFromFolderOpen] =
-    useState(false);
-  const [confirmDeleteLetterOpen, setConfirmDeleteLetterOpen] =
-    useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center">
-      <div className="relative w-[393px] min-h-screen overflow-hidden">
+      <div className="relative w-[393px] min-h-screen">
         <button
-          type="button"
           onClick={onClose}
           className="absolute inset-0 bg-[#B0B0B0] bg-opacity-60"
         />
 
-        <div className="absolute bottom-0 left-0 right-0">
-          <div className="bg-white rounded-t-2xl py-[62px] gap-[40px] flex flex-col">
-            <button
-              onClick={() => {
-                if (inFolder) {
-                  setConfirmRemoveFromFolderOpen(true);
-                } else {
-                  onClose();
-                  onAddToFolder();
-                }
-              }}
-              className="w-full text-lg font-medium text-primary"
-            >
-              {inFolder ? "폴더에서 삭제" : "폴더에 저장"}
-            </button>
+        <div className="absolute bottom-0 w-full bg-white rounded-t-2xl py-[62px] flex flex-col gap-[40px]">
+          <button
+            onClick={() => {
+              if (inFolder) setConfirmRemove(true);
+              else {
+                onClose();
+                onAddToFolder();
+              }
+            }}
+            className="w-full text-lg font-medium text-primary"
+          >
+            {inFolder ? "폴더에서 삭제" : "폴더에 저장"}
+          </button>
 
-            <button
-              onClick={onClose}
-              className="w-full text-lg font-medium text-primary"
-            >
-              편지 수정
-            </button>
+          <button
+            onClick={() => {
+              onClose();
+              onEdit();
+            }}
+            className="w-full text-lg font-medium text-primary"
+          >
+            편지 수정
+          </button>
 
-            <button
-              onClick={() => setConfirmDeleteLetterOpen(true)}
-              className="w-full text-lg font-medium text-[#FF1D0D]"
-            >
-              편지 삭제
-            </button>
-          </div>
+          <button
+            className="w-full text-lg font-medium text-[#FF1D0D]"
+            onClick={() => setConfirmDelete(true)}
+          >
+            편지 삭제
+          </button>
         </div>
 
         {/* 폴더에서 삭제 확인 모달 */}
         <ConfirmModal
-          open={confirmRemoveFromFolderOpen}
+          open={confirmRemove}
           title="폴더에서 삭제"
           description={
             folderName
@@ -81,9 +80,9 @@ export default function LetterMoreBottomSheet({
           }
           cancelText="취소"
           confirmText="삭제"
-          onCancel={() => setConfirmRemoveFromFolderOpen(false)}
+          onCancel={() => setConfirmRemove(false)}
           onConfirm={() => {
-            setConfirmRemoveFromFolderOpen(false);
+            setConfirmRemove(false);
             onClose();
             onRemoveFromFolder();
           }}
@@ -91,17 +90,16 @@ export default function LetterMoreBottomSheet({
 
         {/* 편지 삭제 확인 모달 */}
         <ConfirmModal
-          open={confirmDeleteLetterOpen}
+          open={confirmDelete}
           title="편지 삭제"
           titleClassName="text-[#FF1D0D]"
           description={"편지를 삭제할 경우 되돌릴 수 없어요\n정말 삭제할까요?"}
           cancelText="취소"
           confirmText="삭제"
-          onCancel={() => setConfirmDeleteLetterOpen(false)}
+          onCancel={() => setConfirmDelete(false)}
           onConfirm={() => {
-            setConfirmDeleteLetterOpen(false);
+            setConfirmDelete(false);
             onClose();
-            /* 편지 삭제 api 호출 */
             onDeleteLetter();
           }}
         />
@@ -109,6 +107,7 @@ export default function LetterMoreBottomSheet({
     </div>
   );
 }
+
 
 
 

@@ -11,8 +11,8 @@ export const MOCK_LETTERS: Letter[] = [
     createdAt: '2026-01-16T12:27:03',
     fromId: 1065,
     fromName: '엄마',
-    fromBgColor: '#FFFF00',
-    fromFontColor: '#000000',
+    fromBgColor: '#FEEFEF',
+    fromFontColor: '#333333',
     folderId: 1,
   },
   {

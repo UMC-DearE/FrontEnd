@@ -1,29 +1,25 @@
+// 편지 추가 - 내용 분석 및 편지 수정 공통 UI
+
 import { useState } from "react";
-import type { AiAnalyzeResult } from "@/types/letter";
-import type { CreateFrom } from "@/types/from";
 import { EmotionTag } from "@/components/common/EmotionTag";
 import { BottomButton } from "@/components/common/BottomButton";
+import { FromBadge } from "@/components/common/FromBadge";
 import aiSummary from "@/assets/create/ai-summary.svg";
 import selectFrom from "@/assets/create/select-from.svg";
-import { FromBadge } from "@/components/common/FromBadge";
+import type { LetterFormProps } from "@/types/letterForm";
 
-interface Props {
-  content: string;
-  aiResult: AiAnalyzeResult;
-  from?: CreateFrom;
-  onSelectRecipient?: () => void;
-  onNext?: () => void;
-}
-
-export default function AnalysisResultSection({
+export default function LetterForm({
+  mode,
   content,
   aiResult,
   from,
+  initialDate = "",
+  initialUnknownDate = false,
   onSelectRecipient,
-  onNext,
-}: Props) {
-  const [date, setDate] = useState("");
-  const [unknownDate, setUnknownDate] = useState(false);
+  onSubmit,
+}: LetterFormProps) {
+  const [date, setDate] = useState(initialDate);
+  const [unknownDate, setUnknownDate] = useState(initialUnknownDate);
 
   const canProceed = Boolean(from) && (unknownDate || date);
 
@@ -96,15 +92,18 @@ export default function AnalysisResultSection({
       <div className="fixed bottom-0 left-1/2 w-full max-w-[393px] -translate-x-1/2 bg-white px-4 pb-[52px] pt-3">
         <BottomButton
           disabled={!canProceed}
-          onClick={() => {
-            if (!canProceed) return;
-            onNext?.();
-          }}
+          onClick={() =>
+            from &&
+            onSubmit({
+              from,
+              date,
+              unknownDate,
+            })
+          }
         >
-          편지 추가하기
+          {mode === "edit" ? "수정 완료" : "편지 추가하기"}
         </BottomButton>
       </div>
     </div>
   );
 }
-

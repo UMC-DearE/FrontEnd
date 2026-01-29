@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import AnalysisResultSection from "@/components/create/detail/AnalysisResultSection";
 import type { CreateResultPayload } from "@/types/create";
 import type { CreateFrom } from "@/types/from";
+import LetterForm from "@/components/common/LetterForm";
 
 type LocationState =
   | (CreateResultPayload & {
@@ -32,21 +32,21 @@ export default function CreateDetailPage() {
   if (!state) return null;
 
   return (
-    <AnalysisResultSection
+    <LetterForm
+      mode="create"
       content={state.content}
       aiResult={state.aiResult}
       from={fromDraft}
       onSelectRecipient={() =>
         navigate("/create/from", {
-        state: {
-          ...(state ?? {}),
-          selectedFromDraft: fromDraft,
-        },
-      })
-
+          state: {
+            ...(state ?? {}),
+            selectedFromDraft: fromDraft,
+          },
+        })
       }
-      onNext={() => {
-        // 프롬 생성 + 편지 생성 api 호출
+      onSubmit={({  }) => {
+        // 편지 추가 버튼 - 프롬 생성 / 편지 생성 api 호출
       }}
     />
   );
