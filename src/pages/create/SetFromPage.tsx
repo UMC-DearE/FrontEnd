@@ -120,19 +120,23 @@ export default function SetFromPage() {
         <div className="text-sm text-[#555557] font-medium mb-4">기존 목록</div>
 
         <div className="flex flex-col gap-5">
-          {fromList.map((from) => (
-            <div key={from.fromId} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FromBadge name={from.name} backgroundColor={from.backgroundColor} textColor={from.textColor} />
+          {fromList.length === 0 ? (
+            <div className="w-full text-center text-sm text-[#9D9D9F] py-6">저장된 목록이 없어요</div>
+          ) : (
+            fromList.map((from) => (
+              <div key={from.fromId} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FromBadge name={from.name} backgroundColor={from.backgroundColor} textColor={from.textColor} />
+                </div>
+                <button
+                  onClick={() => handleSelect(from)}
+                  className="text-sm font-normal text-[#9D9D9F] border border-[#C2C4C7] rounded-lg px-[10px] py-[2px]"
+                >
+                  선택
+                </button>
               </div>
-              <button
-                onClick={() => handleSelect(from)}
-                className="text-sm font-normal text-[#9D9D9F] border border-[#C2C4C7] rounded-lg px-[10px] py-[2px]"
-              >
-                선택
-              </button>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
