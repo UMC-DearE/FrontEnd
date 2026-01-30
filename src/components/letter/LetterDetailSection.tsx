@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import FolderSelect from "@/components/letter/FolderSelect";
+import { getMockFolders, type MockFolder } from "@/mocks/mockFolder";
+import useToast from "@/hooks/useToast";
 import type { AiAnalyzeResult } from "@/types/letter";
 import type { CreateFrom } from "@/types/from";
 import { EmotionTag } from "@/components/common/EmotionTag";
@@ -16,7 +18,7 @@ interface Props {
   content: string;
   aiResult: AiAnalyzeResult;
   from: CreateFrom;
-  receivedAt?: string;
+  receivedAt?: string | null;
   inFolder?: boolean;
   folderName?: string | null;
   reply?: string;
@@ -72,8 +74,10 @@ export default function LetterDetailSection({
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [openMore, setOpenMore] = useState(false);
   const [openFolderSelect, setOpenFolderSelect] = useState(false);
+  const toast = useToast();
   const [savedReply, setSavedReply] = useState(initialReply ?? "");
   const [draftReply, setDraftReply] = useState("");
+  const [folders, setFolders] = useState<MockFolder[]>([]);
 
   // 헤더 더보기 버튼에서 이벤트로 열리는 구조
   useEffect(() => {
@@ -147,8 +151,20 @@ export default function LetterDetailSection({
     });
   };
 
+  // 폴더 없을 경우 토스트 띄우기(부모 컴포넌트에서 미리 폴더 불러오기 - 폴더 선택 모달에 넘겨줌)
+  const handleOpenFolderSelect = async () => {
+    const list = await getMockFolders();
+    if (list.length === 0) {
+      toast.show("생성된 폴더가 없습니다", 1200);
+      return;
+    }
+    setFolders(list);   
+    setOpenFolderSelect(true);
+  };
+
   // receivedAt 포맷
   const displayReceivedAt = (() => {
+    if (receivedAt === null) return "-"; // null이면 -로 처리
     if (!receivedAt) return receivedAt;
     if (/^\d{4}\.\d{2}\.\d{2}$/.test(receivedAt)) return receivedAt;
 
@@ -246,6 +262,7 @@ export default function LetterDetailSection({
               <input
                 value={draftReply}
                 onChange={(e) => setDraftReply(e.target.value)}
+                maxLength={100} // 공백 포함 100자까지
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
@@ -290,15 +307,13 @@ export default function LetterDetailSection({
         </BottomButton>
       </div>
 
-
-
       {/* 더보기 바텀시트 */}
       <LetterDetailBottomSheet
         open={openMore}
         inFolder={inFolder}
         folderName={folderName}
         onClose={() => setOpenMore(false)}
-        onAddToFolder={() => setOpenFolderSelect(true)}
+        onAddToFolder={handleOpenFolderSelect}
         onRemoveFromFolder={() => onRemoveFromFolder?.()}
         onDeleteLetter={() => console.log("편지 삭제")}
         onEdit={() => {
@@ -309,9 +324,10 @@ export default function LetterDetailSection({
 
       <FolderSelect
         open={openFolderSelect}
+        folders={folders}
         onClose={() => setOpenFolderSelect(false)}
-        onSelect={(folderId) => onAddToFolder?.(folderId)}
-      />
+        onSelect={(folderId) => onAddToFolder?.(folderId)} />
     </div>
   );
 }
+

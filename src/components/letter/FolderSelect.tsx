@@ -1,37 +1,20 @@
-// 편지 상세 - 폴더에 저장 - 폴더 선택 모달
+// 편지 상세 - 폴더에 저장 - 폴더 선택 모달(폴더 목록 불러오는 건 부모 컴포넌트 - LetterDetailSection => 다시 받아올 필요 없음)
 
-import { useEffect, useState } from "react";
 import type { MockFolder } from "@/mocks/mockFolder";
-import { getMockFolders } from "@/mocks/mockFolder";
 
 interface Props {
   open: boolean;
+  folders: MockFolder[];
   onClose: () => void;
   onSelect: (folderId: number) => void;
 }
 
-export default function FolderSelect({ open, onClose, onSelect }: Props) {
-  const [loading, setLoading] = useState(false);
-  const [folders, setFolders] = useState<MockFolder[]>([]);
-
-  useEffect(() => {
-    if (!open) return;
-    let mounted = true;
-    setLoading(true);
-
-    getMockFolders()
-      .then((list) => {
-        if (mounted) setFolders(list);
-      })
-      .finally(() => {
-        if (mounted) setLoading(false);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [open]);
-
+export default function FolderSelect({
+  open,
+  folders,
+  onClose,
+  onSelect,
+}: Props) {
   if (!open) return null;
 
   return (
@@ -49,7 +32,11 @@ export default function FolderSelect({ open, onClose, onSelect }: Props) {
           </p>
 
           <div className="max-h-[48vh] overflow-auto gap-[10px] flex flex-col no-scrollbar">
-            {!loading &&
+            {folders.length === 0 ? (
+              <div className="w-full text-center text-sm text-[#9D9D9F] py-6">
+                생성된 폴더가 없습니다
+              </div>
+            ) : (
               folders.map((f) => (
                 <button
                   key={f.id}
@@ -61,10 +48,12 @@ export default function FolderSelect({ open, onClose, onSelect }: Props) {
                 >
                   {f.folderName}
                 </button>
-              ))}
+              ))
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
+

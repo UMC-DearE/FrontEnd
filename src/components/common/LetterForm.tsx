@@ -140,14 +140,14 @@ export default function LetterForm({
         <BottomButton
           disabled={!canProceed}
           onClick={() =>
-            from &&
-            onSubmit({
-              from,
-              date,
-              unknownDate,
-              content,
-            })
-          }
+              from &&
+              onSubmit({
+                from,
+                date: unknownDate ? null : date, // 날짜 모름 선택한 경우 서버에 null 전달(이거 api 명세서에 따라 맞출 예정)
+                unknownDate,
+                content,
+              })
+            }
         >
           {mode === "edit" ? "수정 완료" : "편지 추가하기"}
         </BottomButton>

@@ -13,7 +13,7 @@ export interface LetterFormProps {
   onSelectRecipient?: () => void;
   onSubmit: (payload: {
     from: CreateFrom;
-    date?: string;
+    date?: string | null;
     unknownDate: boolean;
     content?: string;
   }) => void;
