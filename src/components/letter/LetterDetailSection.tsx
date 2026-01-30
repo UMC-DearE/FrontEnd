@@ -108,8 +108,8 @@ export default function LetterDetailSection({
         clonedEl.style.boxShadow = "none";
         (clonedEl.style as any).webkitBoxShadow = "none";
 
-        clonedEl.style.overflow = "hidden";
-
+        // 전체 overflow visible로 변경(캡쳐할 때만)
+        clonedEl.style.overflow = "visible";
 
         clonedEl.querySelectorAll("[data-from-badge-text]").forEach((el) => {
         const text = el as HTMLElement;
