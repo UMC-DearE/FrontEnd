@@ -13,14 +13,17 @@ export function FromBadge({
 }: FromBadgeProps) {
   return (
     <span
-    data-from-badge
-    style={{
-      backgroundColor,
-      color: textColor,
-    }}
-    className="inline-flex items-center justify-center h-[24px] px-[11px] rounded-[6px] text-[14px] font-medium leading-none"
-  >
-    {name}
-  </span>
-);
+      data-from-badge
+      className="inline-flex h-[24px] px-[11px] rounded-[6px]"
+      style={{ backgroundColor }}
+    >
+      <span
+        data-from-badge-text
+        className="flex items-center text-[14px] font-medium"
+        style={{ color: textColor }}
+      >
+        {name}
+      </span>
+    </span>
+  );
 }

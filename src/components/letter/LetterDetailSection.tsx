@@ -111,6 +111,14 @@ export default function LetterDetailSection({
         clonedEl.style.overflow = "hidden";
 
 
+        clonedEl.querySelectorAll("[data-from-badge-text]").forEach((el) => {
+        const text = el as HTMLElement;
+
+        // glyph 기준선 보정 - 프롬 뱃지 정렬 맞추기
+        text.style.transform = "translateY(-5px)";
+        text.style.lineHeight = "1";
+      });
+
         const scrollArea = clonedEl.querySelector(
           ".thin-scrollbar"
         ) as HTMLElement | null;
