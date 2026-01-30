@@ -34,7 +34,7 @@ export default function LetterCreatePage() {
       }
 
       if (mode === "IMAGE") {
-        // 1. 이미지 s3 업로드(api 호출) - 이거 url 받아서 뒤에 띄워도 되고 상태로 관리
+        // 1. 이미지 s3 업로드(api 호출)
         // 2. OCR -> text 변환(api 호출)
         finalContent = "OCR로 추출된 편지 내용";
       }
@@ -42,11 +42,12 @@ export default function LetterCreatePage() {
       // 3. AI 분석(api 호출)
       const aiResult = await mockAiAnalyze(finalContent);
 
-      // 4. 내용 분석 페이지로 이동
+      // 4. 내용 분석 페이지로 이동 (이미지 모드일 경우 업로드된 File 배열을 함께 전달(서버 책임 줄어듦) 혹은 s3에 업로드 된 URL 전달 받아서 띄워도 됨)
       navigate("/create/detail", {
         state: {
           content: finalContent,
           aiResult,
+          images: mode === "IMAGE" ? images : undefined,
         },
       });
     } finally {
