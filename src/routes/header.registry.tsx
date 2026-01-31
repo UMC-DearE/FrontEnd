@@ -26,6 +26,12 @@ const MyFromHeader = lazy(
 const MyStyleHeader = lazy(
   () => import("@/components/header/MyStyleHeader")
 );
+const LetterDetailHeader = lazy(
+  () => import("@/components/header/LetterDetailHeader")
+);
+const EditLetterHeader = lazy(
+  () => import("@/components/header/EditLetterHeader")
+);
 
 export type HeaderRenderContext = {
   title?: string;
@@ -50,6 +56,8 @@ export const HEADER_REGISTRY: Record<
   LETTER_BOX: ({ title }) => <LetterBoxHeader title={title} />,
   MY_FROM: () => <MyFromHeader />,
   MY_STYLE: () => <MyStyleHeader />,
+  LETTER_DETAIL: () => <LetterDetailHeader />,
+  EDIT_LETTER: () => <EditLetterHeader />,
   
   NONE: null,
 };

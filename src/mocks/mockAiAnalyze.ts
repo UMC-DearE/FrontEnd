@@ -1,10 +1,9 @@
 import type { AiAnalyzeResult } from '@/types/letter';
 
-export function mockAiAnalyze(content: string): Promise<AiAnalyzeResult> {
+export function mockAiAnalyze(_finalContent: string): Promise<AiAnalyzeResult> {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
-        letterId: 1,
         summary: '그리움과 애정이 담긴 따뜻한 편지입니다.',
         emotions: [
           {
