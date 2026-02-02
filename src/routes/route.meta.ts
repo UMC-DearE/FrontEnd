@@ -7,7 +7,9 @@ export type HeaderPresetKey =
   | "SET_FROM"
   | "LETTER_BOX"
   | "MY_FROM"
-  | "MY_STYLE";
+  | "MY_STYLE"
+  | "LETTER_DETAIL"
+  | "EDIT_LETTER";
 
 export const ROUTE_META: Array<{
   match: (pathname: string) => boolean;
@@ -73,12 +75,19 @@ export const ROUTE_META: Array<{
     bg: "gray",
   },
 
+    // 편지 상세 - 편지 수정
+  {
+    match: (pathname) => pathname.startsWith("/letter/") && pathname.endsWith("/edit"),
+    header: "EDIT_LETTER",
+    bg: "white",
+  },
+
     // 편지 상세
   {
     match: (pathname) => pathname.startsWith("/letter/"),
-    header: "LEFT_ONLY",
+    header: "LETTER_DETAIL",
     title: "편지 상세",
-    bg: "white",
+    bg: "gray",
   },
 
     // 리포트

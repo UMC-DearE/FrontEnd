@@ -32,6 +32,7 @@ import StylePage from "@/pages/my/StylePage";
 import ThemePage from "@/pages/my/ThemePage";
 import MyTermsPage from "@/pages/my/TermsPage";
 import PrivacyPage from "@/pages/my/PrivacyPage";
+import EditLetterPage from "@/pages/letter/EditLetterPage";
 
 const router = createBrowserRouter([
   {
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
                 children: [
                   { index: true, element: <LetterBoxPage /> },
                   { path: ":id", element: <LetterDetailPage /> },
+                  { path: ":id/edit", element: <EditLetterPage /> },
                 ],
               },
 

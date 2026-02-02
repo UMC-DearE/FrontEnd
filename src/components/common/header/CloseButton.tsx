@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import CloseIcon from "@/components/icons/CloseIcon";
+import CloseIcon from "@/assets/header/close-btn.svg";
 
 export default function CloseButton() {
   const navigate = useNavigate();
@@ -9,13 +9,8 @@ export default function CloseButton() {
       type="button"
       aria-label="close"
       onClick={() => navigate(-1)}
-      className="
-        w-12.1 h-12.1
-        flex items-center justify-center
-        text-primary
-      "
-    >
-      <CloseIcon />
+      className="w-6 h-6 flex items-center justify-center text-primary">
+      <img src={CloseIcon} alt="close" className="w-[12px] h-[12px]" />
     </button>
   );
 }

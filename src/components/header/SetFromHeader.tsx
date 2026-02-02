@@ -2,8 +2,11 @@
 
 import TopSection from "@/components/header/TopSection";
 import BackButton from "../common/header/BackButton";
+import { useNavigate } from "react-router-dom";
 
 export default function SetFromHeader() {
+  const navigate = useNavigate();
+
   return (
     <>
       <TopSection
@@ -15,6 +18,7 @@ export default function SetFromHeader() {
               type="button"
               className="text-base font-normal text-[#555557]"
               aria-label="관리"
+              onClick={() => navigate('/my/from')}
             >
               관리
             </button>

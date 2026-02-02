@@ -24,20 +24,27 @@ export default function ConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="relative flex w-[393px] min-h-screen items-center justify-center bg-[#B0B0B0]">
-        <div className="h-[151px] w-[294px] rounded-[17px] bg-white px-[18px] pt-[26px] pb-[20px]">
-          <div className="flex flex-col gap-5">
+        <div className="w-[294px] rounded-[17px] bg-white px-[18px] pt-[26px] pb-[20px]">
+          <div className="flex flex-col gap-[20px]">
             <div className="flex flex-col items-center gap-2">
               <p
-                className={`w-[257.44px] text-center text-[16px] font-semibold ${
+                className={`text-center text-base font-semibold ${
                   titleClassName ?? 'text-black'
                 }`}
               >
                 {title}
               </p>
               {description ? (
-                <p className="w-[257.44px] text-center text-[13px] font-medium text-[#9D9D9F] cursor-pointer">
-                  {description}
-                </p>
+                <div className="text-center text-xs font-medium text-[#9D9D9F]">
+                  {description
+                    .split(/\r?\n/)
+                    .map((line) => line.trim())
+                    .map((line, idx) => (
+                      <p key={idx} className={idx === 0 ? "" : "mt-1"}>
+                        {line}
+                      </p>
+                    ))}
+                </div>
               ) : null}
             </div>
 
@@ -45,7 +52,7 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onCancel}
-                className="h-[38px] w-[122px] rounded-lg border border-[#E5E5E5] text-[14px] font-medium text-[#555557]"
+                className="h-[38px] w-[122px] rounded-lg border border-[#E5E5E5] text-sm font-normal text-[#555557]"
               >
                 {cancelText}
               </button>
@@ -53,7 +60,7 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onConfirm}
-                className="h-[38px] w-[122px] rounded-lg bg-[#111111] text-[14px] font-semibold text-white cursor-pointer"
+                className="h-[38px] w-[122px] rounded-lg bg-[#111111] text-sm font-medium text-white cursor-pointer"
               >
                 {confirmText}
               </button>

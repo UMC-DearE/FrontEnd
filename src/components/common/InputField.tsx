@@ -12,6 +12,9 @@ interface InputFieldProps {
   placeholder?: string;
   rightElement?: ReactNode;
   maxLength?: number;
+  inputClassName?: string;
+  containerClassName?: string;
+  useGrayWhenBlurred?: boolean;
 }
 
 const BASE_PADDING_PX = 18;
@@ -22,9 +25,13 @@ export function InputField({
   placeholder,
   rightElement,
   maxLength,
+  inputClassName,
+  containerClassName,
+  useGrayWhenBlurred = false,
 }: InputFieldProps) {
   const rightRef = useRef<HTMLDivElement>(null);
   const [rightPadding, setRightPadding] = useState<number | null>(null);
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     if (rightRef.current) {
@@ -36,27 +43,33 @@ export function InputField({
   }, [rightElement]);
 
   return (
-    <div className="relative w-full">
+    <div className={`relative w-full ${containerClassName ?? ""}`}>
       <input
         type="text"
         value={value}
         maxLength={maxLength}
         onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         placeholder={placeholder}
         style={
           rightPadding !== null
             ? { paddingRight: rightPadding }
             : undefined
         }
-        className="
-          w-full h-[50px] bg-white
+        className={
+          `
+          w-full h-[50px]
           rounded-xl px-[12px] py-[15px]
           text-base font-medium text-primary
           border border-[#C2C4C7]
           placeholder:text-[#C2C4C7]
           focus:outline-none focus:ring-0 focus:border-primary
           overflow-x-auto whitespace-nowrap
-        "
+        ` +
+            (useGrayWhenBlurred && !isFocused ? " bg-[#F7F7F7]" : " bg-white") +
+            (inputClassName ? ` ${inputClassName}` : "")
+        }
       />
 
       {rightElement && (

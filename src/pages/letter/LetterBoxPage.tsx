@@ -1,6 +1,7 @@
 // 편지함 페이지
 
 import { useMemo, useState, useEffect } from 'react';
+import { MOCK_LETTERS } from '@/mocks/mockLetter';
 import FolderList from '@/components/letterBox/letterFolder/FolderList';
 import FolderSettingSheet from '@/components/letterBox/letterFolder/FolderSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
@@ -9,6 +10,7 @@ import type { FolderType } from '@/types/folder';
 import type { Letter } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
+import { useNavigate } from 'react-router-dom';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기' | '앨범 보기';
@@ -16,6 +18,7 @@ type ViewMode = '기본 보기' | '간편 보기' | '앨범 보기';
 export default function LetterBox() {
   const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>('all');
   const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
+  const navigate = useNavigate();
 
   const [viewMode, setViewMode] = useState<ViewMode>('기본 보기');
 
@@ -43,46 +46,8 @@ export default function LetterBox() {
   const [letters, setLetters] = useState<Letter[]>([]);
 
   useEffect(() => {
-    const mock: Letter[] = [
-      {
-        id: 15,
-        content: '오늘 생일 축하해줘서 정말 고마워!',
-        isLiked: false,
-        receiveAt: '2024-07-08',
-        createdAt: '2026-01-16T12:27:03',
-        fromId: 1065,
-        fromName: '엄마',
-        fromBgColor: '#FFFF00',
-        fromFontColor: '#000000',
-        folderId: 1,
-      },
-      {
-        id: 27,
-        content: '디어리 파이팅~!!',
-        isLiked: true,
-        receiveAt: '2026-01-21',
-        createdAt: '2026-01-16T12:27:03',
-        fromId: 574,
-        fromName: '나룬',
-        fromBgColor: '#F7F7F7',
-        fromFontColor: '#000000',
-        folderId: 1,
-      },
-      {
-        id: 40,
-        content: 'ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ',
-        isLiked: false,
-        receiveAt: '2026-01-23',
-        createdAt: '2026-01-16T12:27:03',
-        fromId: 574,
-        fromName: '나룬',
-        fromBgColor: '#F7F7F7',
-        fromFontColor: '#000000',
-        folderId: 2,
-      },
-    ];
-    setLetters(mock);
-  }, []);
+    setLetters(MOCK_LETTERS);
+  }, []); // 편지 목록 mock 데이터 - 연동 시 제거
 
   const folderFilteredLetters = useMemo(() => {
     let result = letters;
@@ -223,16 +188,22 @@ export default function LetterBox() {
         />
 
         {finalFilteredLetters.map((letter) => (
-          <LetterCard
+          <div
             key={letter.id}
-            content={letter.content}
-            isLiked={letter.isLiked}
-            receiveAt={letter.receiveAt}
-            fromName={letter.fromName}
-            fromBgColor={letter.fromBgColor}
-            fromFontColor={letter.fromFontColor}
-            viewMode={viewMode}
-          />
+            role="button"
+            className="cursor-pointer"
+            onClick={() => navigate(`/letter/${letter.id}`)}
+          >
+            <LetterCard
+              content={letter.content}
+              isLiked={letter.isLiked}
+              receiveAt={letter.receiveAt}
+              fromName={letter.fromName}
+              fromBgColor={letter.fromBgColor}
+              fromFontColor={letter.fromFontColor}
+              viewMode={viewMode}
+            />
+          </div>
         ))}
       </div>
     </>
