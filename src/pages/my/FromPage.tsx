@@ -74,7 +74,7 @@ export default function FromPage() {
                   backgroundColor={from.backgroundColor}
                   textColor={from.textColor}
                 />
-                <div className="text-xs font-medium text-[#9D9D9F]">
+                <div className="flex items-center text-xs font-medium text-[#9D9D9F]">
                   {from.letterCount ?? 0}통의 편지
                 </div>
               </div>
@@ -92,6 +92,5 @@ export default function FromPage() {
     )}
   </div>
 );
-
 }
 

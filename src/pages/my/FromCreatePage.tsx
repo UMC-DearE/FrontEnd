@@ -11,15 +11,14 @@ async function createFromApi(draft: CreateFrom) {
       res({ fromId: Math.floor(Math.random() * 100000), ...draft });
     }, 400);
   });
-} // 프롬 생성 api 호출
+} // 프롬 생성 api 호출(draft 상태 전달하지 말고 버튼 누르면 바로 api 호출해서 프롬 생성 => 바로 프롬 관리 페이지로 이동 후 반영)
 
 export default function FromCreatePage() {
   const navigate = useNavigate();
   const [input, setInput] = useState('');
 
   const handleCreateImmediate = async (draft: CreateFrom) => {
-    const created = await createFromApi(draft);
-
+    const created = await createFromApi(draft); // 프롬 생성 api 호출
     navigate('/my/from', {
       replace: true,
       state: {
