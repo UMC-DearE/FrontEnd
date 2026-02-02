@@ -14,7 +14,6 @@ const LEGACY_STYLE = {
   worry: "bg-[#D7E2F9] text-[#6B80B5]",
 } as const;
 
- /* 없으면 legacy `variant` 스타일을 사용 */
 export function EmotionTag({ label, category, variant }: EmotionTagProps) {
   const displayLabel = label ?? category?.type ?? "";
 

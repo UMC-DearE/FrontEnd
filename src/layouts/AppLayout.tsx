@@ -16,8 +16,13 @@ export function AppLayout() {
   const matched = ROUTE_META.find((r) => r.match(pathname));
   const Header = matched ? HEADER_REGISTRY[matched.header] : null;
 
-  const hideBottomNav = pathname.startsWith('/setup') || pathname.startsWith('/create');
-  const bgClass = matched?.bg === 'white' ? 'bg-white' : 'bg-[#F8F8F8]';
+  const isLetterDetail = /^\/letter\/[^/]+/.test(pathname);
+  const hideBottomNav =
+    pathname.startsWith("/setup") ||
+    pathname.startsWith("/create") ||
+    isLetterDetail;
+  const bgClass =
+    matched?.bg === "white" ? "bg-white" : "bg-[#F8F8F8]";
 
   const useHomeBg = pathname === '/' || pathname.startsWith('/home');
 

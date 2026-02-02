@@ -36,8 +36,37 @@ export interface Emotion {
   category: EmotionCategory;
 }
 
+// AI 편지 내용 분석 결과(letterID는 params로 전달 - UI에서 몰라도 됨)
 export interface AiAnalyzeResult {
-  letterId: number;
   summary: string;
   emotions: Emotion[];
+}
+
+// 편지 상세 조회
+export interface LetterDetailData {
+  content: string;
+  receivedAt?: string;
+  aiSummary?: string;
+
+  emotions?: Emotion[];
+  isLiked?: boolean;
+  reply?: string;
+
+  fromName?: string;
+  fromBgColor?: string;
+  fromFontColor?: string;
+
+  createdAt?: string;
+  imageUrls?: string[];
+
+  inFolder?: boolean;
+  folderId?: number | null;
+  folderName?: string | null;
+}
+
+export interface LetterDetailResponse {
+  success: boolean;
+  code: string;
+  message: string;
+  data: LetterDetailData;
 }

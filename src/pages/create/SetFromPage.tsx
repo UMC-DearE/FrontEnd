@@ -12,19 +12,29 @@ import erasebtn from '@/assets/create/erasebtn.svg';
 
 type FromItem = CreateFrom & { fromId: number };
 
+type SetFromPageState =
+  | (CreateResultPayload & {
+      selectedFromDraft?: CreateFrom;
+    })
+  | {
+      mode: "edit";
+      letterId: string;
+      selectedFromDraft?: CreateFrom;
+    }
+  | null;
+
 export default function SetFromPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as CreateResultPayload | null;
+  const state = location.state as SetFromPageState;
 
   const [input, setInput] = useState('');
   const [selectedColor, setSelectedColor] = useState('#FEEFEF');
   const [showPicker, setShowPicker] = useState(false);
 
   const [fromList, setFromList] = useState<FromItem[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  // 기존 From 목록 불러오기 api 호출
+  // 기존 From 목록 불러오기 api 호출 - textColor 응답에서 받아오기(계산 다시 할 필요 없음)
   useEffect(() => {
     const fetchFromList = async () => {
       const res: FromItem[] = [
@@ -32,7 +42,6 @@ export default function SetFromPage() {
         { fromId: 2, name: '아빠', backgroundColor: '#EAF6FF', textColor: '#333333' },
       ];
       setFromList(res);
-      setLoading(false);
     };
 
     fetchFromList();
@@ -40,7 +49,19 @@ export default function SetFromPage() {
 
   // 생성 또는 선택한 From을 가지고 뒤로 이동 + 상태만 전달해서 바로 UI에 반영 +  뒤로 가기 해도 다시 프롬 선택 페이지 안 뜨게
   const goBackWithDraft = (draft: CreateFrom) => {
-    navigate('/create/detail', {
+    // 수정 플로우
+    if (state && "mode" in state && state.mode === "edit") {
+      navigate(`/letter/${state.letterId}/edit`, {
+        replace: true,
+        state: {
+          selectedFromDraft: draft,
+        },
+      });
+      return;
+    }
+
+    // 생성 플로우
+    navigate("/create/detail", {
       replace: true,
       state: {
         ...(state ?? {}),
@@ -59,7 +80,7 @@ export default function SetFromPage() {
       name,
       backgroundColor: selectedColor,
       textColor: getHarmoniousTextColor(selectedColor),
-    };
+    }; // 프롬 생성할 때 텍스트 색상 계산해서 백엔드에 넘겨줌, 프롬 생성하는 api는 여기서 호출 안 하고 편지 추가할 때 같이 호출
 
     goBackWithDraft(draft);
   };
@@ -99,19 +120,23 @@ export default function SetFromPage() {
         <div className="text-sm text-[#555557] font-medium mb-4">기존 목록</div>
 
         <div className="flex flex-col gap-5">
-          {fromList.map((from) => (
-            <div key={from.fromId} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FromBadge name={from.name} backgroundColor={from.backgroundColor} />
+          {fromList.length === 0 ? (
+            <div className="w-full text-center text-sm text-[#9D9D9F] py-6">저장된 목록이 없어요</div>
+          ) : (
+            fromList.map((from) => (
+              <div key={from.fromId} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FromBadge name={from.name} backgroundColor={from.backgroundColor} textColor={from.textColor} />
+                </div>
+                <button
+                  onClick={() => handleSelect(from)}
+                  className="text-sm font-normal text-[#9D9D9F] border border-[#C2C4C7] rounded-lg px-[10px] py-[2px]"
+                >
+                  선택
+                </button>
               </div>
-              <button
-                onClick={() => handleSelect(from)}
-                className="text-sm font-normal text-[#9D9D9F] border border-[#C2C4C7] rounded-lg px-[10px] py-[2px]"
-              >
-                선택
-              </button>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -162,12 +187,9 @@ export default function SetFromPage() {
             )}
           </div>
 
-          <button
-            onClick={handleCreate}
-            className="flex items-center gap-2 font-medium text-base text-primary"
-          >
+          <button onClick={handleCreate} className="flex items-center gap-2 font-medium text-lg text-primary">
             <img src={Plusbtn} alt="upload" />
-            <FromBadge name={input} backgroundColor={selectedColor} />
+            <FromBadge name={input} backgroundColor={selectedColor} textColor={getHarmoniousTextColor(selectedColor)} />
             생성하기
           </button>
         </div>

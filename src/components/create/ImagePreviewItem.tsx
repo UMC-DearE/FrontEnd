@@ -1,17 +1,20 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import closebtn from "@/assets/create/closebtn.svg";
+import { useEffect, useState } from "react";
 
 interface Props {
   id: string;
   file: File;
   onDelete: () => void;
+  onPreview: (file: File) => void;
 }
 
 export default function ImagePreviewItem({
   id,
   file,
   onDelete,
+  onPreview,
 }: Props) {
   const {
     attributes,
@@ -28,7 +31,18 @@ export default function ImagePreviewItem({
     opacity: isDragging ? 0.6 : 1,
   };
 
-  const url = URL.createObjectURL(file);
+  const [url, setUrl] = useState("");
+
+  useEffect(() => {
+    const objectUrl = URL.createObjectURL(file);
+    setUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [file]);
+
+  if (!url) return null;
 
   return (
     <div
@@ -36,12 +50,16 @@ export default function ImagePreviewItem({
       style={style}
       {...attributes}
       {...listeners}
+      onClick={() => onPreview(file)} 
       className="relative shrink-0 cursor-grab active:cursor-grabbing rounded-sm overflow-hidden"
     >
       <img src={url} alt="이미지 미리보기" className="w-[70px] h-[70px] object-cover" />
 
       <button
-        onClick={onDelete}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
         aria-label="이미지 삭제"
         className="absolute top-1 right-1 w-4 h-4 bg-black/60 flex items-center justify-center text-white rounded-full"
       >

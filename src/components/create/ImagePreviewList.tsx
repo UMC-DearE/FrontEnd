@@ -11,10 +11,11 @@ import {
   horizontalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import ImagePreviewItem from "./ImagePreviewItem";
 import uploadImage from "@/assets/create/image-upload.svg";
+import { ImageViewer } from "../common/ImageViewer";
 
 interface Props {
   images: File[];
@@ -23,12 +24,13 @@ interface Props {
 
 export default function ImagePreviewList({ images, setImages }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        delay: 200,
-        tolerance: 5,
+        delay: 250,
+        tolerance: 10,
       },
     })
   );
@@ -83,7 +85,7 @@ export default function ImagePreviewList({ images, setImages }: Props) {
           items={images.map((_, i) => i.toString())}
           strategy={horizontalListSortingStrategy}
         >
-          <div className="flex gap-2 mt-5 overflow-x-auto">
+          <div className="flex gap-2 mt-5 overflow-x-auto thin-scrollbar pb-1">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
@@ -93,7 +95,12 @@ export default function ImagePreviewList({ images, setImages }: Props) {
             >
               <img src={uploadImage} alt="upload" className="w-[25px] h-[19px] mb-2" />
               <div className="text-[11px] font-medium">
-                {images.length}/10
+                {images.length > 0 ? (
+                  <span className="text-[#FF7A00]">{images.length}</span>
+                ) : (
+                  <span>{images.length}</span>
+                )}
+                /10
               </div>
             </button>
             
@@ -107,8 +114,18 @@ export default function ImagePreviewList({ images, setImages }: Props) {
                     prev.filter((_, i) => i !== index)
                   )
                 }
+                onPreview={() => setPreviewIndex(index)}
               />
             ))}
+
+            {previewIndex !== null && (
+              <ImageViewer
+                images={images}
+                initialIndex={previewIndex}
+                onClose={() => setPreviewIndex(null)}
+              />
+            )}
+
           </div>
         </SortableContext>
       </DndContext>
