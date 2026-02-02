@@ -15,11 +15,11 @@ export default function ReportPage() {
   const topPhrases = ['보고싶어', '힘내', '고마워', '사랑해'];
 
   const emotionDistribution = [
-    { emotion: '고마움', percent: 40, color: 'bg-[#FFE6D8]', textColor: 'text-[#F57542]' },
-    { emotion: '즐거움', percent: 20, color: 'bg-[#FFF3C7]', textColor: 'text-[#FFB245]' },
-    { emotion: '위로', percent: 20, color: 'bg-[#DDF0C8]', textColor: 'text-[#62BA65]' },
-    { emotion: '그리움', percent: 5, color: 'bg-[#E9D6E3]', textColor: 'text-[#D572B7]' },
-    { emotion: '고민', percent: 10, color: 'bg-[#D0D9EE]', textColor: 'text-[#6B80B5]' },
+    { emotion: '고마움', percent: 40, color: '#FFE6D8', textColor: 'text-[#F57542]' },
+    { emotion: '즐거움', percent: 20, color: '#FFF3C7', textColor: 'text-[#FFB245]' },
+    { emotion: '위로', percent: 20, color: '#DDF0C8', textColor: 'text-[#62BA65]' },
+    { emotion: '그리움', percent: 5, color: '#E9D6E3', textColor: 'text-[#D572B7]' },
+    { emotion: '고민', percent: 10, color: '#D0D9EE', textColor: 'text-[#6B80B5]' },
   ];
 
   const medalIcons = [goldIcon, silverIcon, bronzeIcon];
@@ -29,9 +29,11 @@ export default function ReportPage() {
       <button className="absolute top-30 left-4 cursor-pointer">
         <img src={report} alt="report-recap" className="w-[361px] h-32" />
       </button>
+
       <p className="absolute top-[278px] left-4 text-[#141517] font-semibold text-[16px]">TOP3</p>
+
       {/* TOP3 영역 */}
-      <div className="absolute top-[317px] left-4 bg-white w-[361px] h-[144px] rounded-[12px] border-[#F4F5F6] border-[1.2px] shadow-[0_4px_4px_rgba(0,0,0,0.25)] flex flex-col justify-center px-[16px]">
+      <div className="absolute top-[317px] left-4 bg-white w-[361px] h-[144px] rounded-[12px] border-[#F4F5F6] border-[1.2px] shadow-[0_0_4px_rgba(217,217,217,0.5)] flex flex-col justify-center px-[16px]">
         <div className="flex flex-col gap-[14px]">
           {top3From.map((item, index) => (
             <div key={index} className="flex items-center justify-between w-full">
@@ -73,15 +75,18 @@ export default function ReportPage() {
       <p className="absolute top-[589px] left-4 text-[#141517] font-semibold text-[16px]">
         수집한 감정 태그
       </p>
-      <div className="absolute top-[628px] left-4 w-[361px] h-[118px] bg-white rounded-[16px] border-[#F4F5F6] border-[1.2px] flex justify-around  py-[16px] px-[22px]">
+      <div className="absolute top-[628px] left-4 w-[361px] h-[118px] bg-white rounded-[16px] border-[#F4F5F6] border-[1.2px] flex justify-around py-[16px] px-[22px]">
         {emotionDistribution.map((item, index) => (
           <div key={index} className="flex flex-col items-center gap-[2px]">
             <span className="text-[11px] text-[#9EA1A8]">{item.percent}%</span>
 
             <div className="w-[48px] h-[72px] bg-[#F1F1F166] rounded-[10px] relative overflow-hidden">
               <div
-                className={`absolute bottom-0 w-full rounded-[10px] ${item.color}`}
-                style={{ height: `${item.percent}%` }}
+                className="absolute bottom-0 w-full rounded-[10px] bg-gradient-to-b to-[#FFFFFF] shadow-[0_4px_4px_rgba(0,0,0,0.25)]"
+                style={{
+                  height: `${item.percent}%`,
+                  backgroundImage: `linear-gradient(to bottom, ${item.color} 0%, #FFFFFF 100%)`,
+                }}
               />
             </div>
 
