@@ -1,5 +1,3 @@
-// 홈 커스텀 모달
-
 import { useMemo, useRef, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import stickerIcon from '@/assets/homePage/stickerIcon.svg';
@@ -24,6 +22,7 @@ const normalizeHex = (v: string) => {
 
 export default function ProfileCustomSheet({
   open,
+  onClose,
   onComplete,
   onPickStickerFile,
   bgColor,
@@ -34,6 +33,21 @@ export default function ProfileCustomSheet({
 
   const safeBgColor = useMemo(() => normalizeHex(bgColor), [bgColor]);
 
+  const handleComplete = () => {
+    setShowPicker(false);
+    onComplete?.();
+    onClose();
+  };
+
+  const handleClickSticker = () => {
+    setShowPicker(false);
+    fileInputRef.current?.click();
+  };
+
+  const handleToggleBgPicker = () => {
+    setShowPicker((v) => !v);
+  };
+
   if (!open) return null;
 
   return (
@@ -41,7 +55,7 @@ export default function ProfileCustomSheet({
       <div className="relative w-[393px] min-h-screen bg-[#B0B0B0]/50 overflow-hidden pointer-events-none">
         <button
           type="button"
-          onClick={onComplete}
+          onClick={handleComplete}
           className="absolute top-[79px] left-[309px] flex items-center justify-center w-[57px] h-[29px] bg-[#FF5F2F] rounded-[18px] px-[16px] py-[6px] gap-[10px] cursor-pointer pointer-events-auto"
         >
           <p className="absolute w-[25px] h-[17px] text-white font-semibold text-[14px]">완료</p>
@@ -52,7 +66,7 @@ export default function ProfileCustomSheet({
             <div className="flex items-center justify-center mt-[54px] gap-[54px]">
               <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={handleClickSticker}
                 className="flex h-[56px] w-[56px] items-center justify-center rounded-[6px] border border-[#E6E7E9] bg-[#F4F5F6] cursor-pointer"
               >
                 <img src={stickerIcon} alt="sticker-icon" />
@@ -63,7 +77,7 @@ export default function ProfileCustomSheet({
 
               <button
                 type="button"
-                onClick={() => setShowPicker((v) => !v)}
+                onClick={handleToggleBgPicker}
                 className="flex h-[56px] w-[56px] items-center justify-center rounded-[6px] border border-[#E6E7E9] bg-[#F4F5F6] cursor-pointer"
               >
                 <img src={bgIcon} alt="bg-icon" />
@@ -105,6 +119,7 @@ export default function ProfileCustomSheet({
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (!file) return;
+            setShowPicker(false);
             onPickStickerFile?.(file);
             e.currentTarget.value = '';
           }}
