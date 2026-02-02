@@ -6,7 +6,6 @@ import NotFoundPage from "@/pages/NotFoundPage";
 import ProtectedRoute from "./ProtectedRoute";
 
 import LoginPage from "@/pages/onboarding/LoginPage";
-import SplashPage from "@/pages/onboarding/SplashPage";
 
 import TermsPage from "@/pages/setup/TermsPage";
 import SetNickamePage from "@/pages/setup/SetNicknamePage";
@@ -39,9 +38,12 @@ const router = createBrowserRouter([
     element: <BaseLayout />,
     errorElement: <NotFoundPage />,
     children: [ /* 헤더 따로 */
-      { path: "login", element: <LoginPage /> },
-      { path: "splash", element: <SplashPage /> },
-
+      {
+        element: <AppLayout />,
+        children: [
+          { path: "login", element: <LoginPage /> },
+        ],
+      },
       {
         element: <ProtectedRoute />,
         children: [

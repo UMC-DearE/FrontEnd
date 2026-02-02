@@ -3,6 +3,7 @@ export interface MockFolder {
   folderName: string;
   imageUrl?: string | null;
   folderOrder: number;
+  imageId?: number | null;
 }
 
 export async function getMockFolders(): Promise<MockFolder[]> {
@@ -10,22 +11,19 @@ export async function getMockFolders(): Promise<MockFolder[]> {
     setTimeout(() => {
       resolve([
         {
-          id: 17,
-          folderName: "6자이내",
-          imageUrl: "https://bucket.s3.../folderImg.jpg",
+          id: 1,
+          folderName: '디어리',
+          imageUrl:
+            'https://i.namu.wiki/i/PvBNqcPR79Eg_MFLuNBEjB49s9CHrFVwmqqpwIfNAKpanE3P26j1UZqTY7zFBNUWrbl0gNclaXfjttApncYfByJ8Pe0cePGYBPH3Q4LlneOvqbngueyTetaWRhQmqQEouKOcM_7U12C1JIwAeiJzKQ.svg',
           folderOrder: 1,
+          imageId: null,
         },
         {
-          id: 91,
-          folderName: "순서에맞게",
+          id: 2,
+          folderName: '기본',
           imageUrl: null,
           folderOrder: 2,
-        },
-        {
-          id: 30,
-          folderName: "조회가능",
-          imageUrl: "https://bucket.s3.../imgaasdf32579.jpg",
-          folderOrder: 3,
+          imageId: null,
         },
       ]);
     }, 200);

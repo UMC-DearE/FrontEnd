@@ -25,14 +25,11 @@ export default function FolderModal({
   const [folderName, setFolderName] = useState(initialName);
   const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl);
   const [imageId, setImageId] = useState<number | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    setImageUrl(URL.createObjectURL(file));
-    setImageId(116);
-    e.target.value = '';
   };
 
   const handleImageDelete = () => {
@@ -42,15 +39,10 @@ export default function FolderModal({
 
   const handleConfirm = () => {
     if (!folderName.trim()) return;
-
-    onConfirm({
-      folder_name: folderName.trim(),
-      image_id: imageId,
-      previewUrl: imageUrl,
-    });
+    onConfirm({ folder_name: folderName.trim(), image_id: imageId, previewUrl: imageUrl });
   };
 
-  const isFormValid = folderName.trim().length > 0;
+  const isFormValid = folderName.trim().length > 0 && !isUploading;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -130,7 +122,7 @@ export default function FolderModal({
               style={{ backgroundColor: isFormValid ? '#111111' : '#DCDCDCCC' }}
               className="h-[38px] w-[122px] rounded-lg text-[14px] font-semibold text-white transition-colors cursor-pointer"
             >
-              완료
+              {isUploading ? '업로드중' : '완료'}
             </button>
           </div>
         </div>

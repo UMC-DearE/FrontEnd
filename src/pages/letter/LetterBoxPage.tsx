@@ -1,5 +1,3 @@
-// 편지함 페이지
-
 import { useMemo, useState, useEffect } from 'react';
 import { MOCK_LETTERS } from '@/mocks/mockLetter';
 import FolderList from '@/components/letterBox/letterFolder/FolderList';
@@ -11,6 +9,7 @@ import type { Letter } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
 import { useNavigate } from 'react-router-dom';
+import { getMockFolders } from '@/mocks/mockFolder';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기' | '앨범 보기';
@@ -29,33 +28,39 @@ export default function LetterBox() {
   const [editingFolderId, setEditingFolderId] = useState<number | null>(null);
   const [deleteTargetFolderId, setDeleteTargetFolderId] = useState<number | null>(null);
 
-  const [customFolders, setCustomFolders] = useState<FolderType[]>([
-    {
-      id: 1,
-      folderName: '디어리',
-      imageUrl:
-        'https://i.namu.wiki/i/PvBNqcPR79Eg_MFLuNBEjB49s9CHrFVwmqqpwIfNAKpanE3P26j1UZqTY7zFBNUWrbl0gNclaXfjttApncYfByJ8Pe0cePGYBPH3Q4LlneOvqbngueyTetaWRhQmqQEouKOcM_7U12C1JIwAeiJzKQ.svg',
-    },
-    {
-      id: 2,
-      folderName: '기본',
-      imageUrl: undefined,
-    },
-  ]);
-
+  const [customFolders, setCustomFolders] = useState<FolderType[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
 
   useEffect(() => {
     setLetters(MOCK_LETTERS);
-  }, []); // 편지 목록 mock 데이터 - 연동 시 제거
+  }, []);
+
+  useEffect(() => {
+    const run = async () => {
+      const data = await getMockFolders();
+      setCustomFolders(
+        data
+          .sort((a, b) => a.folderOrder - b.folderOrder)
+          .map((f) => ({
+            id: f.id,
+            folderName: f.folderName,
+            imageUrl: f.imageUrl ?? undefined,
+            imageId: f.imageId ?? null,
+          }))
+      );
+    };
+    run();
+  }, []);
 
   const folderFilteredLetters = useMemo(() => {
     let result = letters;
+
     if (selectedFolderId === 'like') {
       result = result.filter((letter) => letter.isLiked);
     } else if (typeof selectedFolderId === 'number') {
       result = result.filter((letter) => letter.folderId === selectedFolderId);
     }
+
     return result;
   }, [letters, selectedFolderId]);
 
@@ -98,17 +103,24 @@ export default function LetterBox() {
           id: Date.now(),
           folderName: data.folder_name,
           imageUrl: data.previewUrl || undefined,
+          imageId: data.image_id,
         },
       ]);
     } else {
       setCustomFolders((prev) =>
         prev.map((f) =>
           f.id === editingFolderId
-            ? { ...f, folderName: data.folder_name, imageUrl: data.previewUrl || undefined }
+            ? {
+                ...f,
+                folderName: data.folder_name,
+                imageUrl: data.previewUrl || undefined,
+                imageId: data.image_id,
+              }
             : f
         )
       );
     }
+
     setIsModalOpen(false);
     setEditingFolderId(null);
   };
@@ -137,6 +149,7 @@ export default function LetterBox() {
           title={editingFolderId == null ? '새 폴더 만들기' : '폴더 수정'}
           initialName={customFolders.find((f) => f.id === editingFolderId)?.folderName ?? ''}
           initialImageUrl={customFolders.find((f) => f.id === editingFolderId)?.imageUrl ?? null}
+          initialImageId={customFolders.find((f) => f.id === editingFolderId)?.imageId ?? null}
           onCancel={() => {
             setIsModalOpen(false);
             setEditingFolderId(null);
@@ -150,6 +163,7 @@ export default function LetterBox() {
         onClose={() => setIsSettingOpen(false)}
         onSelect={(type) => {
           if (settingFolderId == null) return;
+
           if (type === 'editFolder') {
             setIsSettingOpen(false);
             setEditingFolderId(settingFolderId);

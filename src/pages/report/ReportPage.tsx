@@ -78,7 +78,7 @@ export default function ReportPage() {
       <div className="absolute top-[628px] left-4 w-[361px] h-[118px] bg-white rounded-[16px] border-[#F4F5F6] border-[1.2px] flex justify-around py-[16px] px-[22px]">
         {emotionDistribution.map((item, index) => (
           <div key={index} className="flex flex-col items-center gap-[2px]">
-            <span className="text-[11px] text-[#9EA1A8]">{item.percent}%</span>
+            <p className="text-[11px] text-[#9EA1A8]">{item.percent}%</p>
 
             <div className="w-[48px] h-[72px] bg-[#F1F1F166] rounded-[10px] relative overflow-hidden">
               <div
@@ -90,7 +90,7 @@ export default function ReportPage() {
               />
             </div>
 
-            <span className={`text-[8px] font-semibold ${item.textColor}`}>{item.emotion}</span>
+            <p className={`text-[8px] font-semibold ${item.textColor}`}>{item.emotion}</p>
           </div>
         ))}
       </div>
