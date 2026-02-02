@@ -59,9 +59,11 @@ export interface LetterDetailData {
   createdAt?: string;
   imageUrls?: string[];
 
-  inFolder?: boolean;
-  folderId?: number | null;
-  folderName?: string | null;
+  // If the letter belongs to a folder, `folder` contains metadata; otherwise `folder` is null.
+  folder?: {
+    folderId: number;
+    folderName: string;
+  } | null;
 }
 
 export interface LetterDetailResponse {

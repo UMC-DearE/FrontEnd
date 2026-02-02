@@ -42,9 +42,11 @@ export function getMockLetterDetail(_letterId: number): Promise<LetterDetailResp
         "https://bucket.s3.ap-northeast-2.amazonaws.com/images/12345.jpg",
         "https://bucket.s3.ap-northeast-2.amazonaws.com/images/190847agjsd.jpg",
       ],
-      inFolder: true,
-      folderId: 1,
-      folderName: "가족",
+      // folder metadata (null if not in folder)
+      folder: {
+        folderId: 1,
+        folderName: "가족",
+      },
     },
   });
 }

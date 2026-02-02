@@ -19,8 +19,8 @@ interface Props {
   aiResult: AiAnalyzeResult;
   from: CreateFrom;
   receivedAt?: string | null;
-  inFolder?: boolean;
-  folderName?: string | null;
+  // folder metadata object; null if not in a folder
+  folder?: { folderId: number; folderName: string } | null;
   reply?: string;
   onSave?: () => void;
   onAddToFolder?: (folderId: number) => void;
@@ -62,8 +62,7 @@ export default function LetterDetailSection({
   aiResult,
   from,
   receivedAt = "2025.06.02",
-  inFolder = false,
-  folderName,
+  folder = null,
   reply: initialReply,
   onSave,
   onAddToFolder,
@@ -318,8 +317,7 @@ export default function LetterDetailSection({
       {/* 더보기 바텀시트 */}
       <LetterDetailBottomSheet
         open={openMore}
-        inFolder={inFolder}
-        folderName={folderName}
+        folder={folder}
         onClose={() => setOpenMore(false)}
         onAddToFolder={handleOpenFolderSelect}
         onRemoveFromFolder={() => onRemoveFromFolder?.()}

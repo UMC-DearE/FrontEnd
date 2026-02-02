@@ -5,8 +5,8 @@ import ConfirmModal from "@/components/common/ConfirmModal";
 
 interface Props {
   open: boolean;
-  inFolder: boolean;
-  folderName?: string | null;
+  // folder metadata object; null if not in folder
+  folder?: { folderId: number; folderName: string } | null;
   onClose: () => void;
   onAddToFolder: () => void;
   onRemoveFromFolder: () => void;
@@ -16,8 +16,7 @@ interface Props {
 
 export default function LetterDetailBottomSheet({
   open,
-  inFolder,
-  folderName,
+  folder,
   onClose,
   onAddToFolder,
   onRemoveFromFolder,
@@ -40,7 +39,7 @@ export default function LetterDetailBottomSheet({
         <div className="absolute bottom-0 w-full bg-white rounded-t-2xl py-[62px] flex flex-col gap-[40px]">
           <button
             onClick={() => {
-              if (inFolder) setConfirmRemove(true);
+              if (folder) setConfirmRemove(true);
               else {
                 onClose();
                 onAddToFolder();
@@ -48,7 +47,7 @@ export default function LetterDetailBottomSheet({
             }}
             className="w-full text-lg font-medium text-primary"
           >
-            {inFolder ? "폴더에서 삭제" : "폴더에 저장"}
+            {folder ? "폴더에서 삭제" : "폴더에 저장"}
           </button>
 
           <button
@@ -73,8 +72,8 @@ export default function LetterDetailBottomSheet({
           open={confirmRemove}
           title="폴더에서 삭제"
           description={
-            folderName
-              ? `'${folderName}' 폴더에서 삭제할까요?\n편지는 삭제되지 않아요`
+            folder?.folderName
+              ? `'${folder.folderName}' 폴더에서 삭제할까요?\n편지는 삭제되지 않아요`
               : "폴더에서 삭제할까요?\n편지는 삭제되지 않아요"
           }
           cancelText="취소"
