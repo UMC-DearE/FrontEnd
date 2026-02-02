@@ -3,6 +3,7 @@ export interface FolderType {
   id: number;
   folderName: string;
   imageUrl?: string;
+  imageId?: number | null;
 }
 
 // 새 폴더 생성
