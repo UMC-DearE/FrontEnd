@@ -42,7 +42,6 @@ export default function HomePage() {
 
   const [openSheet, setOpenSheet] = useState(false);
 
-  const colorInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [savedStickers, setSavedStickers] = useState<StickerItem[]>([]);
@@ -58,10 +57,6 @@ export default function HomePage() {
   const handleConfirmUnpin = () => {
     setPinnedLetterId(null);
     setPendingUnpinId(null);
-  };
-
-  const handleSelectTool = (type: 'sticker' | 'bg') => {
-    if (type === 'bg') colorInputRef.current?.click();
   };
 
   const openEditor = () => {
@@ -137,6 +132,7 @@ export default function HomePage() {
           onDelete={onDeleteSticker}
         />
       </div>
+
       <ProfileCard
         nickname="키르"
         bio="안녕하세요 잘 부탁합니다 ദ്ദി^ᴗ ̫ ᴗ^₎"
@@ -145,12 +141,13 @@ export default function HomePage() {
 
       <ProfileCustomSheet
         open={openSheet}
+        bgColor={homeBgColor}
+        onChangeBgColor={setHomeBgColor}
         onClose={() => {
           setOpenSheet(false);
           setSelectedId(null);
           setDraftStickers(savedStickers);
         }}
-        onSelect={handleSelectTool}
         onComplete={() => {
           setSavedStickers(draftStickers);
           setOpenSheet(false);
@@ -159,14 +156,6 @@ export default function HomePage() {
         onPickStickerFile={(file) => {
           addStickerFromFile(file);
         }}
-      />
-
-      <input
-        ref={colorInputRef}
-        type="color"
-        value={homeBgColor}
-        onChange={(e) => setHomeBgColor(e.target.value)}
-        className="hidden"
       />
 
       <LetterCard
