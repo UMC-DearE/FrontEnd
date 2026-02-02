@@ -93,7 +93,7 @@ export default function MyhomePage() {
         </button>
 
         <MenuItem label="계정 관리" onClick={() => navigate("/my/account")}/>
-        <MenuItem label="From 관리"/>
+        <MenuItem label="From 관리" onClick={() => navigate("/my/from")}/>
         <button
         type="button"
         onClick={() => setOpenLogoutModal(true)}

@@ -21,12 +21,12 @@ export default function FromPage() {
     },
     {
       fromId: 2,
-      name: '아빠',
+      name: '긴 이름 테스트',
       backgroundColor: '#EAF6FF',
       textColor: '#333333',
       letterCount: 3,
     },
-  ]);
+  ]); // 프롬 목록 api 호출
 
   useEffect(() => {
     if (!createdFrom) return;
@@ -50,7 +50,6 @@ export default function FromPage() {
       fromList.map((from) => (
         <div key={from.fromId}>
           {editingFromId === from.fromId ? (
-
             <FromEditPanel
               from={from}
               onCancel={() => setEditingFromId(null)}
@@ -59,7 +58,11 @@ export default function FromPage() {
                   prev.map((f) =>
                     f.fromId === updated.fromId ? updated : f
                   )
-                );
+                ); // 프롬 수정 api 호출
+                setEditingFromId(null);
+              }}
+              onDelete={(id) => {
+                setFromList((prev) => prev.filter((f) => f.fromId !== id));
                 setEditingFromId(null);
               }}
             />

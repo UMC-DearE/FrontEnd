@@ -11,11 +11,11 @@ async function createFromApi(draft: CreateFrom) {
       res({ fromId: Math.floor(Math.random() * 100000), ...draft });
     }, 400);
   });
-}
+} // 프롬 생성 api 호출
 
 export default function FromCreatePage() {
   const navigate = useNavigate();
-  const [query, setQuery] = useState('');
+  const [input, setInput] = useState('');
 
   const handleCreateImmediate = async (draft: CreateFrom) => {
     const created = await createFromApi(draft);
@@ -32,16 +32,16 @@ export default function FromCreatePage() {
     <div>
       <div className="p-0 mt-3 px-0">
         <InputField
-          value={query}
-          onChange={setQuery}
+          value={input}
+          onChange={setInput}
           placeholder="이름을 입력하세요"
           useGrayWhenBlurred
           maxLength={7}
           inputClassName="h-[50px] rounded-xl px-4 text-base font-medium outline-none cursor-text focus:bg-white focus:ring-1 focus:ring-primary"
           rightElement={
-            query ? (
+            input ? (
               <button
-                onClick={() => setQuery('')}
+                onClick={() => setInput('')}
                 className="flex items-center justify-center w-6 h-6"
               >
                 <img src={erasebtn} alt="clear" />
@@ -54,8 +54,8 @@ export default function FromCreatePage() {
       <div className="mt-2">
         <FromCreator
           onCreateImmediate={handleCreateImmediate}
-          name={query}
-          onNameChange={setQuery}
+          name={input}
+          onNameChange={setInput}
         />
       </div>
     </div>
