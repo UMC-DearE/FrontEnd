@@ -105,6 +105,7 @@ export const ROUTE_META: Array<{
     title: "MY",
     bg: "gray",
   },
+
     // 마이 - 프로필 수정
   {
     match: (pathname) => pathname === "/my/profile",
@@ -123,21 +124,21 @@ export const ROUTE_META: Array<{
   {
     match: (pathname) => pathname === "/my/from",
     header: "MY_FROM",
-    title: "FROM 관리",
+    title: "From 관리",
     bg: "gray",
   },
     // 마이 - 프롬 생성
     {
     match: (pathname) => pathname === "/my/from/create",
     header: "RIGHT_BUTTON",
-    title: "FROM 생성",
-    bg: "gray",
+    title: "From 생성",
+    bg: "white",
   },
     // 마이 - 프롬 수정
     {
     match: (pathname) => pathname.startsWith("/my/from/") && pathname.endsWith("/edit"),
     header: "BACK_TITLE",
-    title: "FROM 수정",
+    title: "From 수정",
     bg: "gray",
   },
     // 마이 - 스타일

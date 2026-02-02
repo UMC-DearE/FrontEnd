@@ -68,8 +68,7 @@ export default function LetterDetailBottomSheet({
             편지 삭제
           </button>
         </div>
-
-        {/* 폴더에서 삭제 확인 모달 */}
+        
         <ConfirmModal
           open={confirmRemove}
           title="폴더에서 삭제"
