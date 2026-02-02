@@ -18,10 +18,9 @@ export const ROUTE_META: Array<{
   bg?: "gray" | "white";
     }> = [
   {
-    match: (pathname) =>
-    pathname === "/login" || pathname === "/splash",
-    header: "NONE",
-    bg: "white",
+    match: (pathname) => pathname === "/login",
+    header: "LEFT_ONLY",
+    bg: "gray",
   },
 
     // 회원가입 플로우
