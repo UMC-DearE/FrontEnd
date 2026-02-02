@@ -124,21 +124,21 @@ export const ROUTE_META: Array<{
     match: (pathname) => pathname === "/my/from",
     header: "MY_FROM",
     title: "FROM 관리",
-    bg: "white",
+    bg: "gray",
   },
     // 마이 - 프롬 생성
     {
     match: (pathname) => pathname === "/my/from/create",
     header: "RIGHT_BUTTON",
     title: "FROM 생성",
-    bg: "white",
+    bg: "gray",
   },
     // 마이 - 프롬 수정
     {
-    match: (pathname) => pathname === "/my/from/edit",
+    match: (pathname) => pathname.startsWith("/my/from/") && pathname.endsWith("/edit"),
     header: "BACK_TITLE",
     title: "FROM 수정",
-    bg: "white",
+    bg: "gray",
   },
     // 마이 - 스타일
   {
