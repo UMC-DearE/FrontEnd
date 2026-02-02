@@ -24,7 +24,7 @@ export default function ProfileCustomSheet({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-      <div className="relative w-[393px] min-h-screen bg-[#B0B0B0]/50 overflow-hidden pointer-events-none">
+      <div className="relative w-[393px] min-h-screen bg-black/40 overflow-hidden pointer-events-none">
         <button
           type="button"
           onClick={onComplete}

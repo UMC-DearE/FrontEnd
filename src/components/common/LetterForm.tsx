@@ -110,7 +110,11 @@ export default function LetterForm({
             <input
               type="checkbox"
               checked={unknownDate}
-              onChange={(e) => setUnknownDate(e.target.checked)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setUnknownDate(checked);
+                if (checked) setDate("");
+              }}
               className="checkbox-accent checkbox-custom"
             />
             날짜 모름

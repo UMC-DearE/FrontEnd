@@ -34,7 +34,7 @@ export default function LetterDetailBottomSheet({
       <div className="relative w-[393px] min-h-screen">
         <button
           onClick={onClose}
-          className="absolute inset-0 bg-[#B0B0B0] bg-opacity-60"
+          className="absolute inset-0 bg-black/40"
         />
 
         <div className="absolute bottom-0 w-full bg-white rounded-t-2xl py-[62px] flex flex-col gap-[40px]">

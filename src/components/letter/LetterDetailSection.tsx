@@ -309,7 +309,7 @@ export default function LetterDetailSection({
         )}
       </div>
 
-      <div className="fixed bottom-0 left-1/2 w-full max-w-[393px] -translate-x-1/2 bg-[#F8F8F8] px-4 pb-[32px] pt-3">
+      <div className="fixed bottom-0 left-1/2 w-full max-w-[393px] -translate-x-1/2 bg-[#F8F8F8] px-4 pb-[52px] pt-3">
         <BottomButton onClick={handleSaveCard}>
           편지 카드 저장
         </BottomButton>

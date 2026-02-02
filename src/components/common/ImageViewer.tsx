@@ -49,7 +49,7 @@ export function ImageViewer({
 
   return (
     <div
-      className="absolute inset-0 z-50 bg-black/90
+      className="absolute inset-0 z-50 bg-black
                  flex items-center justify-center"
       onClick={onClose}
       onPointerDown={(e) => e.stopPropagation()}
