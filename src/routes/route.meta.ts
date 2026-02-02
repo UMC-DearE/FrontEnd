@@ -116,7 +116,7 @@ export const ROUTE_META: Array<{
     match: (pathname) => pathname === "/my/account",
     header: "BACK_TITLE",
     title: "계정 관리",
-    bg: "white",
+    bg: "gray",
   },
     // 마이 - 프롬 관리
   {

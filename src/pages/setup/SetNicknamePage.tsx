@@ -1,8 +1,10 @@
+// 닉네임 설정 페이지
+
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomButton } from "@/components/common/BottomButton";
 
-const NICKNAME_REGEX = /^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ]{2,10}$/;
+const NICKNAME_REGEX = /^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]+$/;
 
 const SetNamePage = () => {
   const navigate = useNavigate();
@@ -16,9 +18,6 @@ const SetNamePage = () => {
 
     if (value.length === 0) return "";
 
-    // 공백 포함
-    if (/\s/.test(value)) return "특수문자는 사용이 불가해요.";
-
     // 길이 제한(10 초과)
     if (value.length > 10) return "최대 10글자까지 설정이 가능해요.";
 
@@ -26,7 +25,9 @@ const SetNamePage = () => {
     if (value.length < 2) return "최소 2글자부터 설정이 가능해요.";
 
     // 특수문자 포함(한글/영문/숫자만 허용)
-    if (!/^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ]{2,10}$/.test(value)) return "특수문자는 사용이 불가해요.";
+    if (!NICKNAME_REGEX.test(value)) {
+      return "특수문자는 사용이 불가해요.";
+    }
 
     return "";
   }, [nickname, touched]);

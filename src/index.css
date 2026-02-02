@@ -43,9 +43,25 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Cafe24GounNight";
+  src: url("/fonts/Cafe24GounNight.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "LeeSeoYoon";
+  src: url("/fonts/LeeSeoYoon.woff2") format("woff2");
+  font-display: swap;
+}
+
 @layer base {
+  :root {
+    --app-font: 'Pretendard';
+  }
+
   html {
-    font-family: 'Pretendard', system-ui, sans-serif;
+    font-family: var(--app-font), system-ui, sans-serif;
     font-size: 16px;
     font-weight: 500;
     line-height: normal;

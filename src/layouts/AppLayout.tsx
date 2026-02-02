@@ -21,10 +21,13 @@ export function AppLayout() {
                         || pathname.startsWith("/my/account") || pathname.startsWith("my/style")
                         || pathname.startsWith("/login") || isLetterDetail;
 
+  const useHomeBg = pathname === '/' || pathname.startsWith('/home');
+  
   const bgClass =
     matched?.bg === "white" ? "bg-white" : "bg-[#F8F8F8]";
 
-  const useHomeBg = pathname === '/' || pathname.startsWith('/home');
+  const NO_MAIN_PADDING_PATHS = ["/my", "/my/account"];
+  const noMainPadding = NO_MAIN_PADDING_PATHS.includes(pathname);
 
   return (
     <div
@@ -38,8 +41,13 @@ export function AppLayout() {
           </div>
         </Suspense>
       )}
-
-      <main className={`flex-1 overflow-y-auto px-4 py-4 ${!hideBottomNav ? 'pb-[95px]' : ''}`}>
+      <main
+        className={[
+          "flex-1 overflow-y-auto",
+          noMainPadding ? "" : "px-4 py-4",
+          !hideBottomNav ? "pb-[95px]" : "",
+        ].join(" ")}
+      >
         <Outlet context={{ homeBgColor, setHomeBgColor }} />
       </main>
 
