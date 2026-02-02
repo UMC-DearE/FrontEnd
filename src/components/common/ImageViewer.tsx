@@ -1,4 +1,4 @@
-// 이미지 크게 보기 오버레이 모달, 단순 뷰어 + 모바일 스와이프
+// 이미지 크게 보기 뷰어 + 모바일 스와이프, 확대 및 축소
 
 import { useEffect, useRef, useState } from "react";
 
@@ -14,26 +14,78 @@ export function ImageViewer({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [url, setUrl] = useState("");
 
+  const [scale, setScale] = useState(1);
+
   const touchStartX = useRef<number | null>(null);
+  const lastDistance = useRef<number | null>(null);
 
   const file = images[currentIndex];
 
   useEffect(() => {
     const objectUrl = URL.createObjectURL(file);
     setUrl(objectUrl);
+    setScale(1); // 이미지 바뀌면 초기화
     return () => URL.revokeObjectURL(objectUrl);
   }, [file]);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
+  type TouchPoint = {
+  clientX: number;
+  clientY: number;
+};
+
+const getDistance = (t1: TouchPoint, t2: TouchPoint) => {
+  const dx = t1.clientX - t2.clientX;
+  const dy = t1.clientY - t2.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+};
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 1) {
+      const t = e.touches.item(0);
+      if (!t) return;
+      touchStartX.current = t.clientX;
+    }
+
+    if (e.touches.length === 2) {
+      const t1 = e.touches.item(0);
+      const t2 = e.touches.item(1);
+      if (!t1 || !t2) return;
+      lastDistance.current = getDistance(t1, t2);
+    }
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2 && lastDistance.current) {
+      const t1 = e.touches.item(0);
+      const t2 = e.touches.item(1);
+      if (!t1 || !t2) return;
+
+      const newDistance = getDistance(t1, t2);
+      const ratio = newDistance / lastDistance.current;
+
+      setScale((prev) =>
+        Math.min(Math.max(prev * ratio, 1), 3)
+      );
+
+      lastDistance.current = newDistance;
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    lastDistance.current = null;
+
+    // 확대 중이면 swipe 막기
+    if (scale > 1) {
+      touchStartX.current = null;
+      return;
+    }
+
     if (touchStartX.current === null) return;
 
-    const endX = e.changedTouches[0].clientX;
-    const diff = endX - touchStartX.current;
+    const t = e.changedTouches.item(0);
+    if (!t) return;
 
+    const diff = t.clientX - touchStartX.current;
     const THRESHOLD = 50;
 
     if (diff > THRESHOLD && currentIndex > 0) {
@@ -49,34 +101,32 @@ export function ImageViewer({
 
   return (
     <div
-      className="absolute inset-0 z-50 bg-black
-                 flex items-center justify-center"
+      className="absolute inset-0 z-50 bg-black flex items-center justify-center"
       onClick={onClose}
-      onPointerDown={(e) => e.stopPropagation()}
->
+    >
       <div
-        className="relative w-full flex justify-center"
+        className="relative w-full flex justify-center overflow-hidden"
         onClick={(e) => e.stopPropagation()}
-        onPointerDown={(e) => e.stopPropagation()}
         onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
         <img
           src={url}
           alt="이미지 크게 보기"
-          className="
-            w-full
-            h-auto
-            max-h-[80vh]
-            object-contain
-            select-none"
           draggable={false}
+          className="w-full max-h-[80vh] object-contain select-none transition-transform"
+          style={{
+            transform: `scale(${scale})`,
+          }}
         />
       </div>
     </div>
   );
 }
+
 export default ImageViewer;
+
 
 
 
