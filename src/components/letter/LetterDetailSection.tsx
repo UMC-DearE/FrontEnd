@@ -19,8 +19,8 @@ interface Props {
   aiResult: AiAnalyzeResult;
   from: CreateFrom;
   receivedAt?: string | null;
-  inFolder?: boolean;
-  folderName?: string | null;
+  // folder metadata object; null if not in a folder
+  folder?: { folderId: number; folderName: string } | null;
   reply?: string;
   onSave?: () => void;
   onAddToFolder?: (folderId: number) => void;
@@ -62,8 +62,7 @@ export default function LetterDetailSection({
   aiResult,
   from,
   receivedAt = "2025.06.02",
-  inFolder = false,
-  folderName,
+  folder = null,
   reply: initialReply,
   onSave,
   onAddToFolder,
@@ -309,7 +308,7 @@ export default function LetterDetailSection({
         )}
       </div>
 
-      <div className="fixed bottom-0 left-1/2 w-full max-w-[393px] -translate-x-1/2 bg-[#F8F8F8] px-4 pb-[32px] pt-3">
+      <div className="fixed bottom-0 left-1/2 w-full max-w-[393px] -translate-x-1/2 bg-[#F8F8F8] px-4 pb-[52px] pt-3">
         <BottomButton onClick={handleSaveCard}>
           편지 카드 저장
         </BottomButton>
@@ -318,8 +317,7 @@ export default function LetterDetailSection({
       {/* 더보기 바텀시트 */}
       <LetterDetailBottomSheet
         open={openMore}
-        inFolder={inFolder}
-        folderName={folderName}
+        folder={folder}
         onClose={() => setOpenMore(false)}
         onAddToFolder={handleOpenFolderSelect}
         onRemoveFromFolder={() => onRemoveFromFolder?.()}

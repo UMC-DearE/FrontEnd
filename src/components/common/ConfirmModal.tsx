@@ -23,7 +23,7 @@ export default function ConfirmModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="relative flex w-[393px] min-h-screen items-center justify-center bg-[#B0B0B0]">
+      <div className="relative flex w-[393px] min-h-screen items-center justify-center bg-black/40">
         <div className="w-[294px] rounded-[17px] bg-white px-[18px] pt-[26px] pb-[20px]">
           <div className="flex flex-col gap-[20px]">
             <div className="flex flex-col items-center gap-2">

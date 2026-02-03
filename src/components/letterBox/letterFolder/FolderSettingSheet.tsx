@@ -12,7 +12,7 @@ export default function FolderSettingSheet({ open, onClose, onSelect }: FolderSe
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="relative w-[393px] min-h-screen overflow-hidden">
-        <button type="button" onClick={onClose} className="absolute inset-0 bg-[#B0B0B0]" />
+        <button type="button" onClick={onClose} className="absolute inset-0 bg-black/40"/>
 
         <div className="fixed bottom-0 left-1/2 h-52 w-[393px] -translate-x-1/2 rounded-t-[17px] bg-white">
           <div className="flex h-full flex-col">

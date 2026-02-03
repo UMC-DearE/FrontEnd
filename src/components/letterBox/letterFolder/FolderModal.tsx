@@ -46,7 +46,7 @@ export default function FolderModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="flex w-[393px] min-h-screen items-center justify-center bg-[#B0B0B0]">
+      <div className="flex w-[393px] min-h-screen items-center justify-center bg-black/40">
         <div
           className="relative w-[294px] rounded-[17px] bg-white p-[18px] transition-all duration-300"
           style={{ height: imageUrl ? '310px' : '272px' }}
