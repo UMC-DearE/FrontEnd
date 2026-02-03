@@ -57,21 +57,16 @@ export default function LetterDetailPage() {
         textColor: data.fromFontColor ?? "#000",
       }}
       receivedAt={data.receivedAt}
-      inFolder={data.inFolder}
-      folderName={data.folderName}
+      folder={data.folder ?? null}
       reply={data.reply}
       onSave={() => {
         console.log("편지 카드 저장");
       }}
       onAddToFolder={(folderId) => {
-        setData((prev) =>
-          prev ? { ...prev, inFolder: true, folderId } : prev
-        );
+        setData((prev) => (prev ? { ...prev, folder: { folderId, folderName: '' } } : prev));
       }}
       onRemoveFromFolder={() => {
-        setData((prev) =>
-          prev ? { ...prev, inFolder: false, folderId: null } : prev
-        );
+        setData((prev) => (prev ? { ...prev, folder: null } : prev));
       }}
       onEdit={() => {
         navigate(`/letter/${id}/edit`);

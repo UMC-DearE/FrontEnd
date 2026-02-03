@@ -135,6 +135,12 @@
   }
 }
 
+/* 크롬, 사파리에서 달력 아이콘 제거*/
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+}
+
 /* Checkbox accent */
 .checkbox-accent {
   accent-color: #FF5F2F;
@@ -142,8 +148,8 @@
 .checkbox-custom {
   -webkit-appearance: none;
   appearance: none;
-  width: 17px;
-  height: 17px;
+  width: 20px;
+  height: 20px;
   border-radius: 3px;
   border: 1px solid #E6E7E9;
   display: inline-block;
@@ -157,10 +163,10 @@
 .checkbox-custom:checked::after {
   content: "";
   position: absolute;
-  left: 5px;
-  top: 2px;
-  width: 5px;
-  height: 9px;
+  left: 6px;
+  top: 3px;
+  width: 6px;
+  height: 10px;
   border: solid #fff;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);

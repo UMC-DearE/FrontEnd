@@ -23,7 +23,7 @@ export default function FolderSelect({
         <button
           type="button"
           onClick={onClose}
-          className="absolute inset-0 bg-[#B0B0B0]"
+          className="absolute inset-0 bg-black/40"
         />
 
         <div className="relative z-10 w-[300px] bg-white rounded-xl px-[21px] py-[20px] shadow-lg gap-[23px] flex flex-col">

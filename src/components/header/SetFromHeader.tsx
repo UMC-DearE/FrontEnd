@@ -13,7 +13,7 @@ export default function SetFromHeader() {
         left={<BackButton />}
         center={<div className="text-lg font-semibold">From 선택</div>}
         right={
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 mr-2">
             <button
               type="button"
               className="text-base font-normal text-[#555557]"

@@ -27,8 +27,9 @@ export function AppLayout() {
 
   const isLetterDetail = /^\/letter\/[^/]+/.test(pathname);
   const hideBottomNav = pathname.startsWith("/setup")|| pathname.startsWith("/my/profile")
-                        || pathname.startsWith("/my/account") || pathname.startsWith("/my/style")
-                        || pathname.startsWith("/login") || isLetterDetail;
+                        || pathname.startsWith("/my/account") || pathname.startsWith("my/style")
+                        || pathname.startsWith("/login") || isLetterDetail
+                        || pathname.startsWith("/create");
 
   const useHomeBg = pathname === '/' || pathname.startsWith('/home');
   
