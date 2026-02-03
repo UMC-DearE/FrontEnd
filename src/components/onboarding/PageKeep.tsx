@@ -3,26 +3,24 @@ import AutoCarousel from "./AutoCarousel";
 import { onboardingAssets } from "./assets";
 
 export default function PageKeep({ active }: { active: boolean }) {
-  const smallSlideIndexes = new Set([0, 1]);
+  const keepSlides = useMemo(() => {
+    const smallSlideIndexes = new Set([0, 1]);
 
-  const keepSlides = useMemo(
-    () =>
-      onboardingAssets.keep.map((src, idx) => (
+    return onboardingAssets.keep.map((src, idx) => (
         <div key={idx} className="flex justify-center">
-          <img
+        <img
             src={src}
             alt={`keep-${idx + 1}`}
             draggable={false}
             className={
-              smallSlideIndexes.has(idx)
+            smallSlideIndexes.has(idx)
                 ? "w-[95px] pt-[40px]"
                 : "w-full"
             }
-          />
+        />
         </div>
-      )),
-    []
-  );
+    ));
+    }, []);
 
   return (
     <div className="flex flex-col items-center">

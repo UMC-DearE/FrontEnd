@@ -143,6 +143,6 @@ export const ROUTE_META: Array<{
   {
     match: (pathname) => pathname === "/my/style",
     header: "MY_STYLE",
-    bg: "white",
+    bg: "gray",
   },
 ];

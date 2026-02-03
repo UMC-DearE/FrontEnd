@@ -8,6 +8,9 @@ import MenuItem from "@/components/my/MenuItem";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon";
 import ProfilePlaceholderIcon from "@/components/icons/ProfilePlaceholderIcon";
 import ConfirmModal from "@/components/common/ConfirmModal";
+import { useStyleStore } from "@/stores/styleStores";
+import { useMembershipStore } from "@/stores/membershipStores";
+import { FONT_LABEL } from "@/utils/fontLabelMap";
 
 function MyProfileSection({ isPlus }: { isPlus: boolean }) {
   const navigate = useNavigate();
@@ -53,9 +56,13 @@ function MyProfileSection({ isPlus }: { isPlus: boolean }) {
 }
 
 export default function MyhomePage() {
-  const [isPlus, setIsPlus] = useState(false);
   const [isPlusModalOpen, setIsPlusModalOpen] = useState(false);
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
+
+  const font = useStyleStore((s) => s.font);
+
+  const isPlus = useMembershipStore((s) => s.isPlus);
+  const setIsPlus = useMembershipStore((s) => s.setIsPlus);
 
   const navigate = useNavigate();
 
@@ -72,7 +79,7 @@ export default function MyhomePage() {
       <main className="bg-white">
         <MyProfileSection isPlus={isPlus} />
 
-        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9.33px] font-medium text-[13px] text-[#9D9D9F]">설정</div>
+        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#9D9D9F]">설정</div>
 
         <button
           className="w-full px-[22px] pt-[18px] pb-[17px] flex justify-between items-center border-b border-[#E6E7E9]"
@@ -101,18 +108,22 @@ export default function MyhomePage() {
           <span className="font-medium text-[16px]">로그아웃</span>
         </button>
 
-        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9.33px] font-medium text-[13px] text-[#9D9D9F]">테마</div>
+        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#9D9D9F]">테마</div>
         <button
           className="w-full px-[22px] pt-[18px] pb-[17px] flex justify-between items-center border-b border-[#E6E7E9]"
           onClick={() => {
-            if (!isPlus) setIsPlusModalOpen(true);
+            if (isPlus) {
+              navigate("/my/style");
+            } else {
+              setIsPlusModalOpen(true);
+            }
           }}
         >
           <span className="font-medium text-[16px]">스타일</span>
 
           {isPlus ? (
             <div className="flex items-center gap-[9px]">
-              <span className="text-[12px] text-[#9D9D9F]">기본</span>
+              <span className="text-[12px] text-[#9D9D9F]">{FONT_LABEL[font]}</span>
               <ChevronRightIcon />
             </div>
           ) : (
@@ -129,7 +140,7 @@ export default function MyhomePage() {
           </div>
         </button>
 
-        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9.33px] font-medium text-[13px] text-[#9D9D9F]">지원</div>
+        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#9D9D9F]">지원</div>
         <MenuItem label="서비스 이용약관"/>
         <MenuItem label="개인정보처리방침"/>
       </main>

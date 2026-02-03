@@ -1,8 +1,10 @@
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import BottomNav from '@/components/bottomNav/BottomNav';
 import { HEADER_REGISTRY } from '@/routes/header.registry';
 import { ROUTE_META } from '@/routes/route.meta';
+import { useStyleStore } from '@/stores/styleStores';
+import { FONT_FAMILY } from "@/utils/fontMap";
 
 export type AppLayoutContext = {
   homeBgColor: string;
@@ -13,12 +15,19 @@ export function AppLayout() {
   const { pathname } = useLocation();
   const [homeBgColor, setHomeBgColor] = useState('#F8F8F8');
 
+  const font = useStyleStore((s) => s.font);
+
+  useEffect(() => {
+    const fontFamily = FONT_FAMILY[font] ?? "Pretendard";
+    document.documentElement.style.setProperty("--app-font", fontFamily);
+  }, [font]);
+
   const matched = ROUTE_META.find((r) => r.match(pathname));
   const Header = matched ? HEADER_REGISTRY[matched.header] : null;
 
   const isLetterDetail = /^\/letter\/[^/]+/.test(pathname);
   const hideBottomNav = pathname.startsWith("/setup")|| pathname.startsWith("/my/profile")
-                        || pathname.startsWith("/my/account") || pathname.startsWith("my/style")
+                        || pathname.startsWith("/my/account") || pathname.startsWith("/my/style")
                         || pathname.startsWith("/login") || isLetterDetail;
 
   const useHomeBg = pathname === '/' || pathname.startsWith('/home');
