@@ -189,7 +189,7 @@ export default function LetterBox() {
         }}
       />
 
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-[10px] mb-3">
         <ToolBar
           totalCount={visibleCount}
           folderTotalCount={folderTotalCount}

@@ -24,7 +24,6 @@ export default function LetterForm({
 
   const canProceed = Boolean(from) && (unknownDate || date);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   // 초기 OCR 텍스트 높이 자동 조절 및 내용 변경 시 높이 재조절(+ 최대 높이 초과 시 스크롤 생김)
   const MAX_HEIGHT = 176;
 
@@ -48,7 +47,7 @@ export default function LetterForm({
   };
 
   return (
-    <div className="flex flex-col h-full pt-1">
+    <div className="flex flex-col pt-1 pb-[90px]">
       {/* 편지 내용(이미지인 경우 - ocr 분석 텍스트 결과) 뿌리고 텍스트 영역 수정 가능 - 수정된 content 값을 서버로 전달(편지 생성할 때) */}
       {onContentChange ? (
         <textarea

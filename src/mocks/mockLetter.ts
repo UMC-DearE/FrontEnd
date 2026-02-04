@@ -39,6 +39,30 @@ export const MOCK_LETTERS: Letter[] = [
     fromFontColor: '#000000',
     folderId: 2,
   },
+  {
+    id: 41,
+    content: 'ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ',
+    isLiked: false,
+    receiveAt: '2026-01-23',
+    createdAt: '2026-01-16T12:27:03',
+    fromId: 574,
+    fromName: '나룬',
+    fromBgColor: '#F7F7F7',
+    fromFontColor: '#000000',
+    folderId: 2,
+  },
+  {
+    id: 42,
+    content: 'ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ',
+    isLiked: false,
+    receiveAt: '2026-01-23',
+    createdAt: '2026-01-16T12:27:03',
+    fromId: 574,
+    fromName: '나룬',
+    fromBgColor: '#F7F7F7',
+    fromFontColor: '#000000',
+    folderId: 2,
+  },
 ];
 
 export function getMockLetters(): Promise<Letter[]> {

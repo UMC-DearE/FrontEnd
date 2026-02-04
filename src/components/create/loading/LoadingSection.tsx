@@ -8,7 +8,7 @@ export default function LoadingSection() {
       <p className="text-base text-[#555557] font-medium">편지를 읽고 있어요</p>
       <p className="text-sm font-medium text-[#9D9D9F]">reading</p></div>
 
-      <div className="w-[135px] h-[15px] bg-[#F4F5F6] rounded-[20px] overflow-hidden">
+      <div className="w-[135px] h-[15px] bg-[#F4F5F6] rounded-[20px] overflow-hidden px-[2px] py-[1px]">
         <div className="loading-grow h-[12px] rounded-[20px]" />
       </div>
     </div>
