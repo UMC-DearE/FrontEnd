@@ -3,7 +3,7 @@
 import LetterCardDefault from './LetterCardDefault';
 import LetterCardCompact from './LetterCardCompact';
 
-export type ViewMode = '기본 보기' | '간편 보기' | '앨범 보기';
+export type ViewMode = '기본 보기' | '간편 보기';
 
 export type LetterCardProps = {
   content: string;
