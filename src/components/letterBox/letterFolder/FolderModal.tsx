@@ -7,6 +7,7 @@ interface FolderModalProps {
   title?: string;
   initialName?: string;
   initialImageUrl?: string | null;
+  initialImageId?: number | null;
   onCancel: () => void;
   onConfirm: (data: {
     folder_name: string;
@@ -19,6 +20,7 @@ export default function FolderModal({
   title = '새 폴더 만들기',
   initialName = '',
   initialImageUrl = null,
+  initialImageId = null,
   onCancel,
   onConfirm,
 }: FolderModalProps) {
