@@ -37,7 +37,7 @@ export default function LetterCardDefault({
   }, [isLiked]);
 
   return (
-    <div className="w-[361px]">
+    <div className="w-full">
       <div
         className={`rounded-lg bg-white px-3 py-3 ${
           isTwoLine ? 'h-[121px]' : 'h-[100px]'
@@ -57,7 +57,7 @@ export default function LetterCardDefault({
         <div className="flex-1 flex items-center">
           <p
             ref={textRef}
-            className="mx-auto w-[337px] font-medium text-[14px] leading-[20px] tracking-[-0.01em] line-clamp-2 text-[#555557]"
+            className="mx-auto w-full font-medium text-[14px] leading-[20px] tracking-[-0.01em] line-clamp-2 text-[#555557]"
           >
             {content}
           </p>
