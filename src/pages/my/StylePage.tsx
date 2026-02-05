@@ -36,7 +36,7 @@ export default function StylePage() {
     setFont(pendingFont);
     navigate(-1);
   };
-  
+
   useEffect(() => {
     if (!setFixedAction) return;
 
@@ -46,7 +46,6 @@ export default function StylePage() {
           변경
         </BottomButton>
       ),
-      bgColor: '#FFFFFF',
     });
 
     return () => setFixedAction(null);
