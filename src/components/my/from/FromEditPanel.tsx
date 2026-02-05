@@ -20,7 +20,7 @@ type Props = {
   onDelete?: (fromId: number) => void;
 };
 
-export default function FromEditPanel({ from, onCancel, onSave, onDelete }: Props) {
+export default function FromEditPanel({ from, onCancel, onSave}: Props) {
   const [name, setName] = useState(from.name);
   const [selectedColor, setSelectedColor] = useState(from.backgroundColor);
   const [showPicker, setShowPicker] = useState(false);
@@ -37,7 +37,7 @@ export default function FromEditPanel({ from, onCancel, onSave, onDelete }: Prop
   };
 
   const [showConfirm, setShowConfirm] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [_deleting, setDeleting] = useState(false);
 
   const handleDeleteConfirm = async () => {
     setDeleting(true);

@@ -1,6 +1,7 @@
 // 마이페이지-스타일 수정 페이지
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { FontRow } from "@/components/my/FontRow";
 import { FONT_OPTIONS } from "@/utils/fontOptions";
@@ -17,6 +18,12 @@ export default function StylePage() {
 
   const [pendingFont, setPendingFont] = useState(font);
 
+  type LayoutContext = {
+    setFixedAction: (payload: { node: React.ReactNode; bgColor?: string } | null) => void;
+  };
+
+  const { setFixedAction } = useOutletContext<LayoutContext>();
+
   const current = useMemo(
     () => FONT_OPTIONS.find((x) => x.key === pendingFont) ?? FONT_OPTIONS[0],
     [pendingFont]
@@ -30,8 +37,22 @@ export default function StylePage() {
     navigate(-1);
   };
 
+  useEffect(() => {
+    if (!setFixedAction) return;
+
+    setFixedAction({
+      node: (
+        <BottomButton disabled={!canSave} onClick={onSubmit}>
+          변경
+        </BottomButton>
+      ),
+    });
+
+    return () => setFixedAction(null);
+  }, [setFixedAction, canSave, onSubmit]);
+
   return (
-    <div className="min-h-full">
+    <div className="min-h-full pb-[52px]">
       <div>
         <div className="text-[14px] text-[#9D9D9F] mt-[4px] mb-[16px]">
           미리보기
@@ -78,12 +99,6 @@ export default function StylePage() {
               />
             );
           })}
-        </div>
-
-        <div className="fixed bottom-0 left-1/2 w-full max-w-[393px] -translate-x-1/2 px-4 pb-[52px] pt-3">
-          <BottomButton disabled={!canSave} onClick={onSubmit}>
-              변경
-          </BottomButton>
         </div>
       </div>
     </div>

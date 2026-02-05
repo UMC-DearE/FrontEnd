@@ -14,6 +14,10 @@ export type AppLayoutContext = {
 export function AppLayout() {
   const { pathname } = useLocation();
   const [homeBgColor, setHomeBgColor] = useState('#F8F8F8');
+  const [fixedAction, setFixedAction] = useState<
+    | { node: React.ReactNode; bgColor?: string }
+    | null
+  >(null);
 
   const font = useStyleStore((s) => s.font);
 
@@ -27,7 +31,7 @@ export function AppLayout() {
 
   const isLetterDetail = /^\/letter\/[^/]+/.test(pathname);
   const hideBottomNav = pathname.startsWith("/setup")|| pathname.startsWith("/my/profile")
-                        || pathname.startsWith("/my/account") || pathname.startsWith("my/style")
+                        || pathname.startsWith("/my/account") || pathname.startsWith("/my/style") || pathname.startsWith("/my/from")
                         || pathname.startsWith("/login") || isLetterDetail
                         || pathname.startsWith("/create");
 
@@ -38,31 +42,70 @@ export function AppLayout() {
 
   const NO_MAIN_PADDING_PATHS = ["/my", "/my/account"];
   const noMainPadding = NO_MAIN_PADDING_PATHS.includes(pathname);
+  const HEADER_HEIGHT = 105;
+  const BOTTOM_NAV_HEIGHT = 95;
+  const FIXED_ACTION_HEIGHT = 52 + 28 + 16;
+  const BASE_PADDING = 16;
+
+  const bottomInset = fixedAction
+    ? FIXED_ACTION_HEIGHT
+    : hideBottomNav
+      ? 0
+      : BOTTOM_NAV_HEIGHT;
 
   return (
     <div
-      className={`h-screen flex flex-col ${bgClass}`}
-      style={useHomeBg ? { backgroundColor: homeBgColor } : undefined}
+      className={`min-h-screen flex flex-col ${bgClass}`}
+      style={{
+        ...(useHomeBg ? { backgroundColor: homeBgColor } : {}),
+        paddingBottom: bottomInset,
+      }}
     >
       {Header && (
         <Suspense fallback={null}>
-          <div className="shrink-0">
-            <Header title={matched?.title} />
+          <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
+            <div className="w-full max-w-[393px]">
+              <Header title={matched?.title} />
+            </div>
           </div>
         </Suspense>
       )}
-      
+
       <main
         className={[
-          "flex-1 overflow-y-auto",
-          noMainPadding ? "" : "px-4 py-4",
-          !hideBottomNav ? "pb-[95px]" : "",
+          noMainPadding ? "" : "px-4",
         ].join(" ")}
-      >
-        <Outlet context={{ homeBgColor, setHomeBgColor }} />
+        style={{
+          paddingTop: Header
+            ? HEADER_HEIGHT + (noMainPadding ? 0 : BASE_PADDING)
+            : noMainPadding
+              ? 0
+              : BASE_PADDING,
+              }}
+            >
+        <Outlet context={{ homeBgColor, setHomeBgColor, setFixedAction }} />
       </main>
 
-      {!hideBottomNav && <BottomNav />}
+      {fixedAction && (
+        <div className="fixed bottom-0 inset-x-0 z-40 flex justify-center pointer-events-none">
+          <div
+            className="w-full max-w-[393px] pt-3 pb-[52px] pointer-events-auto"
+            style={{ background: fixedAction.bgColor ?? '#F8F8F8' }}
+          >
+            <div className="px-4">
+              {fixedAction.node}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!hideBottomNav && !fixedAction && (
+        <nav className="fixed bottom-0 inset-x-0 z-40 flex justify-center bg-white">
+          <div className="w-full max-w-[393px]">
+            <BottomNav />
+          </div>
+        </nav>
+      )}
     </div>
   );
 }

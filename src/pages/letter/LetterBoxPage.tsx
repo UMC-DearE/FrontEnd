@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { getMockFolders } from '@/mocks/mockFolder';
 
 type FolderSelectId = 'all' | 'like' | number;
-type ViewMode = '기본 보기' | '간편 보기' | '앨범 보기';
+type ViewMode = '기본 보기' | '간편 보기';
 
 export default function LetterBox() {
   const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>('all');
@@ -189,7 +189,7 @@ export default function LetterBox() {
         }}
       />
 
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-[10px] mb-3">
         <ToolBar
           totalCount={visibleCount}
           folderTotalCount={folderTotalCount}

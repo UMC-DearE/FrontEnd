@@ -7,7 +7,7 @@ import Dropdown from '@/components/letterBox/Dropdown';
 import FromBottomSheet from '@/components/letterBox/FromBottomSheet';
 import type { From } from '@/types/from';
 
-type Option = '기본 보기' | '간편 보기' | '앨범 보기';
+type Option = '기본 보기' | '간편 보기';
 
 type ToolBarProps = {
   totalCount: number;
@@ -46,7 +46,7 @@ export default function ToolBar({
 
   return (
     <>
-      <div className="relative flex w-[361px] h-[25px] items-center justify-between">
+      <div className="relative flex w-[361px] h-[25px] mt-5 items-center justify-between">
         <div className="text-[14px] font-semibold text-[#141517]">총 {folderTotalCount}통</div>
 
         <div className="relative flex items-center">

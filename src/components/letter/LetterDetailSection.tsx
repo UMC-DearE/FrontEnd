@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useOutletContext } from "react-router-dom";
 import FolderSelect from "@/components/letter/FolderSelect";
 import { getMockFolders, type MockFolder } from "@/mocks/mockFolder";
 import useToast from "@/hooks/useToast";
@@ -13,6 +14,12 @@ import upBar from "@/assets/letter/up-bar.svg";
 import downBar from "@/assets/letter/down-bar.svg";
 import heartbtn from "@/assets/letter/heart.svg";
 import html2canvas from "html2canvas";
+
+type LayoutContext = {
+  setFixedAction: (
+    payload: { node: React.ReactNode; bgColor?: string } | null
+  ) => void;
+};
 
 interface Props {
   content: string;
@@ -42,7 +49,12 @@ function roundCanvas(source: HTMLCanvasElement, radius = 16) {
   ctx.lineTo(canvas.width - radius, 0);
   ctx.quadraticCurveTo(canvas.width, 0, canvas.width, radius);
   ctx.lineTo(canvas.width, canvas.height - radius);
-  ctx.quadraticCurveTo(canvas.width, canvas.height, canvas.width - radius, canvas.height);
+  ctx.quadraticCurveTo(
+    canvas.width,
+    canvas.height,
+    canvas.width - radius,
+    canvas.height
+  );
   ctx.lineTo(radius, canvas.height);
   ctx.quadraticCurveTo(0, canvas.height, 0, canvas.height - radius);
   ctx.lineTo(0, radius);
@@ -52,8 +64,8 @@ function roundCanvas(source: HTMLCanvasElement, radius = 16) {
 
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   ctx.drawImage(source, 0, 0);
+
   return canvas;
 }
 
@@ -69,24 +81,26 @@ export default function LetterDetailSection({
   onRemoveFromFolder,
   onEdit,
 }: Props) {
-  const [openSummary, setOpenSummary] = useState(false);
+  const { setFixedAction } = useOutletContext<LayoutContext>();
+
   const cardRef = useRef<HTMLDivElement | null>(null);
+  const toast = useToast();
+
+  const [openSummary, setOpenSummary] = useState(false);
   const [openMore, setOpenMore] = useState(false);
   const [openFolderSelect, setOpenFolderSelect] = useState(false);
-  const toast = useToast();
+  const [folders, setFolders] = useState<MockFolder[]>([]);
   const [savedReply, setSavedReply] = useState(initialReply ?? "");
   const [draftReply, setDraftReply] = useState("");
-  const [folders, setFolders] = useState<MockFolder[]>([]);
 
-  // 헤더 더보기 버튼에서 이벤트로 열리는 구조
-  useEffect(() => {
+    // 헤더 더보기 버튼에서 이벤트로 열리는 구조
+    useEffect(() => {
     const handleOpen = () => setOpenMore(true);
     window.addEventListener("open-letter-more", handleOpen as EventListener);
     return () =>
       window.removeEventListener("open-letter-more", handleOpen as EventListener);
   }, []);
-
-  const handleSaveCard = async () => {
+  const handleSaveCard = useCallback(async () => {
     if (onSave) onSave();
 
     const el = cardRef.current;
@@ -156,19 +170,35 @@ export default function LetterDetailSection({
       a.click();
       URL.revokeObjectURL(url);
     });
-  };
+  }, [onSave]);
 
-  // 폴더 없을 경우 토스트 띄우기(부모 컴포넌트에서 미리 폴더 불러오기 - 폴더 선택 모달에 넘겨줌)
+// 폴더 없을 경우 토스트 띄우기(부모 컴포넌트에서 미리 폴더 불러오기 - 폴더 선택 모달에 넘겨줌)
+
+  useEffect(() => {
+    setFixedAction({
+      node: (
+        <BottomButton onClick={handleSaveCard}>
+          편지 카드 저장
+        </BottomButton>
+      ),
+      bgColor: "#F8F8F8",
+    });
+
+    return () => {
+      setFixedAction(null);
+    };
+  }, [setFixedAction, handleSaveCard]);
+
+
   const handleOpenFolderSelect = async () => {
     const list = await getMockFolders();
     if (list.length === 0) {
       toast.show("생성된 폴더가 없습니다", 1200);
       return;
     }
-    setFolders(list);   
+    setFolders(list);
     setOpenFolderSelect(true);
   };
-
   // receivedAt 포맷
   const displayReceivedAt = (() => {
     if (receivedAt === null) return "-"; // null이면 -로 처리
@@ -183,29 +213,28 @@ export default function LetterDetailSection({
       return `${y}.${m}.${dd}`;
     }
 
-    const first10 = receivedAt.slice(0, 10).replace(/-/g, ".");
-    return first10;
+    return receivedAt.slice(0, 10).replace(/-/g, ".");
   })();
 
 
   return (
-    <div className="flex flex-col h-full pt-1">
-      <div ref={cardRef} data-letter-card className="border border-[#E6E7E9] bg-white rounded-xl p-4 text-sm text-[#555557] mb-6 scale-100 overflow-hidden shadow-[0_0_6px_rgba(0,0,0,0.05)]">
-        <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E6E7E9]">
+    <div className="flex flex-col pt-1">
+      <div
+        ref={cardRef}
+        data-letter-card
+        className="mb-6 rounded-xl border border-[#E6E7E9] bg-white p-4 text-sm text-[#555557] shadow-[0_0_6px_rgba(0,0,0,0.05)]"
+      >
+        <div className="mb-3 flex items-center justify-between border-b border-[#E6E7E9] pb-3">
           <FromBadge
             name={from.name}
             backgroundColor={from.backgroundColor}
             textColor={from.textColor}
           />
-          <img
-            src={heartbtn}
-            alt="like"
-            className="w-[13px] h-[12px]"
-          />
+          <img src={heartbtn} alt="like" className="w-[13px] h-[12px]" />
         </div>
 
         <div className="max-h-[250px] overflow-y-auto pr-2 thin-scrollbar">
-          <p className="leading-relaxed text-primary text-sm whitespace-pre-line">
+          <p className="whitespace-pre-line text-sm leading-relaxed text-primary">
             {content}
           </p>
         </div>
@@ -217,32 +246,28 @@ export default function LetterDetailSection({
         </div>
       </div>
 
-       <div className="mb-6">
+      <div className="mb-6">
         <button
           onClick={() => setOpenSummary((v) => !v)}
-          className="w-full flex items-center justify-between text-base font-semibold text-primary mb-2"
+          className="mb-2 flex w-full items-center justify-between text-base font-semibold text-primary"
         >
           AI 한 줄 요약
           <img src={openSummary ? upBar : downBar} alt={openSummary ? "열림" : "닫힘"} />
         </button>
 
         {openSummary && (
-          <div className="flex items-center gap-2 text-[#555557] font-medium bg-white border border-[#E6E7E9] rounded-xl p-4 text-sm">
-            <img
-              src={aiSummary}
-              alt="ai summary"
-              className="w-[19px] h-[19px] flex-shrink-0"
-            />
-            <p className="ml-2">{aiResult.summary}</p>
+          <div className="flex items-center gap-2 rounded-xl border border-[#E6E7E9] bg-white p-4 text-sm text-[#555557]">
+            <img src={aiSummary} alt="" className="w-[19px] h-[19px]" />
+            <p>{aiResult.summary}</p>
           </div>
         )}
       </div>
 
       <div className="mb-6">
-        <p className="text-base font-semibold text-primary mb-2">
+        <p className="mb-2 text-base font-semibold text-primary">
           태그된 감정
         </p>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex flex-wrap gap-2">
           {aiResult.emotions.map((emotion) => (
             <EmotionTag
               key={emotion.emotionId}
@@ -254,13 +279,10 @@ export default function LetterDetailSection({
       </div>
 
       <div className="mb-6">
-        <p className="text-base font-semibold text-primary mb-2">
-          답장하기
-        </p>
-
+        <p className="mb-2 text-base font-semibold text-primary">답장하기</p>
         {/* 이미 답장이 있는 경우 */}
         {savedReply ? (
-          <div className="border border-[#E6E7E9] bg-white rounded-xl px-4 py-[14px] text-sm text-[#555557]">
+          <div className="rounded-xl border border-[#E6E7E9] bg-white px-4 py-[14px] text-sm text-[#555557]">
             {savedReply}
           </div>
         ) : (
@@ -308,13 +330,7 @@ export default function LetterDetailSection({
         )}
       </div>
 
-      <div className="fixed bottom-0 left-1/2 w-full max-w-[393px] -translate-x-1/2 bg-[#F8F8F8] px-4 pb-[52px] pt-3">
-        <BottomButton onClick={handleSaveCard}>
-          편지 카드 저장
-        </BottomButton>
-      </div>
-
-      {/* 더보기 바텀시트 */}
+      {/* 바텀시트 / 폴더 */}
       <LetterDetailBottomSheet
         open={openMore}
         folder={folder}
@@ -332,7 +348,8 @@ export default function LetterDetailSection({
         open={openFolderSelect}
         folders={folders}
         onClose={() => setOpenFolderSelect(false)}
-        onSelect={(folderId) => onAddToFolder?.(folderId)} />
+        onSelect={(folderId) => onAddToFolder?.(folderId)}
+      />
     </div>
   );
 }

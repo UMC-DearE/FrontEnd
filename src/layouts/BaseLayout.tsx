@@ -5,7 +5,7 @@ export const BaseLayout = () => {
     <div className="min-h-screen bg-neutral-100 flex justify-center">
       <div
         id="app-frame"
-        className="relative w-full max-w-[393px] h-[852px] min-h-screen bg-[#F8F8F8]"
+        className="relative w-full max-w-[393px] min-h-screen bg-[#F8F8F8]"
       >
         <Outlet />
       </div>
