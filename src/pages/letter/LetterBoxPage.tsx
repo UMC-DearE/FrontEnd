@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { getMockFolders } from '@/mocks/mockFolder';
 
 type FolderSelectId = 'all' | 'like' | number;
-type ViewMode = '기본 보기' | '간편 보기' | '앨범 보기';
+type ViewMode = '기본 보기' | '간편 보기';
 
 export default function LetterBox() {
   const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>('all');
