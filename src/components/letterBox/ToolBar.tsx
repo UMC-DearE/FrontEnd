@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import fromIcon from '@/assets/letterPage/fromIcon.svg';
-import dropdownIcon from '@/assets/letterPage/dropDownIcon.svg';
+import dropdownIcon from '@/assets/letterPage/dropdownIcon.svg';
 import Dropdown from '@/components/letterBox/Dropdown';
 import FromBottomSheet from '@/components/letterBox/FromBottomSheet';
 import type { From } from '@/types/from';
