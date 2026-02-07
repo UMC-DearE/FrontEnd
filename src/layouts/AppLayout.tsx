@@ -63,7 +63,10 @@ export function AppLayout() {
     >
       {Header && (
         <Suspense fallback={null}>
-          <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
+          <div
+            className="fixed top-0 left-0 right-0 z-50 flex justify-center"
+            style={{ paddingTop: 'env(safe-area-inset-top)' }}
+          >
             <div className="w-full max-w-[393px]">
               <Header title={matched?.title} />
             </div>
@@ -76,12 +79,14 @@ export function AppLayout() {
           noMainPadding ? "" : "px-4",
         ].join(" ")}
         style={{
-          paddingTop: Header
-            ? HEADER_HEIGHT + (noMainPadding ? 0 : BASE_PADDING)
-            : noMainPadding
-              ? 0
-              : BASE_PADDING,
-              }}
+                    paddingTop: Header
+                ? `calc(${HEADER_HEIGHT}px + ${
+                    noMainPadding ? 0 : BASE_PADDING
+                  }px + env(safe-area-inset-top))`
+                : noMainPadding
+                  ? 0
+                  : BASE_PADDING,
+            }}
             >
         <Outlet context={{ homeBgColor, setHomeBgColor, setFixedAction }} />
       </main>
