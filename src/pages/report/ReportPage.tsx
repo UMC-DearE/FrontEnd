@@ -25,7 +25,7 @@ export default function ReportPage() {
   const medalIcons = [goldIcon, silverIcon, bronzeIcon];
 
   return (
-     <div className="flex flex-col">
+    <div className="flex flex-col">
       <div className="flex-1 pb-1 space-y-7">
         <button className="cursor-pointer">
           <img src={report} alt="report-recap" className="w-full h-32" />
@@ -61,9 +61,7 @@ export default function ReportPage() {
 
         {/* 가장 많이 들은 말 영역 */}
         <div className="flex flex-col gap-[18px]">
-          <p className="text-[#141517] font-semibold text-[16px]">
-            가장 많이 들은 말
-          </p>
+          <p className="text-[#141517] font-semibold text-[16px]">가장 많이 들은 말</p>
           <div className="flex gap-[8px]">
             {topPhrases.map((phrase, index) => (
               <div
@@ -78,9 +76,7 @@ export default function ReportPage() {
 
         {/* 수집한 감정 태그 영역 */}
         <div className="flex flex-col gap-[18px]">
-          <p className="text-[#141517] font-semibold text-[16px]">
-            수집한 감정 태그
-          </p>
+          <p className="text-[#141517] font-semibold text-[16px]">수집한 감정 태그</p>
           <div className="w-full h-[118px] bg-white rounded-[16px] border-[#F4F5F6] border-[1.2px] flex justify-around py-[16px] px-[22px]">
             {emotionDistribution.map((item, index) => (
               <div key={index} className="flex flex-col items-center gap-[2px]">
