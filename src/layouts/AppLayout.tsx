@@ -62,7 +62,9 @@ export function AppLayout() {
     >
       {Header && (
         <Suspense fallback={null}>
-          <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
+          <div
+            className="fixed top-0 left-0 right-0 z-50 flex justify-center"
+          >
             <div className="w-full max-w-[393px]">
               <Header title={matched?.title} />
             </div>
