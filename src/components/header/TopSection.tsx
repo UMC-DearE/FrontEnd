@@ -17,7 +17,7 @@ export default function TopSection({
       }}
     >
       <div
-        className="flex items-center h-full"
+        className="flex items-center h-full pt-15"
         style={{
           height: 'calc(105px - env(safe-area-inset-top))',
         }}
