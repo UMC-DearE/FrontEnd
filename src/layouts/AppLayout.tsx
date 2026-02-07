@@ -49,7 +49,6 @@ export function AppLayout() {
   const HEADER_HEIGHT = 105;
   const BOTTOM_NAV_HEIGHT = 95;
   const FIXED_ACTION_HEIGHT = 52 + 28 + 16;
-  const BASE_PADDING = 16;
 
   const bottomInset = fixedAction ? FIXED_ACTION_HEIGHT : hideBottomNav ? 0 : BOTTOM_NAV_HEIGHT;
 
