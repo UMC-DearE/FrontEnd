@@ -23,7 +23,7 @@ export default function FolderList({
   onOpenFolderSetting,
 }: FolderListProps) {
   return (
-    <div className="flex gap-[10px] px-4 py-3 overflow-x-auto no-scrollbar">
+    <div className="flex gap-[10px] px-4 py-3 overflow-x-auto no-scrollbar -mt-[10px]">
       <div className="flex flex-col items-center gap-2 shrink-0" onClick={() => onSelect('all')}>
         <button
           type="button"
