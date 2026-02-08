@@ -89,13 +89,12 @@ export default function LetterBox() {
 
   const handleConfirmUpsertFolder = async (data: {
     folder_name: string;
-    image_id: number | null;
-    previewUrl: string | null;
+    imageId: number | null;
   }) => {
     if (editingFolderId == null) {
-      await createFolder({ name: data.folder_name, imageId: data.image_id });
+      await createFolder(data.folder_name, data.imageId);
     } else {
-      await updateFolder(editingFolderId, { name: data.folder_name, imageId: data.image_id });
+      await updateFolder(editingFolderId, { folder_name: data.folder_name, imageId: data.imageId });
     }
 
     const next = await getFolderList();
@@ -127,9 +126,9 @@ export default function LetterBox() {
       {isModalOpen && (
         <FolderModal
           title={editingFolderId == null ? '새 폴더 만들기' : '폴더 수정'}
-          initialName={editingFolder?.name ?? ''}
+          initialName={editingFolder?.folder_name ?? ''}
           initialImageUrl={editingFolder?.imageUrl ?? null}
-          initialImageId={null}
+          initialImageId={editingFolder?.imageId ?? null}
           onCancel={() => {
             setIsModalOpen(false);
             setEditingFolderId(null);
