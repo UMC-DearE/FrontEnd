@@ -18,3 +18,7 @@ export async function updateFolder(folderId: number, body: { name: string; image
 export async function deleteFolder(folderId: number): Promise<void> {
   await api.delete(`/folders/${folderId}`);
 }
+
+export async function updateFolderOrders(folderIds: number[]): Promise<void> {
+  await api.patch('/folders/orders', { foldersOrder: folderIds });
+}

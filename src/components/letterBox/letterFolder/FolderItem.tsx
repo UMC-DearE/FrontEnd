@@ -19,8 +19,11 @@ export default function FolderItem({
   onOpenFolderSetting,
 }: FolderItemProps) {
   const isSelected = selectedId === folder.id;
-  const [imgBroken, setImgBroken] = useState(false);
-  const hasFolderImage = Boolean(folder.imageUrl) && !imgBroken;
+  const [brokenUrl, setBrokenUrl] = useState<string | null>(null);
+
+  const url = folder.imageUrl ?? null;
+  const isBroken = url != null && url === brokenUrl;
+  const hasFolderImage = url != null && !isBroken;
 
   return (
     <div className="flex flex-col items-center gap-[8px] shrink-0">
@@ -39,10 +42,10 @@ export default function FolderItem({
       >
         {hasFolderImage ? (
           <img
-            src={folder.imageUrl as string}
+            src={url as string}
             alt={folder.name}
             className="w-full h-full rounded-[10px] object-cover"
-            onError={() => setImgBroken(true)}
+            onError={() => setBrokenUrl(url)}
           />
         ) : (
           <DefaultFolder alt={folder.name} />

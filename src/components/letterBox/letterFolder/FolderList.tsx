@@ -3,7 +3,17 @@
 import likeIcon from '@/assets/letterPage/likeIcon.svg';
 import plusIcon from '@/assets/letterPage/plusIcon.svg';
 import type { Folder } from '@/types/folder';
-import FolderItem from './FolderItem';
+import {
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import { SortableContext, arrayMove, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { useMemo } from 'react';
+import SortableFolderItem from './SortableFolderItem';
 
 type FolderSelectId = 'all' | 'like' | number;
 
@@ -13,6 +23,7 @@ interface FolderListProps {
   onSelect: (id: FolderSelectId) => void;
   onFolderAdd: () => void;
   onOpenFolderSetting: (folderId: number) => void;
+  onReorder: (next: Folder[]) => void;
 }
 
 export default function FolderList({
@@ -21,7 +32,33 @@ export default function FolderList({
   onSelect,
   onFolderAdd,
   onOpenFolderSetting,
+  onReorder,
 }: FolderListProps) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 6 },
+    })
+  );
+
+  const ids = useMemo(() => folders.map((f) => f.id), [folders]);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+    if (active.id === over.id) return;
+
+    const oldIndex = folders.findIndex((f) => f.id === active.id);
+    const newIndex = folders.findIndex((f) => f.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+
+    const next = arrayMove(folders, oldIndex, newIndex).map((f, idx) => ({
+      ...f,
+      folderOrder: idx + 1,
+    }));
+
+    onReorder(next);
+  };
+
   return (
     <div className="flex gap-[10px] px-4 py-3 overflow-x-auto no-scrollbar -mt-[10px]">
       <div className="flex flex-col items-center gap-2 shrink-0" onClick={() => onSelect('all')}>
@@ -64,15 +101,20 @@ export default function FolderList({
         </p>
       </div>
 
-      {folders.map((folder) => (
-        <FolderItem
-          key={folder.id}
-          folder={folder}
-          selectedId={selectedId}
-          onSelect={onSelect}
-          onOpenFolderSetting={onOpenFolderSetting}
-        />
-      ))}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={ids} strategy={horizontalListSortingStrategy}>
+          {folders.map((folder) => (
+            <SortableFolderItem
+              key={folder.id}
+              id={folder.id}
+              folder={folder}
+              selectedId={selectedId}
+              onSelect={onSelect}
+              onOpenFolderSetting={onOpenFolderSetting}
+            />
+          ))}
+        </SortableContext>
+      </DndContext>
 
       {folders.length < 3 && (
         <div className="flex flex-col items-center gap-2 shrink-0" onClick={onFolderAdd}>

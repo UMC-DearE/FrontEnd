@@ -9,7 +9,13 @@ import type { Letter } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
 import { useNavigate } from 'react-router-dom';
-import { getFolderList, deleteFolder, createFolder, updateFolder } from '@/api/folder';
+import {
+  getFolderList,
+  deleteFolder,
+  createFolder,
+  updateFolder,
+  updateFolderOrders,
+} from '@/api/folder';
 import { uploadImage } from '@/api/image';
 
 type FolderSelectId = 'all' | 'like' | number;
@@ -67,6 +73,10 @@ export default function LetterBox() {
     setEditingFolderId(null);
   };
 
+  const persistOrder = async (next: Folder[]) => {
+    await updateFolderOrders(next.map((f) => f.id));
+  };
+
   return (
     <>
       <FolderList
@@ -83,6 +93,10 @@ export default function LetterBox() {
         onOpenFolderSetting={(id) => {
           setSettingFolderId(id);
           setIsSettingOpen(true);
+        }}
+        onReorder={(next) => {
+          setFolders(next);
+          void persistOrder(next);
         }}
       />
 
