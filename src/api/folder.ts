@@ -1,18 +1,14 @@
 import { api } from '@/api/client';
-import type {
-  Folder,
-  FolderListResponse,
-  CreateFolderRequest,
-  UpdateFolderRequest,
-} from '@/types/folder';
+import type { Folder, FolderListResponse, UpdateFolderRequest } from '@/types/folder';
 
 export async function getFolderList(): Promise<Folder[]> {
   const res = await api.get<FolderListResponse>('/folders');
   return res.data.data.items;
 }
 
-export async function createFolder(body: CreateFolderRequest): Promise<void> {
-  await api.post('/folders', body);
+export async function createFolder(folder_name: string, imageId: number): Promise<Folder> {
+  const res = await api.post<{ data: Folder }>('/folders', { folder_name, imageId });
+  return res.data.data;
 }
 
 export async function updateFolder(folderId: number, body: UpdateFolderRequest): Promise<void> {
