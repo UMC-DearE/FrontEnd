@@ -57,10 +57,7 @@ export default function LetterBox() {
     if (editingFolderId == null) {
       await createFolder(data.folder_name, data.imageId);
     } else {
-      await updateFolder(editingFolderId, {
-        name: data.folder_name,
-        imageId: data.imageId,
-      });
+      await updateFolder(editingFolderId, { name: data.folder_name, imageId: data.imageId });
     }
 
     const next = await getFolderList();

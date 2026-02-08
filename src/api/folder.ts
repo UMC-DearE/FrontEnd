@@ -11,11 +11,8 @@ export async function createFolder(folder_name: string, imageId: number | null):
   return res.data.data;
 }
 
-export async function updateFolder(
-  folderId: number,
-  body: UpdateFolderRequest & { imageId: number | null }
-): Promise<void> {
-  await api.put(`/folders/${folderId}`, body);
+export async function updateFolder(folderId: number, body: { name: string; imageId?: number }) {
+  await api.patch(`/folders/${folderId}`, body);
 }
 
 export async function deleteFolder(folderId: number): Promise<void> {
