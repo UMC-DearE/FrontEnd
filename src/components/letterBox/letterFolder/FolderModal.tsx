@@ -94,6 +94,10 @@ export default function FolderModal({
                   src={imageUrl}
                   className="h-[77px] w-[77px] rounded-xl object-cover"
                   alt="folder-image"
+                  onError={() => {
+                    setImageUrl(null);
+                    setImageId(null);
+                  }}
                 />
               ) : (
                 <div className="h-[77px] w-[77px] rounded-xl bg-[#E6E7E9]" />

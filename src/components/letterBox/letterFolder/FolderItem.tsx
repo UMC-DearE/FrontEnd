@@ -1,8 +1,7 @@
-// 편지함 폴더
-
+import { useState } from 'react';
 import folderSetIcon from '@/assets/letterPage/folderSetIcon.svg';
-import defaultFolderImage from '@/assets/letterPage/default-folder.svg';
 import type { Folder } from '@/types/folder';
+import DefaultFolder from './DefaultFolder';
 
 type FolderSelectId = 'all' | 'like' | number;
 
@@ -20,7 +19,8 @@ export default function FolderItem({
   onOpenFolderSetting,
 }: FolderItemProps) {
   const isSelected = selectedId === folder.id;
-  const hasFolderImage = Boolean(folder.imageUrl);
+  const [imgBroken, setImgBroken] = useState(false);
+  const hasFolderImage = Boolean(folder.imageUrl) && !imgBroken;
 
   return (
     <div className="flex flex-col items-center gap-[8px] shrink-0">
@@ -42,21 +42,10 @@ export default function FolderItem({
             src={folder.imageUrl as string}
             alt={folder.name}
             className="w-full h-full rounded-[10px] object-cover"
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = defaultFolderImage;
-            }}
+            onError={() => setImgBroken(true)}
           />
         ) : (
-          <img
-            src={defaultFolderImage}
-            alt={folder.name}
-            className="w-[20px] h-[17px]"
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = defaultFolderImage;
-            }}
-          />
+          <DefaultFolder alt={folder.name} />
         )}
 
         {isSelected && (

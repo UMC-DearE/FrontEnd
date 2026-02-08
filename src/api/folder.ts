@@ -1,5 +1,5 @@
 import { api } from '@/api/client';
-import type { Folder, FolderListResponse, UpdateFolderRequest } from '@/types/folder';
+import type { Folder, FolderListResponse } from '@/types/folder';
 
 export async function getFolderList(): Promise<Folder[]> {
   const res = await api.get<FolderListResponse>('/folders');
