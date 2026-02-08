@@ -28,6 +28,7 @@ export default function LetterBox() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingFolderId, setEditingFolderId] = useState<number | null>(null);
   const [deleteTargetFolderId, setDeleteTargetFolderId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [folders, setFolders] = useState<Folder[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
@@ -126,19 +127,30 @@ export default function LetterBox() {
         title="폴더 삭제"
         titleClassName="text-[#FF1D0D]"
         description="폴더를 삭제할까요? 편지는 삭제되지 않아요"
-        onCancel={() => setIsDeleteModalOpen(false)}
-        onConfirm={async () => {
-          if (deleteTargetFolderId != null) {
-            await deleteFolder(deleteTargetFolderId);
-          }
-
-          const next = await getFolderList();
-          setFolders([...next].sort((a, b) => a.folderOrder - b.folderOrder));
-
-          if (selectedFolderId === deleteTargetFolderId) {
-            setSelectedFolderId('all');
-          }
+        onCancel={() => {
+          if (isDeleting) return;
           setIsDeleteModalOpen(false);
+        }}
+        onConfirm={async () => {
+          if (deleteTargetFolderId == null || isDeleting) return;
+
+          setIsDeleting(true);
+          try {
+            await deleteFolder(deleteTargetFolderId);
+
+            const next = await getFolderList();
+            setFolders([...next].sort((a, b) => a.folderOrder - b.folderOrder));
+
+            if (selectedFolderId === deleteTargetFolderId) {
+              setSelectedFolderId('all');
+              setSelectedFromId('all');
+            }
+
+            setIsDeleteModalOpen(false);
+            setDeleteTargetFolderId(null);
+          } finally {
+            setIsDeleting(false);
+          }
         }}
       />
 
