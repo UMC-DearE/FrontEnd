@@ -50,6 +50,9 @@ export default function FolderModal({
       const res = await uploadImage(file, 'folder');
       setImageId(res.imageId);
       setImageUrl(res.url || preview);
+    } catch (err) {
+      console.error(err);
+      setImageUrl(preview);
     } finally {
       setIsUploading(false);
       e.target.value = '';

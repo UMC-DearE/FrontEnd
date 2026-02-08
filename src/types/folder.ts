@@ -2,6 +2,7 @@ export type Folder = {
   id: number;
   name: string;
   imageUrl: string | null;
+  imageId: number | null;
   folderOrder: number;
 };
 
