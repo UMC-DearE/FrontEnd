@@ -2,12 +2,12 @@
 
 import folderSetIcon from '@/assets/letterPage/folderSetIcon.svg';
 import defaultFolderImage from '@/assets/letterPage/default-folder.svg';
-import type { FolderType } from '@/types/folder';
+import type { Folder } from '@/types/folder';
 
 type FolderSelectId = 'all' | 'like' | number;
 
 interface FolderItemProps {
-  folder: FolderType;
+  folder: Folder;
   selectedId: FolderSelectId;
   onSelect: (id: FolderSelectId) => void;
   onOpenFolderSetting: (folderId: number) => void;
@@ -40,7 +40,7 @@ export default function FolderItem({
         {hasFolderImage ? (
           <img
             src={folder.imageUrl as string}
-            alt={folder.folderName}
+            alt={folder.name}
             className="w-full h-full rounded-[10px] object-cover"
             onError={(e) => {
               e.currentTarget.onerror = null;
@@ -50,7 +50,7 @@ export default function FolderItem({
         ) : (
           <img
             src={defaultFolderImage}
-            alt={folder.folderName}
+            alt={folder.name}
             className="w-[20px] h-[17px]"
             onError={(e) => {
               e.currentTarget.onerror = null;
@@ -88,7 +88,7 @@ export default function FolderItem({
       <p
         className={`text-[12px] transition-colors ${isSelected ? 'text-black font-semibold' : 'text-[#C2C4C7]'}`}
       >
-        {folder.folderName}
+        {folder.name}
       </p>
     </div>
   );

@@ -1,21 +1,25 @@
-// 폴더 기본 구조
-export interface FolderType {
+export type Folder = {
   id: number;
-  folderName: string;
-  imageUrl?: string;
-  imageId?: number | null;
-}
+  name: string;
+  imageUrl: string | null;
+  folderOrder: number;
+};
 
-// 새 폴더 생성
-export interface CreateFolderRequest {
-  folder_name: string; // 6자 이내
-  image_id: number;
-}
-
-// 폴더 목록 조회
-export interface FolderListResponse {
+export type FolderListResponse = {
   success: boolean;
   code: string;
   message: string;
-  data: FolderType[];
-}
+  data: {
+    items: Folder[];
+  };
+};
+
+export type CreateFolderRequest = {
+  name: string;
+  imageId: number | null;
+};
+
+export type UpdateFolderRequest = {
+  name: string;
+  imageId: number | null;
+};

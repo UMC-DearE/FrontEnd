@@ -4,12 +4,12 @@ import FolderList from '@/components/letterBox/letterFolder/FolderList';
 import FolderSettingSheet from '@/components/letterBox/letterFolder/FolderSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import FolderModal from '@/components/letterBox/letterFolder/FolderModal';
-import type { FolderType } from '@/types/folder';
+import type { Folder } from '@/types/folder';
 import type { Letter } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
 import { useNavigate } from 'react-router-dom';
-import { getMockFolders } from '@/mocks/mockFolder';
+import { getFolderList, deleteFolder, createFolder, updateFolder } from '@/api/folder';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
@@ -28,7 +28,7 @@ export default function LetterBox() {
   const [editingFolderId, setEditingFolderId] = useState<number | null>(null);
   const [deleteTargetFolderId, setDeleteTargetFolderId] = useState<number | null>(null);
 
-  const [customFolders, setCustomFolders] = useState<FolderType[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
 
   useEffect(() => {
@@ -37,20 +37,16 @@ export default function LetterBox() {
 
   useEffect(() => {
     const run = async () => {
-      const data = await getMockFolders();
-      setCustomFolders(
-        data
-          .sort((a, b) => a.folderOrder - b.folderOrder)
-          .map((f) => ({
-            id: f.id,
-            folderName: f.folderName,
-            imageUrl: f.imageUrl ?? undefined,
-            imageId: f.imageId ?? null,
-          }))
-      );
+      const data = await getFolderList();
+      setFolders([...data].sort((a, b) => a.folderOrder - b.folderOrder));
     };
     run();
   }, []);
+
+  const editingFolder = useMemo(() => {
+    if (editingFolderId == null) return null;
+    return folders.find((f) => f.id === editingFolderId) ?? null;
+  }, [folders, editingFolderId]);
 
   const folderFilteredLetters = useMemo(() => {
     let result = letters;
@@ -91,35 +87,19 @@ export default function LetterBox() {
   const folderTotalCount = folderFilteredLetters.length;
   const visibleCount = finalFilteredLetters.length;
 
-  const handleConfirmUpsertFolder = (data: {
+  const handleConfirmUpsertFolder = async (data: {
     folder_name: string;
     image_id: number | null;
     previewUrl: string | null;
   }) => {
     if (editingFolderId == null) {
-      setCustomFolders((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          folderName: data.folder_name,
-          imageUrl: data.previewUrl || undefined,
-          imageId: data.image_id,
-        },
-      ]);
+      await createFolder({ name: data.folder_name, imageId: data.image_id });
     } else {
-      setCustomFolders((prev) =>
-        prev.map((f) =>
-          f.id === editingFolderId
-            ? {
-                ...f,
-                folderName: data.folder_name,
-                imageUrl: data.previewUrl || undefined,
-                imageId: data.image_id,
-              }
-            : f
-        )
-      );
+      await updateFolder(editingFolderId, { name: data.folder_name, imageId: data.image_id });
     }
+
+    const next = await getFolderList();
+    setFolders([...next].sort((a, b) => a.folderOrder - b.folderOrder));
 
     setIsModalOpen(false);
     setEditingFolderId(null);
@@ -128,7 +108,7 @@ export default function LetterBox() {
   return (
     <>
       <FolderList
-        folders={customFolders}
+        folders={folders}
         selectedId={selectedFolderId}
         onSelect={(id) => {
           setSelectedFolderId(id);
@@ -147,9 +127,9 @@ export default function LetterBox() {
       {isModalOpen && (
         <FolderModal
           title={editingFolderId == null ? '새 폴더 만들기' : '폴더 수정'}
-          initialName={customFolders.find((f) => f.id === editingFolderId)?.folderName ?? ''}
-          initialImageUrl={customFolders.find((f) => f.id === editingFolderId)?.imageUrl ?? null}
-          initialImageId={customFolders.find((f) => f.id === editingFolderId)?.imageId ?? null}
+          initialName={editingFolder?.name ?? ''}
+          initialImageUrl={editingFolder?.imageUrl ?? null}
+          initialImageId={null}
           onCancel={() => {
             setIsModalOpen(false);
             setEditingFolderId(null);
@@ -182,8 +162,14 @@ export default function LetterBox() {
         titleClassName="text-[#FF1D0D]"
         description="폴더를 삭제할까요? 편지는 삭제되지 않아요"
         onCancel={() => setIsDeleteModalOpen(false)}
-        onConfirm={() => {
-          setCustomFolders((prev) => prev.filter((f) => f.id !== deleteTargetFolderId));
+        onConfirm={async () => {
+          if (deleteTargetFolderId != null) {
+            await deleteFolder(deleteTargetFolderId);
+          }
+
+          const next = await getFolderList();
+          setFolders([...next].sort((a, b) => a.folderOrder - b.folderOrder));
+
           if (selectedFolderId === deleteTargetFolderId) setSelectedFolderId('all');
           setIsDeleteModalOpen(false);
         }}
