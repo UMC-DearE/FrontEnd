@@ -1,4 +1,4 @@
-import type { EmotionCategory } from "@/types/letter";
+import type { EmotionCategory } from "@/types/create";
 
 interface EmotionTagProps {
   label?: string;
@@ -15,10 +15,18 @@ const LEGACY_STYLE = {
 } as const;
 
 export function EmotionTag({ label, category, variant }: EmotionTagProps) {
-  const displayLabel = label ?? category?.type ?? "";
+  const displayLabel = label ?? category?.categoryType ?? "";
+
+  const normalizeColor = (value?: string) => {
+    if (!value) return undefined;
+    return value.startsWith("#") ? value : `#${value}`;
+  };
 
   const style = category
-    ? { backgroundColor: category.bgColor, color: category.fontColor }
+    ? {
+        backgroundColor: normalizeColor(category.bgColor),
+        color: normalizeColor(category.fontColor),
+      }
     : undefined;
 
   const legacyClass = variant ? LEGACY_STYLE[variant] : undefined;

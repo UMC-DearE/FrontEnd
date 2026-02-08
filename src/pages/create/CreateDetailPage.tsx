@@ -3,10 +3,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import type { CreateResultPayload } from "@/types/create";
 import type { CreateFrom } from "@/types/from";
 import LetterForm from "@/components/common/LetterForm";
+import { createLetter } from "@/api/create";
+import useToast from "@/hooks/useToast";
 
 type LocationState =
   | (CreateResultPayload & {
       selectedFromDraft?: CreateFrom;
+      imageIds?: number[];
     })
   | null;
 
@@ -19,6 +22,7 @@ export default function CreateDetailPage() {
     state?.selectedFromDraft
   );
   const [content, setContent] = useState<string>(state?.content ?? "");
+  const toast = useToast();
 
   useEffect(() => {
     if (!state) {
@@ -48,8 +52,36 @@ export default function CreateDetailPage() {
           },
         })
       }
-      onSubmit={() => {
-        // 편지 추가 버튼 - 프롬 생성 / 편지 생성 api 호출
+      // 편지 추가 버튼 - 프롬 생성 -> 편지 생성 api 호출
+      onSubmit={async (payload) => {
+        const fromId = payload.from?.fromId ?? fromDraft?.fromId;
+        if (!fromId) {
+          toast.show("받는 사람을 선택해주세요.");
+          return;
+        }
+
+        const receivedAt = payload.unknownDate ? "" : payload.date ?? "";
+        const finalContent = payload.content ?? content;
+
+        try {
+          const res = await createLetter({
+            content: finalContent,
+            aiSummary: state.aiResult.summary,
+            emotionIds: state.aiResult.emotions.map((e) => e.emotionId),
+            fromId,
+            receivedAt,
+            imageIds: state.imageIds ?? [],
+          });
+
+          if (!res.success) {
+            toast.show(res.message || "편지 생성에 실패했습니다.");
+            return;
+          }
+
+          navigate(`/letter/${res.data.letterId}`, { replace: true });
+        } catch (e) {
+          toast.show("편지 생성 중 오류가 발생했습니다.");
+        }
       }}
     />
   );

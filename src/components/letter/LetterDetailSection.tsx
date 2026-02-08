@@ -3,7 +3,6 @@ import { useOutletContext } from "react-router-dom";
 import FolderSelect from "@/components/letter/FolderSelect";
 import { getMockFolders, type MockFolder } from "@/mocks/mockFolder";
 import useToast from "@/hooks/useToast";
-import type { AiAnalyzeResult } from "@/types/letter";
 import type { CreateFrom } from "@/types/from";
 import { EmotionTag } from "@/components/common/EmotionTag";
 import { BottomButton } from "@/components/common/BottomButton";
@@ -14,6 +13,7 @@ import upBar from "@/assets/letter/up-bar.svg";
 import downBar from "@/assets/letter/down-bar.svg";
 import heartbtn from "@/assets/letter/heart.svg";
 import html2canvas from "html2canvas";
+import type { AnalyzeLetterResponse } from "@/types/create";
 
 type LayoutContext = {
   setFixedAction: (
@@ -23,7 +23,7 @@ type LayoutContext = {
 
 interface Props {
   content: string;
-  aiResult: AiAnalyzeResult;
+  aiResult: AnalyzeLetterResponse;
   from: CreateFrom;
   receivedAt?: string | null;
   // folder metadata object; null if not in a folder

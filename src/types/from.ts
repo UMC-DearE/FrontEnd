@@ -1,4 +1,7 @@
+import type { CommonResponse } from "./common";
+
 export interface CreateFrom {
+  fromId?: number;
   name: string;
   backgroundColor: string;
   textColor: string;
@@ -14,11 +17,8 @@ export interface From {
   letterCount?: number;
 }
 
-export interface FromListResponse {
-  success: boolean;
-  code: string;
-  message: string;
-  data: {
-    froms: From[];
-  };
+export interface FromListResponseData {
+  froms: From[];
 }
+
+export type FromListResponse = CommonResponse<FromListResponseData>;

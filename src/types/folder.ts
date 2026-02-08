@@ -1,3 +1,5 @@
+import type { CommonResponse } from "./common";
+
 // 폴더 기본 구조
 export interface FolderType {
   id: number;
@@ -13,9 +15,4 @@ export interface CreateFolderRequest {
 }
 
 // 폴더 목록 조회
-export interface FolderListResponse {
-  success: boolean;
-  code: string;
-  message: string;
-  data: FolderType[];
-}
+export type FolderListResponse = CommonResponse<FolderType[]>;
