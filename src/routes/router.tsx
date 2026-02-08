@@ -6,6 +6,7 @@ import NotFoundPage from "@/pages/NotFoundPage";
 import ProtectedRoute from "./ProtectedRoute";
 
 import LoginPage from "@/pages/onboarding/LoginPage";
+import OAuthCallbackPage from "@/pages/onboarding/OauthCallbackPage";
 
 import TermsPage from "@/pages/setup/TermsPage";
 import SetNickamePage from "@/pages/setup/SetNicknamePage";
@@ -42,6 +43,7 @@ const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { path: "login", element: <LoginPage /> },
+          { path: "auth/:provider/callback", element: <OAuthCallbackPage /> },
         ],
       },
       {
