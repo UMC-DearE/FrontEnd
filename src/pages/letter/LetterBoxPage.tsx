@@ -4,12 +4,20 @@ import FolderList from '@/components/letterBox/letterFolder/FolderList';
 import FolderSettingSheet from '@/components/letterBox/letterFolder/FolderSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import FolderModal from '@/components/letterBox/letterFolder/FolderModal';
-import type { FolderType } from '@/types/folder';
+import type { Folder } from '@/types/folder';
 import type { Letter } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
 import { useNavigate } from 'react-router-dom';
-import { getMockFolders } from '@/mocks/mockFolder';
+import {
+  getFolderList,
+  deleteFolder,
+  createFolder,
+  updateFolder,
+  updateFolderOrders,
+} from '@/api/folder';
+import { uploadImage } from '@/api/image';
+import { refreshAccessToken } from '@/api/http';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
@@ -27,8 +35,9 @@ export default function LetterBox() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingFolderId, setEditingFolderId] = useState<number | null>(null);
   const [deleteTargetFolderId, setDeleteTargetFolderId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const [customFolders, setCustomFolders] = useState<FolderType[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
 
   useEffect(() => {
@@ -37,98 +46,51 @@ export default function LetterBox() {
 
   useEffect(() => {
     const run = async () => {
-      const data = await getMockFolders();
-      setCustomFolders(
-        data
-          .sort((a, b) => a.folderOrder - b.folderOrder)
-          .map((f) => ({
-            id: f.id,
-            folderName: f.folderName,
-            imageUrl: f.imageUrl ?? undefined,
-            imageId: f.imageId ?? null,
-          }))
-      );
+      try {
+        await refreshAccessToken();
+      } catch {
+        return;
+      }
+
+      const data = await getFolderList();
+      setFolders([...data].sort((a, b) => a.folderOrder - b.folderOrder));
     };
-    run();
+    void run();
   }, []);
 
-  const folderFilteredLetters = useMemo(() => {
-    let result = letters;
+  const editingFolder = useMemo(() => {
+    if (editingFolderId == null) return null;
+    return folders.find((f) => f.id === editingFolderId) ?? null;
+  }, [folders, editingFolderId]);
 
-    if (selectedFolderId === 'like') {
-      result = result.filter((letter) => letter.isLiked);
-    } else if (typeof selectedFolderId === 'number') {
-      result = result.filter((letter) => letter.folderId === selectedFolderId);
-    }
-
-    return result;
-  }, [letters, selectedFolderId]);
-
-  const { froms, fromCounts } = useMemo(() => {
-    const selectFroms = new Map<number, any>();
-    const counts: Record<number, number> = {};
-
-    folderFilteredLetters.forEach((letter) => {
-      if (!selectFroms.has(letter.fromId)) {
-        selectFroms.set(letter.fromId, {
-          fromId: letter.fromId,
-          name: letter.fromName,
-          backgroundColor: letter.fromBgColor,
-          textColor: letter.fromFontColor,
-        });
-      }
-      counts[letter.fromId] = (counts[letter.fromId] || 0) + 1;
-    });
-
-    return { froms: Array.from(selectFroms.values()), fromCounts: counts };
-  }, [folderFilteredLetters]);
-
-  const finalFilteredLetters = useMemo(() => {
-    if (selectedFromId === 'all') return folderFilteredLetters;
-    return folderFilteredLetters.filter((letter) => letter.fromId === selectedFromId);
-  }, [folderFilteredLetters, selectedFromId]);
-
-  const folderTotalCount = folderFilteredLetters.length;
-  const visibleCount = finalFilteredLetters.length;
-
-  const handleConfirmUpsertFolder = (data: {
+  const handleConfirmUpsertFolder = async (data: {
     folder_name: string;
-    image_id: number | null;
-    previewUrl: string | null;
+    imageId: number | null;
   }) => {
     if (editingFolderId == null) {
-      setCustomFolders((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          folderName: data.folder_name,
-          imageUrl: data.previewUrl || undefined,
-          imageId: data.image_id,
-        },
-      ]);
+      await createFolder(data.folder_name, data.imageId);
     } else {
-      setCustomFolders((prev) =>
-        prev.map((f) =>
-          f.id === editingFolderId
-            ? {
-                ...f,
-                folderName: data.folder_name,
-                imageUrl: data.previewUrl || undefined,
-                imageId: data.image_id,
-              }
-            : f
-        )
-      );
+      await updateFolder(editingFolderId, {
+        name: data.folder_name,
+        imageId: data.imageId ?? null,
+      });
     }
+
+    const next = await getFolderList();
+    setFolders([...next].sort((a, b) => a.folderOrder - b.folderOrder));
 
     setIsModalOpen(false);
     setEditingFolderId(null);
   };
 
+  const persistOrder = async (next: Folder[]) => {
+    await updateFolderOrders(next.map((f) => f.id));
+  };
+
   return (
     <>
       <FolderList
-        folders={customFolders}
+        folders={folders}
         selectedId={selectedFolderId}
         onSelect={(id) => {
           setSelectedFolderId(id);
@@ -142,19 +104,24 @@ export default function LetterBox() {
           setSettingFolderId(id);
           setIsSettingOpen(true);
         }}
+        onReorder={(next) => {
+          setFolders(next);
+          void persistOrder(next);
+        }}
       />
 
       {isModalOpen && (
         <FolderModal
           title={editingFolderId == null ? '새 폴더 만들기' : '폴더 수정'}
-          initialName={customFolders.find((f) => f.id === editingFolderId)?.folderName ?? ''}
-          initialImageUrl={customFolders.find((f) => f.id === editingFolderId)?.imageUrl ?? null}
-          initialImageId={customFolders.find((f) => f.id === editingFolderId)?.imageId ?? null}
+          initialName={editingFolder?.name ?? ''}
+          initialImageUrl={editingFolder?.imageUrl ?? null}
+          initialImageId={editingFolder?.imageId ?? null}
           onCancel={() => {
             setIsModalOpen(false);
             setEditingFolderId(null);
           }}
           onConfirm={handleConfirmUpsertFolder}
+          uploadImage={uploadImage}
         />
       )}
 
@@ -181,42 +148,53 @@ export default function LetterBox() {
         title="폴더 삭제"
         titleClassName="text-[#FF1D0D]"
         description="폴더를 삭제할까요? 편지는 삭제되지 않아요"
-        onCancel={() => setIsDeleteModalOpen(false)}
-        onConfirm={() => {
-          setCustomFolders((prev) => prev.filter((f) => f.id !== deleteTargetFolderId));
-          if (selectedFolderId === deleteTargetFolderId) setSelectedFolderId('all');
+        onCancel={() => {
+          if (isDeleting) return;
           setIsDeleteModalOpen(false);
+        }}
+        onConfirm={async () => {
+          if (deleteTargetFolderId == null || isDeleting) return;
+
+          setIsDeleting(true);
+          try {
+            await deleteFolder(deleteTargetFolderId);
+
+            const next = await getFolderList();
+            setFolders([...next].sort((a, b) => a.folderOrder - b.folderOrder));
+
+            if (selectedFolderId === deleteTargetFolderId) {
+              setSelectedFolderId('all');
+              setSelectedFromId('all');
+            }
+
+            setIsDeleteModalOpen(false);
+            setDeleteTargetFolderId(null);
+          } finally {
+            setIsDeleting(false);
+          }
         }}
       />
 
       <div className="flex flex-col gap-[10px] mb-3">
         <ToolBar
-          totalCount={visibleCount}
-          folderTotalCount={folderTotalCount}
-          froms={froms}
-          fromCounts={fromCounts}
+          totalCount={letters.length}
+          folderTotalCount={letters.length}
+          froms={[]}
+          fromCounts={{}}
           selectedFromId={selectedFromId}
           onFromSelect={setSelectedFromId}
           view={viewMode}
           onViewChange={setViewMode}
         />
 
-        {finalFilteredLetters.map((letter) => (
+        {letters.map((letter) => (
           <div
             key={letter.id}
             role="button"
             className="cursor-pointer"
             onClick={() => navigate(`/letter/${letter.id}`)}
           >
-            <LetterCard
-              content={letter.content}
-              isLiked={letter.isLiked}
-              receiveAt={letter.receiveAt}
-              fromName={letter.fromName}
-              fromBgColor={letter.fromBgColor}
-              fromFontColor={letter.fromFontColor}
-              viewMode={viewMode}
-            />
+            <LetterCard {...letter} viewMode={viewMode} />
           </div>
         ))}
       </div>
