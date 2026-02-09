@@ -72,6 +72,7 @@ export default function SetFromPage() {
 
   const handleSelect = (from: FromItem) => {
     goBackWithDraft({
+      fromId: from.fromId,
       name: from.name,
       backgroundColor: from.backgroundColor,
       textColor: from.textColor,

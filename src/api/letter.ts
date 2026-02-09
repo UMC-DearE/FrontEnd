@@ -1,0 +1,26 @@
+import { api } from "./http";
+import type {
+  LetterDetailResponse,
+  PatchLetterRequest,
+  PatchLetterResponse,
+} from "@/types/letter";
+
+export const getLetterDetail = async (
+  letterId: number
+): Promise<LetterDetailResponse> => {
+  const { data } = await api.get<LetterDetailResponse>(
+    `/letters/${letterId}`
+  );
+  return data;
+};
+
+export const patchLetter = async (
+  letterId: number,
+  payload: PatchLetterRequest
+): Promise<PatchLetterResponse> => {
+  const { data } = await api.patch<PatchLetterResponse>(
+    `/letters/${letterId}`,
+    payload
+  );
+  return data;
+};

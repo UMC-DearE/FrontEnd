@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import LetterDetailSection from "@/components/letter/LetterDetailSection";
-import { getMockLetterDetail } from "@/mocks/mockLetterDetail";
+import { getLetterDetail } from "@/api/letter";
 import type { LetterDetailData } from "@/types/letter";
 
 export default function LetterDetailPage() {
@@ -18,7 +18,7 @@ export default function LetterDetailPage() {
     async function load() {
       try {
         setLoading(true);
-        const res = await getMockLetterDetail(Number(id));
+        const res = await getLetterDetail(Number(id));
         if (!mounted) return;
 
         if (!res.success) {
@@ -49,12 +49,12 @@ export default function LetterDetailPage() {
       content={data.content}
       aiResult={{
         summary: data.aiSummary ?? "",
-        emotions: data.emotions ?? [],
+        emotions: data.emotionTags ?? [],
       }}
       from={{
-        name: data.fromName ?? "",
-        backgroundColor: data.fromBgColor ?? "#FFF",
-        textColor: data.fromFontColor ?? "#000",
+        name: data.from?.name ?? "",
+        backgroundColor: data.from?.bgColor ?? "#FFF",
+        textColor: data.from?.fontColor ?? "#000",
       }}
       receivedAt={data.receivedAt}
       folder={data.folder ?? null}

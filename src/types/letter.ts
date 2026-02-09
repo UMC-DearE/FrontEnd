@@ -1,3 +1,6 @@
+import type { Emotion } from "./create";
+import type { CommonResponse } from "./common";
+
 export type Letter = {
   id: number;
   content: string;
@@ -11,36 +14,14 @@ export type Letter = {
   folderId: number;
 };
 
-export type LetterListResponse = {
-  success: boolean;
-  code: string;
-  message: string;
-  result: {
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    content: Letter[];
-  };
-};
-
-export interface EmotionCategory {
-  categoryId: number;
-  type: string;
-  bgColor: string;
-  fontColor: string;
+export interface LetterListResult {
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  content: Letter[];
 }
 
-export interface Emotion {
-  emotionId: number;
-  emotionName: string;
-  category: EmotionCategory;
-}
-
-// AI 편지 내용 분석 결과(letterID는 params로 전달 - UI에서 몰라도 됨)
-export interface AiAnalyzeResult {
-  summary: string;
-  emotions: Emotion[];
-}
+export type LetterListResponse = CommonResponse<LetterListResult>;
 
 // 편지 상세 조회
 export interface LetterDetailData {
@@ -48,27 +29,33 @@ export interface LetterDetailData {
   receivedAt?: string;
   aiSummary?: string;
 
-  emotions?: Emotion[];
+  emotionTags?: Emotion[];
   isLiked?: boolean;
   reply?: string;
 
-  fromName?: string;
-  fromBgColor?: string;
-  fromFontColor?: string;
+  from?: {
+    fromId: number;
+    name: string;
+    bgColor: string;
+    fontColor: string;
+  };
 
   createdAt?: string;
   imageUrls?: string[];
-
-  // If the letter belongs to a folder, `folder` contains metadata; otherwise `folder` is null.
+  
   folder?: {
     folderId: number;
     folderName: string;
   } | null;
 }
 
-export interface LetterDetailResponse {
-  success: boolean;
-  code: string;
-  message: string;
-  data: LetterDetailData;
+export type LetterDetailResponse = CommonResponse<LetterDetailData>;
+
+// 편지 수정
+export interface PatchLetterRequest {
+  content: string;
+  fromId: number;
+  receivedAt: string;
 }
+
+export type PatchLetterResponse = CommonResponse<Record<string, never>>;
