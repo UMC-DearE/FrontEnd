@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LetterForm from "@/components/common/LetterForm";
-import { getMockLetterDetail } from "@/mocks/mockLetterDetail";
+import { getLetterDetail, patchLetter } from "@/api/letter";
 import type { LetterDetailData } from "@/types/letter";
 import type { CreateFrom } from "@/types/from";
+import useToast from "@/hooks/useToast";
 
 type EditPageLocationState = {
   selectedFromDraft?: CreateFrom;
@@ -14,6 +15,7 @@ export default function EditLetterPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as EditPageLocationState;
+  const toast = useToast();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +31,7 @@ export default function EditLetterPage() {
     async function load() {
       try {
         setLoading(true);
-        const res = await getMockLetterDetail(Number(id));
+        const res = await getLetterDetail(Number(id));
         if (!mounted) return;
 
         if (!res.success) {
@@ -46,9 +48,10 @@ export default function EditLetterPage() {
         if (prev) return prev;
 
         return {
-          name: res.data.fromName ?? "",
-          backgroundColor: res.data.fromBgColor ?? "#FFF",
-          textColor: res.data.fromFontColor ?? "#000",
+          fromId: res.data.from?.fromId,
+          name: res.data.from?.name ?? "",
+          backgroundColor: res.data.from?.bgColor ?? "#FFF",
+          textColor: res.data.from?.fontColor ?? "#000",
         };
       });
       } catch {
@@ -81,7 +84,7 @@ export default function EditLetterPage() {
       content={content}
       aiResult={{
         summary: data.aiSummary ?? "",
-        emotions: data.emotions ?? [],
+        emotions: data.emotionTags ?? [],
       }}
       from={fromDraft}
       initialDate={data.receivedAt ?? ""}
@@ -96,14 +99,38 @@ export default function EditLetterPage() {
           },
         })
       }
-      onSubmit={(payload) => {
-        console.log("편지 수정 payload", {
-          ...payload,
-          content, // 수정된 content
-        });
+      onSubmit={async (payload) => {
+        const letterId = Number(id);
+        if (!letterId) return;
 
-        // 편지 수정 API 호출
-        navigate(`/letter/${id}`);
+        const fromId = payload.from?.fromId ?? fromDraft?.fromId;
+
+        // 편지 수정 버튼 - fromDraft에 fromId 없으면(기존 목록에서 불러온 프롬이 아님, 새 프롬) 프롬 생성 -> 편지 수정 api 호출
+        // 프롬 수정은 기존 프롬 => 다른 기존 프롬으로 변경 / 기존 프롬 => 새 프롬 생성
+        if (!fromId) {
+          toast.show("받는 사람을 선택해주세요.");
+          return;
+        }
+
+        const receivedAt = payload.unknownDate ? "" : payload.date ?? "";
+        const finalContent = payload.content ?? content;
+
+        try {
+          const res = await patchLetter(letterId, {
+            content: finalContent,
+            fromId,
+            receivedAt,
+          });
+
+          if (!res.success) {
+            toast.show(res.message || "편지 수정에 실패했습니다.");
+            return;
+          }
+
+          navigate(`/letter/${letterId}`);
+        } catch {
+          toast.show("편지 수정 중 오류가 발생했습니다.");
+        }
       }}
     />
   );

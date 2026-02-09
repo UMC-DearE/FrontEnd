@@ -52,7 +52,7 @@ export default function CreateDetailPage() {
           },
         })
       }
-      // 편지 추가 버튼 - 프롬 생성 -> 편지 생성 api 호출
+      // 편지 추가 버튼 - fromDraft에 fromId 없으면(기존 목록에서 불러온 프롬이 아님, 새 프롬) 프롬 생성 -> 편지 생성 api 호출
       onSubmit={async (payload) => {
         const fromId = payload.from?.fromId ?? fromDraft?.fromId;
         if (!fromId) {

@@ -50,3 +50,12 @@ export interface LetterDetailData {
 }
 
 export type LetterDetailResponse = CommonResponse<LetterDetailData>;
+
+// 편지 수정
+export interface PatchLetterRequest {
+  content: string;
+  fromId: number;
+  receivedAt: string;
+}
+
+export type PatchLetterResponse = CommonResponse<Record<string, never>>;
