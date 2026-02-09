@@ -1,8 +1,9 @@
 import { useMemo, useRef, useState } from "react";
-import { onboardingAssets } from "@/components/onboarding/assets";
 import PageKeep from "@/components/onboarding/PageKeep";
 import PageAI from "@/components/onboarding/PageAI";
 import PageArchive from "@/components/onboarding/PageArchive";
+import { SocialLoginButton } from "@/components/common/SocialLoginButton";
+import { getOAuthAuthorizeUrl } from "@/api/auth";
 
 export default function LoginPage() {
   const [pageIdx, setPageIdx] = useState(0);
@@ -56,6 +57,17 @@ export default function LoginPage() {
     ],
     [activeIdx]
   );
+
+  const onKakaoLogin = async () => {
+    const url = await getOAuthAuthorizeUrl("kakao");
+    window.location.href = url;
+  };
+
+  const onGoogleLogin = async () => {
+    const url = await getOAuthAuthorizeUrl("google");
+    window.location.href = url;
+  };
+
   return (
     <div>
       <div className="pt-4 pb-[59px] flex flex-col">
@@ -91,19 +103,15 @@ export default function LoginPage() {
         </div>
 
         <div className="shrink-0 space-y-4">
-          <button
-            type="button"
-            className="w-full rounded-xl bg-[#FEE500] flex items-center justify-center active:scale-[0.99]"
-          >
-            <img src={onboardingAssets.KakaoIcon} alt="kakao" draggable={false} />
-          </button>
+          <SocialLoginButton
+            provider="kakao"
+            onClick={onKakaoLogin}
+          />
 
-          <button
-            type="button"
-            className="w-full rounded-xl border border-gray-200 bg-white flex items-center justify-center active:scale-[0.99]"
-          >
-            <img src={onboardingAssets.GoogleIcon} alt="google" draggable={false} />
-          </button>
+          <SocialLoginButton
+            provider="google"
+            onClick={onGoogleLogin}
+          />
         </div>
       </div>
     </div>

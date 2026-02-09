@@ -1,6 +1,6 @@
 // 마이페이지-스타일 수정 페이지
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { FontRow } from "@/components/my/FontRow";
@@ -31,11 +31,11 @@ export default function StylePage() {
 
   const canSave = pendingFont !== font;
 
-  const onSubmit = () => {
-    if (!canSave) return;
+  const onSubmit = useCallback(() => {
+    if (pendingFont === font) return;
     setFont(pendingFont);
     navigate(-1);
-  };
+  }, [pendingFont, font, setFont, navigate]);
 
   useEffect(() => {
     if (!setFixedAction) return;
