@@ -1,17 +1,16 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import resetIcon from '@/assets/letterPage/resetIcon.svg';
 
+type UploadImageResult = { imageId: number; url: string };
+
 interface FolderModalProps {
   title?: string;
-  initialName?: string;
-  initialImageUrl?: string | null;
-  initialImageId?: number | null;
+  initialName: string;
+  initialImageUrl: string | null;
+  initialImageId: number | null;
   onCancel: () => void;
-  onConfirm: (data: {
-    folder_name: string;
-    image_id: number | null;
-    previewUrl: string | null;
-  }) => void;
+  onConfirm: (data: { folder_name: string; imageId: number | null }) => void;
+  uploadImage: (file: File, dir: string) => Promise<UploadImageResult>;
 }
 
 export default function FolderModal({
@@ -21,6 +20,7 @@ export default function FolderModal({
   initialImageId = null,
   onCancel,
   onConfirm,
+  uploadImage,
 }: FolderModalProps) {
   const [folderName, setFolderName] = useState(initialName);
   const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl);
@@ -40,16 +40,23 @@ export default function FolderModal({
 
     if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
 
-    const nextUrl = URL.createObjectURL(file);
-    objectUrlRef.current = nextUrl;
-
-    setIsUploading(true);
-
-    setImageUrl(nextUrl);
+    const preview = URL.createObjectURL(file);
+    objectUrlRef.current = preview;
+    setImageUrl(preview);
     setImageId(null);
 
-    setIsUploading(false);
-    e.target.value = '';
+    setIsUploading(true);
+    try {
+      const res = await uploadImage(file, 'folder');
+      setImageId(res.imageId);
+      setImageUrl(res.url || preview);
+    } catch (err) {
+      console.error(err);
+      setImageUrl(preview);
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
   };
 
   const handleImageDelete = () => {
@@ -64,7 +71,7 @@ export default function FolderModal({
   const handleConfirm = () => {
     const name = folderName.trim();
     if (!name || isUploading) return;
-    onConfirm({ folder_name: name, image_id: imageId, previewUrl: imageUrl });
+    onConfirm({ folder_name: name, imageId });
   };
 
   const isFormValid = folderName.trim().length > 0 && !isUploading;
@@ -87,6 +94,10 @@ export default function FolderModal({
                   src={imageUrl}
                   className="h-[77px] w-[77px] rounded-xl object-cover"
                   alt="folder-image"
+                  onError={() => {
+                    setImageUrl(null);
+                    setImageId(null);
+                  }}
                 />
               ) : (
                 <div className="h-[77px] w-[77px] rounded-xl bg-[#E6E7E9]" />
