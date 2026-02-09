@@ -1,5 +1,5 @@
 import { api } from '@/api/http';
-import type { Folder, FolderListResponse } from '@/types/folder';
+import type { Folder, FolderListResponse, FolderLetterResponse } from '@/types/folder';
 
 export async function getFolderList(): Promise<Folder[]> {
   const res = await api.get<FolderListResponse>('/folders');
@@ -24,4 +24,24 @@ export async function deleteFolder(folderId: number): Promise<void> {
 
 export async function updateFolderOrders(folderIds: number[]): Promise<void> {
   await api.patch('/folders/orders', { foldersOrder: folderIds });
+}
+
+export async function addLetterToFolder(
+  folderId: number,
+  letterId: number
+): Promise<FolderLetterResponse> {
+  const res = await api.post<FolderLetterResponse>(
+    `/folders/${folderId}/letters/${letterId}`
+  );
+  return res.data;
+}
+
+export async function removeLetterFromFolder(
+  folderId: number,
+  letterId: number
+): Promise<FolderLetterResponse> {
+  const res = await api.delete<FolderLetterResponse>(
+    `/folders/${folderId}/letters/${letterId}`
+  );
+  return res.data;
 }

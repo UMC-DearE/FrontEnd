@@ -1,10 +1,10 @@
 // 편지 상세 - 폴더에 저장 - 폴더 선택 모달(폴더 목록 불러오는 건 부모 컴포넌트 - LetterDetailSection => 다시 받아올 필요 없음)
 
-import type { MockFolder } from "@/mocks/mockFolder";
+import type { Folder } from "@/types/folder";
 
 interface Props {
   open: boolean;
-  folders: MockFolder[];
+  folders: Folder[];
   onClose: () => void;
   onSelect: (folderId: number) => void;
 }
@@ -46,7 +46,7 @@ export default function FolderSelect({
                     onClose();
                   }}
                 >
-                  {f.folderName}
+                  {f.name}
                 </button>
               ))
             )}

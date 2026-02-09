@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import FolderSelect from "@/components/letter/FolderSelect";
-import { getMockFolders, type MockFolder } from "@/mocks/mockFolder";
+import { getFolderList } from "@/api/folder";
+import type { Folder } from "@/types/folder";
 import useToast from "@/hooks/useToast";
 import type { CreateFrom } from "@/types/from";
 import { EmotionTag } from "@/components/common/EmotionTag";
@@ -30,13 +31,13 @@ interface Props {
   aiResult: AnalyzeLetterResponse;
   from: CreateFrom;
   receivedAt?: string | null;
-  // folder metadata object; null if not in a folder
   folder?: { folderId: number; folderName: string } | null;
   reply?: string;
   onSave?: () => void;
   onAddToFolder?: (folderId: number) => void;
   onRemoveFromFolder?: () => void;
   onEdit: () => void;
+  onDeleteLetter?: () => void;
 }
 
 // 캡처한 편지 카드를 둥근 모서리로 자르는 함수
@@ -86,6 +87,7 @@ export default function LetterDetailSection({
   onAddToFolder,
   onRemoveFromFolder,
   onEdit,
+  onDeleteLetter,
 }: Props) {
   const { setFixedAction } = useOutletContext<LayoutContext>();
 
@@ -95,7 +97,7 @@ export default function LetterDetailSection({
   const [openSummary, setOpenSummary] = useState(false);
   const [openMore, setOpenMore] = useState(false);
   const [openFolderSelect, setOpenFolderSelect] = useState(false);
-  const [folders, setFolders] = useState<MockFolder[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const [savedReply, setSavedReply] = useState(initialReply ?? "");
   const [draftReply, setDraftReply] = useState("");
   const [isEditingReply, setIsEditingReply] = useState(false);
@@ -186,7 +188,20 @@ export default function LetterDetailSection({
     });
   }, [onSave]);
 
-// 폴더 없을 경우 토스트 띄우기(부모 컴포넌트에서 미리 폴더 불러오기 - 폴더 선택 모달에 넘겨줌)
+  // 폴더 목록 불러오기 - 폴더 없을 경우 토스트 띄우기(부모 컴포넌트에서 미리 폴더 불러오기 - 폴더 선택 모달에 넘겨줌)
+  const handleOpenFolderSelect = async () => {
+    try {
+      const list = await getFolderList();
+      if (list.length === 0) {
+        toast.show("생성된 폴더가 없습니다", 1200);
+        return;
+      }
+      setFolders(list);
+      setOpenFolderSelect(true);
+    } catch {
+      toast.show("폴더 목록을 불러오지 못했어요.");
+    }
+  };
 
   useEffect(() => {
     setFixedAction({
@@ -203,16 +218,6 @@ export default function LetterDetailSection({
     };
   }, [setFixedAction, handleSaveCard]);
 
-
-  const handleOpenFolderSelect = async () => {
-    const list = await getMockFolders();
-    if (list.length === 0) {
-      toast.show("생성된 폴더가 없습니다", 1200);
-      return;
-    }
-    setFolders(list);
-    setOpenFolderSelect(true);
-  };
   // receivedAt 포맷
   const displayReceivedAt = (() => {
     if (receivedAt === null) return "-"; // null이면 -로 처리
@@ -389,7 +394,7 @@ export default function LetterDetailSection({
                       setReplyLoading(false);
                     }
                   }}
-                  className="h-[36px] px-3 rounded-lg text-sm font-medium bg-[#E6E7E9] text-[#555557]"
+                  className="h-[30px] px-2 rounded-lg text-xs font-medium bg-[#E6E7E9] text-[#555557]"
                   disabled={replyLoading}
                 >
                   삭제
@@ -415,7 +420,7 @@ export default function LetterDetailSection({
                     setReplyLoading(false);
                   }
                 }}
-                className={`h-[36px] px-3 rounded-lg text-sm font-medium ${
+                className={`h-[30px] px-2 rounded-lg text-xs font-medium ${
                   draftReply.trim()
                     ? "bg-[#555557] text-white"
                     : "bg-[#E6E7E9] text-[#9D9D9F] cursor-not-allowed"
@@ -435,7 +440,7 @@ export default function LetterDetailSection({
         onClose={() => setOpenMore(false)}
         onAddToFolder={handleOpenFolderSelect}
         onRemoveFromFolder={() => onRemoveFromFolder?.()}
-        onDeleteLetter={() => console.log("편지 삭제")}
+        onDeleteLetter={() => onDeleteLetter?.()}
         onEdit={() => {
           setOpenMore(false);
           onEdit();

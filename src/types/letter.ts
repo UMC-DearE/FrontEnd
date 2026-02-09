@@ -70,6 +70,9 @@ export type PatchLetterReplyResponse = CommonResponse<Record<string, never>>;
 // 편지 답장 삭제
 export type DeleteLetterReplyResponse = CommonResponse<Record<string, never>>;
 
+// 편지 삭제
+export type DeleteLetterResponse = CommonResponse<Record<string, never>>;
+
 // 편지 좋아요
 export interface LetterLikeData {
   liked: boolean;

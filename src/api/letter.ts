@@ -2,6 +2,7 @@ import { api } from "./http";
 import type {
   LetterDetailResponse,
   LetterLikeResponse,
+  DeleteLetterResponse,
   DeleteLetterReplyResponse,
   PatchLetterReplyRequest,
   PatchLetterReplyResponse,
@@ -59,6 +60,15 @@ export const deleteLetterReply = async (
 ): Promise<DeleteLetterReplyResponse> => {
   const { data } = await api.delete<DeleteLetterReplyResponse>(
     `/letters/${letterId}/reply`
+  );
+  return data;
+};
+
+export const deleteLetter = async (
+  letterId: number
+): Promise<DeleteLetterResponse> => {
+  const { data } = await api.delete<DeleteLetterResponse>(
+    `/letters/${letterId}`
   );
   return data;
 };
