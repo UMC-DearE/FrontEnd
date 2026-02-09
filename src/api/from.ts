@@ -26,7 +26,7 @@ export const updateFrom = async (
 	payload: UpdateFromRequest
 ): Promise<UpdateFromResponse> => {
 	const { data } = await api.patch<UpdateFromResponse>(
-		`/user/from/${fromId}`,
+		`/froms/${fromId}`,
 		payload
 	);
 	return data;
@@ -36,7 +36,7 @@ export const deleteFrom = async (
 	fromId: number
 ): Promise<DeleteFromResponse> => {
 	const { data } = await api.delete<DeleteFromResponse>(
-		`/user/from/${fromId}`
+		`/froms/${fromId}`
 	);
 	return data;
 };

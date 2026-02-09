@@ -20,7 +20,7 @@ type Props = {
   onDelete?: (fromId: number) => void;
 };
 
-export default function FromEditPanel({ from, onCancel, onSave}: Props) {
+export default function FromEditPanel({ from, onCancel, onSave, onDelete }: Props) {
   const [name, setName] = useState(from.name);
   const [selectedColor, setSelectedColor] = useState(from.bgColor);
   const [showPicker, setShowPicker] = useState(false);
@@ -41,8 +41,9 @@ export default function FromEditPanel({ from, onCancel, onSave}: Props) {
 
   const handleDeleteConfirm = async () => {
     setDeleting(true);
-    // 프롬 삭제 api 호출
-  }
+    onDelete?.(from.fromId);
+    setDeleting(false);
+  };
 
   return (
     <div className="border border-[#E6E7E9] rounded-xl p-4 bg-white mb-4">
