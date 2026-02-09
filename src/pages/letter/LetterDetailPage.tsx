@@ -46,6 +46,8 @@ export default function LetterDetailPage() {
 
   return (
     <LetterDetailSection
+      letterId={Number(id)}
+      isLiked={data.isLiked ?? false}
       content={data.content}
       aiResult={{
         summary: data.aiSummary ?? "",
