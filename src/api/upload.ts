@@ -1,6 +1,6 @@
 // 이미지 업로드는 다른 곳에서도 씀 -> 통일해서 쓸 필요(파일 분리함)
 
-import axiosInstance from "./axiosInstance";
+import { api } from "./http";
 import type { UploadImageResponse } from "@/types/upload";
 
 export const uploadImage = async (
@@ -11,6 +11,6 @@ export const uploadImage = async (
   formData.append("file", file);
   formData.append("dir", dir);
 
-  const { data } = await axiosInstance.post<UploadImageResponse>("/images", formData);
+  const { data } = await api.post<UploadImageResponse>("/images", formData);
   return data;
 };
