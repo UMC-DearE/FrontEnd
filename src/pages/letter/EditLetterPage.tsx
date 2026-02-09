@@ -5,6 +5,7 @@ import { getLetterDetail, patchLetter } from "@/api/letter";
 import type { LetterDetailData } from "@/types/letter";
 import type { CreateFrom } from "@/types/from";
 import useToast from "@/hooks/useToast";
+import { createFrom } from "@/api/from";
 
 type EditPageLocationState = {
   selectedFromDraft?: CreateFrom;
@@ -49,8 +50,8 @@ export default function EditLetterPage() {
           const draft: CreateFrom = {
             fromId: res.data.from?.fromId,
             name: res.data.from?.name ?? "",
-            bgColor: res.data.from?.bgColor ?? "#FFF",
-            fontColor: res.data.from?.fontColor ?? "#000",
+            bgColor: res.data.from?.bgColor ?? "#FFFFFF",
+            fontColor: res.data.from?.fontColor ?? "#000000",
           };
 
           return draft;
@@ -104,19 +105,34 @@ export default function EditLetterPage() {
         const letterId = Number(id);
         if (!letterId) return;
 
-        const fromId = payload.from?.fromId ?? fromDraft?.fromId;
-
+        let fromId = payload.from?.fromId ?? fromDraft?.fromId;
+        
         // 편지 수정 버튼 - fromDraft에 fromId 없으면(기존 목록에서 불러온 프롬이 아님, 새 프롬) 프롬 생성 -> 편지 수정 api 호출
         // 프롬 수정은 기존 프롬 => 다른 기존 프롬으로 변경 / 기존 프롬 => 새 프롬 생성
-        if (!fromId) {
+        if (!fromDraft) {
           toast.show("받는 사람을 선택해주세요.");
           return;
         }
 
-        const receivedAt = payload.unknownDate ? "" : payload.date ?? "";
-        const finalContent = payload.content ?? content;
-
         try {
+          if (!fromId) {
+            const fromRes = await createFrom({
+              name: fromDraft.name,
+              bgColor: fromDraft.bgColor,
+              fontColor: fromDraft.fontColor,
+            });
+
+            if (!fromRes.success) {
+              toast.show(fromRes.message || "프롬 생성에 실패했습니다.");
+              return;
+            }
+
+            fromId = fromRes.data.fromId;
+          }
+
+          const receivedAt = payload.unknownDate ? "" : payload.date ?? "";
+          const finalContent = payload.content ?? content;
+
           const res = await patchLetter(letterId, {
             content: finalContent,
             fromId,
