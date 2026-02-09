@@ -83,6 +83,25 @@ export default function LetterBox() {
     setEditingFolderId(null);
   };
 
+  const handleImageDelete = async (folderId: number | null) => {
+    if (folderId == null) return;
+
+    try {
+      const folder = folders.find((f) => f.id === folderId);
+      if (!folder) return;
+
+      await updateFolder(folderId, {
+        name: folder.name,
+        imageId: null,
+      });
+
+      const next = await getFolderList();
+      setFolders([...next].sort((a, b) => a.folderOrder - b.folderOrder));
+    } catch (err) {
+      console.error('이미지 삭제 실패:', err);
+    }
+  };
+
   const persistOrder = async (next: Folder[]) => {
     await updateFolderOrders(next.map((f) => f.id));
   };
@@ -122,6 +141,8 @@ export default function LetterBox() {
           }}
           onConfirm={handleConfirmUpsertFolder}
           uploadImage={uploadImage}
+          onImageDelete={() => handleImageDelete(editingFolderId)}
+          currentFolderId={editingFolderId}
         />
       )}
 
