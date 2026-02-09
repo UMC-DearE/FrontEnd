@@ -95,7 +95,9 @@ export default function HomePage() {
     try {
       const pinned = await updateLetterPinned(letterId, true);
       setPinnedLetterId(pinned ? letterId : null);
-    } catch {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleRequestUnpin = (letterId: number) => setPendingUnpinId(letterId);
@@ -108,7 +110,9 @@ export default function HomePage() {
       const pinned = await updateLetterPinned(pendingUnpinId, false);
       setPinnedLetterId(pinned ? pendingUnpinId : null);
       setPendingUnpinId(null);
-    } catch {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const openEditor = () => {

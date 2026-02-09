@@ -11,7 +11,7 @@ type UploadImageResponse = {
   };
 };
 
-export async function uploadImage(file: File, dir: string) {
+export async function uploadImage(file: File, dir: 'profile' | 'letter' | 'sticker' | 'folder') {
   const form = new FormData();
   form.append('file', file);
   form.append('dir', dir);

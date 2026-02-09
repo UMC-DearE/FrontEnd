@@ -5,18 +5,18 @@ export type ApiResponse<T> = {
   data: T;
 };
 
-export type HomeUser = {
+export type HomeUserDto = {
   userId: number;
   nickname: string;
   intro: string;
   imgUrl: string;
 };
 
-export type HomeSetting = {
+export type HomeSettingDto = {
   homeColor: string;
 };
 
-export type HomeSticker = {
+export type HomeStickerDto = {
   stickerId: number;
   imageId: number;
   imageUrl: string;
@@ -27,10 +27,8 @@ export type HomeSticker = {
   scale: number;
 };
 
-export type HomeDataApi = {
-  user: HomeUser;
-  setting: HomeSetting;
-  stickers: HomeSticker[];
+export type HomeDataDto = {
+  user: HomeUserDto;
+  setting: HomeSettingDto;
+  stickers: HomeStickerDto[];
 };
-
-export type HomeResponse = ApiResponse<HomeDataApi>;
