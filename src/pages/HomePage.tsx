@@ -1,5 +1,3 @@
-// 홈화면
-
 import { useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import ProfileCard from '@/components/home/ProfileCard';
@@ -9,6 +7,7 @@ import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
+import { updateLetterPinned } from '@/api/letter';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -51,12 +50,24 @@ export default function HomePage() {
   const enabled = openSheet;
   const stickers = openSheet ? draftStickers : savedStickers;
 
-  const handlePin = (letterId: number) => setPinnedLetterId(letterId);
+  const handlePin = async (letterId: number) => {
+    try {
+      const pinned = await updateLetterPinned(letterId, true);
+      setPinnedLetterId(pinned ? letterId : null);
+    } catch {}
+  };
+
   const handleRequestUnpin = (letterId: number) => setPendingUnpinId(letterId);
   const handleCancelUnpin = () => setPendingUnpinId(null);
-  const handleConfirmUnpin = () => {
-    setPinnedLetterId(null);
-    setPendingUnpinId(null);
+
+  const handleConfirmUnpin = async () => {
+    if (pendingUnpinId === null) return;
+
+    try {
+      const pinned = await updateLetterPinned(pendingUnpinId, false);
+      setPinnedLetterId(pinned ? pendingUnpinId : null);
+      setPendingUnpinId(null);
+    } catch {}
   };
 
   const openEditor = () => {
