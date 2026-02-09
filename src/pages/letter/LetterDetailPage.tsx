@@ -15,6 +15,14 @@ export default function LetterDetailPage() {
   useEffect(() => {
     let mounted = true;
 
+    if (!id || Number.isNaN(Number(id))) {
+      setError("잘못된 편지 ID입니다.");
+      setLoading(false);
+      return () => {
+        mounted = false;
+      };
+    }
+
     async function load() {
       try {
         setLoading(true);
@@ -27,8 +35,10 @@ export default function LetterDetailPage() {
         }
 
         setData(res.data);
-      } catch {
-        setError("편지 조회 중 오류가 발생했습니다.");
+      } catch (e) {
+        const message = (e as { response?: { data?: { message?: string } } })
+          ?.response?.data?.message;
+        setError(message || "편지 조회 중 오류가 발생했습니다.");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -54,9 +64,10 @@ export default function LetterDetailPage() {
         emotions: data.emotionTags ?? [],
       }}
       from={{
+        fromId: data.from?.fromId ?? 0,
         name: data.from?.name ?? "",
-        backgroundColor: data.from?.bgColor ?? "#FFF",
-        textColor: data.from?.fontColor ?? "#000",
+        bgColor: data.from?.bgColor ?? "#FFF",
+        fontColor: data.from?.fontColor ?? "#000",
       }}
       receivedAt={data.receivedAt}
       folder={data.folder ?? null}

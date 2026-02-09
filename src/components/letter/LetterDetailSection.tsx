@@ -241,8 +241,8 @@ export default function LetterDetailSection({
         <div className="mb-3 flex items-center justify-between border-b border-[#E6E7E9] pb-3">
           <FromBadge
             name={from.name}
-            backgroundColor={from.backgroundColor}
-            textColor={from.textColor}
+            bgColor={from.bgColor}
+            fontColor={from.fontColor}
           />
             <button
               type="button"

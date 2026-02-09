@@ -22,7 +22,7 @@ type Props = {
 
 export default function FromEditPanel({ from, onCancel, onSave}: Props) {
   const [name, setName] = useState(from.name);
-  const [selectedColor, setSelectedColor] = useState(from.backgroundColor);
+  const [selectedColor, setSelectedColor] = useState(from.bgColor);
   const [showPicker, setShowPicker] = useState(false);
 
   const handleSave = () => {
@@ -31,8 +31,8 @@ export default function FromEditPanel({ from, onCancel, onSave}: Props) {
     onSave({
       ...from,
       name: name.trim().slice(0, 7),
-      backgroundColor: selectedColor,
-      textColor: getHarmoniousTextColor(selectedColor),
+      bgColor: selectedColor,
+      fontColor: getHarmoniousTextColor(selectedColor),
     });
   };
 
@@ -108,8 +108,8 @@ export default function FromEditPanel({ from, onCancel, onSave}: Props) {
       <div className="mb-5">
         <FromBadge
           name={name || '이름'}
-          backgroundColor={selectedColor}
-          textColor={getHarmoniousTextColor(selectedColor)}
+          bgColor={selectedColor}
+          fontColor={getHarmoniousTextColor(selectedColor)}
           size="sm"
         />
       </div>

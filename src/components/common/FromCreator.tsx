@@ -27,8 +27,8 @@ export default function CreateFrom({ onDraftCreate, onCreateImmediate, name, onN
 
     const draft: CreateFrom = {
       name: shortName,
-      backgroundColor: selectedColor,
-      textColor: getHarmoniousTextColor(selectedColor),
+      bgColor: selectedColor,
+      fontColor: getHarmoniousTextColor(selectedColor),
     };
 
     if (onDraftCreate) {
@@ -92,7 +92,7 @@ export default function CreateFrom({ onDraftCreate, onCreateImmediate, name, onN
 
       <button onClick={handleCreate} className="flex items-center gap-2 font-medium text-lg text-primary">
         <img src={Plusbtn} alt="upload" />
-        <FromBadge name={name || '이름'} backgroundColor={selectedColor} textColor={getHarmoniousTextColor(selectedColor)} />
+        <FromBadge name={name || '이름'} bgColor={selectedColor} fontColor={getHarmoniousTextColor(selectedColor)} />
         생성하기
       </button>
     </div>

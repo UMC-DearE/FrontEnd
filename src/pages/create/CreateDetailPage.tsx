@@ -5,6 +5,7 @@ import type { CreateFrom } from "@/types/from";
 import LetterForm from "@/components/common/LetterForm";
 import { createLetter } from "@/api/create";
 import useToast from "@/hooks/useToast";
+import { createFrom } from "@/api/from";
 
 type LocationState =
   | (CreateResultPayload & {
@@ -54,16 +55,31 @@ export default function CreateDetailPage() {
       }
       // 편지 추가 버튼 - fromDraft에 fromId 없으면(기존 목록에서 불러온 프롬이 아님, 새 프롬) 프롬 생성 -> 편지 생성 api 호출
       onSubmit={async (payload) => {
-        const fromId = payload.from?.fromId ?? fromDraft?.fromId;
-        if (!fromId) {
+        let fromId = payload.from?.fromId ?? fromDraft?.fromId;
+        if (!fromDraft) {
           toast.show("받는 사람을 선택해주세요.");
           return;
         }
 
-        const receivedAt = payload.unknownDate ? "" : payload.date ?? "";
-        const finalContent = payload.content ?? content;
-
         try {
+          if (!fromId) {
+            const fromRes = await createFrom({
+              name: fromDraft.name,
+              bgColor: fromDraft.bgColor,
+              fontColor: fromDraft.fontColor,
+            });
+
+            if (!fromRes.success) {
+              toast.show(fromRes.message || "프롬 생성에 실패했습니다.");
+              return;
+            }
+
+            fromId = fromRes.data.fromId;
+          }
+
+          const receivedAt = payload.unknownDate ? "" : payload.date ?? "";
+          const finalContent = payload.content ?? content;
+
           const res = await createLetter({
             content: finalContent,
             aiSummary: state.aiResult.summary,
@@ -79,7 +95,7 @@ export default function CreateDetailPage() {
           }
 
           navigate(`/letter/${res.data.letterId}`, { replace: true });
-        } catch (e) {
+        } catch {
           toast.show("편지 생성 중 오류가 발생했습니다.");
         }
       }}

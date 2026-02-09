@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useLocation} from 'react-router-dom';
 import { FromBadge } from '@/components/common/FromBadge';
-import type { CreateFrom } from '@/types/from';
 import FromEditPanel from '@/components/my/from/FromEditPanel';
+import type { From } from '@/types/from';
 
-type FromItem = CreateFrom & { fromId: number };
+type FromItem = From;
 
 export default function FromPage() {
   const location = useLocation();
@@ -15,15 +15,15 @@ export default function FromPage() {
     {
       fromId: 1,
       name: '엄마',
-      backgroundColor: '#FEEFEF',
-      textColor: '#333333',
+      bgColor: '#FEEFEF',
+      fontColor: '#333333',
       letterCount: 5,
     },
     {
       fromId: 2,
       name: '긴 이름 테스트',
-      backgroundColor: '#EAF6FF',
-      textColor: '#333333',
+      bgColor: '#EAF6FF',
+      fontColor: '#333333',
       letterCount: 3,
     },
   ]); // 프롬 목록 api 호출
@@ -71,8 +71,8 @@ export default function FromPage() {
               <div className="flex items-center gap-3">
                 <FromBadge
                   name={from.name}
-                  backgroundColor={from.backgroundColor}
-                  textColor={from.textColor}
+                  bgColor={from.bgColor}
+                  fontColor={from.fontColor}
                 />
                 <div className="flex items-center text-xs font-medium text-[#9D9D9F]">
                   {from.letterCount ?? 0}통의 편지

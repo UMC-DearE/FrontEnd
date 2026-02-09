@@ -121,8 +121,8 @@ export default function LetterForm({
           {from ? (
             <FromBadge
               name={from.name}
-              backgroundColor={from.backgroundColor}
-              textColor={from.textColor}
+              bgColor={from.bgColor}
+              fontColor={from.fontColor}
             />
           ) : (
             <span className="text-[#C7C7CC]">

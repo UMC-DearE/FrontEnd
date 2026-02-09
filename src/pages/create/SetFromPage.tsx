@@ -1,3 +1,5 @@
+// 서버 응답 X - goBackWithDraft로 상태 전달하여 이전 페이지에서 처리
+
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { CreateResultPayload } from '@/types/create';
@@ -6,8 +8,10 @@ import { FromBadge } from '@/components/common/FromBadge';
 import { InputField } from '@/components/common/InputField';
 import FromCreator from '@/components/common/FromCreator';
 import erasebtn from '@/assets/create/erasebtn.svg';
+import type { From } from '@/types/from';
+import { getFromList } from '@/api/from';
 
-type FromItem = CreateFrom & { fromId: number };
+type FromItem = From;
 
 type SetFromPageState =
   | (CreateResultPayload & {
@@ -30,20 +34,7 @@ export default function SetFromPage() {
 
   useEffect(() => {
     const fetchFromList = async () => {
-      const res: FromItem[] = [
-        {
-          fromId: 1,
-          name: '엄마',
-          backgroundColor: '#FEEFEF',
-          textColor: '#333333',
-        },
-        {
-          fromId: 2,
-          name: '아빠',
-          backgroundColor: '#EAF6FF',
-          textColor: '#333333',
-        },
-      ];
+      const res = await getFromList();
       setFromList(res);
     };
 
@@ -74,8 +65,8 @@ export default function SetFromPage() {
     goBackWithDraft({
       fromId: from.fromId,
       name: from.name,
-      backgroundColor: from.backgroundColor,
-      textColor: from.textColor,
+      bgColor: from.bgColor,
+      fontColor: from.fontColor,
     });
   };
 
@@ -118,8 +109,8 @@ export default function SetFromPage() {
                 <div className="flex items-center gap-2">
                   <FromBadge
                     name={from.name}
-                    backgroundColor={from.backgroundColor}
-                    textColor={from.textColor}
+                    bgColor={from.bgColor}
+                    fontColor={from.fontColor}
                   />
                 </div>
                 <button

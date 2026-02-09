@@ -43,17 +43,18 @@ export default function EditLetterPage() {
         setContent(res.data.content ?? "");
 
         // 최초 진입 시 기본 from 세팅
-        setFromDraft((prev) => {
-        // 이미 선택된 프롬이 있으면 유지
-        if (prev) return prev;
+        setFromDraft((prev: CreateFrom | undefined) => {
+          if (prev) return prev;
 
-        return {
-          fromId: res.data.from?.fromId,
-          name: res.data.from?.name ?? "",
-          backgroundColor: res.data.from?.bgColor ?? "#FFF",
-          textColor: res.data.from?.fontColor ?? "#000",
-        };
-      });
+          const draft: CreateFrom = {
+            fromId: res.data.from?.fromId,
+            name: res.data.from?.name ?? "",
+            bgColor: res.data.from?.bgColor ?? "#FFF",
+            fontColor: res.data.from?.fontColor ?? "#000",
+          };
+
+          return draft;
+        });
       } catch {
         setError("편지 수정 정보를 불러오지 못했어요.");
       } finally {
