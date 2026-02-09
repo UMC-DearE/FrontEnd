@@ -19,7 +19,7 @@ export default function OAuthCallbackPage() {
       const code = params.get("code");
       const state = params.get("state");
 
-      console.log("[OAuthCallback] code/state/provider =", { code, state, provider });
+      // console.log("[OAuthCallback] code/state/provider =", { code, state, provider });
 
       if (!code || !provider) {
         navigate("/login", { replace: true });
@@ -37,12 +37,12 @@ export default function OAuthCallbackPage() {
         }
       );
 
-      console.log("[OAuthCallback] response =", res.data);
+      // console.log("[OAuthCallback] response =", res.data);
 
       const resultType = res.data?.data?.resultType as ResultType | undefined;
 
       if (resultType === "SIGNUP_REQUIRED") {
-        navigate("/setup/terms", { replace: true });
+        navigate("/auth/terms", { replace: true });
       } else if (resultType === "REGISTERED") {
         navigate("/", { replace: true });
       } else {

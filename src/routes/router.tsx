@@ -53,10 +53,10 @@ const router = createBrowserRouter([
             element: <AppLayout />,
             children: [
               {
-                path: "setup",
+                path: "auth",
                 children: [
                   { path: "terms", element: <TermsPage /> },
-                  { path: "setnickname", element: <SetNickamePage /> },
+                  { path: "signup", element: <SetNickamePage /> },
                 ],
               },
 
