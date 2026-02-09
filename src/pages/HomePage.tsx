@@ -8,7 +8,9 @@ import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
 import { updateLetterPinned, getRandomLetter } from '@/api/letter';
-import { updateHomeColor } from '@/api/home';
+import { uploadImage } from '@/api/image';
+import { getHome, updateHomeColor } from '@/api/home';
+import { createSticker, deleteSticker, updateSticker } from '@/api/sticker';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -33,11 +35,12 @@ const getToday = () => {
   return { month, day, dayOfWeek };
 };
 
+const cloneStickers = (arr: StickerItem[]) => arr.map((s) => ({ ...s }));
+
 export default function HomePage() {
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
 
   const [letter, setLetter] = useState<Letter | null>(null);
-
   const [pinnedLetterId, setPinnedLetterId] = useState<number | null>(null);
   const [pendingUnpinId, setPendingUnpinId] = useState<number | null>(null);
 
@@ -54,6 +57,38 @@ export default function HomePage() {
 
   useEffect(() => {
     let mounted = true;
+
+    getHome()
+      .then(async (home) => {
+        if (!mounted) return;
+
+        setHomeBgColor(home.setting.homeColor);
+
+        const sized = await Promise.all(
+          home.stickers.map(async (s) => {
+            const size = await loadImageSize(s.imageUrl).catch(() => ({ w: 160, h: 160 }));
+            const fitted = fitToMaxSide(size.w, size.h, 160);
+
+            const item: StickerItem = {
+              id: String(s.stickerId),
+              src: s.imageUrl,
+              x: s.posX,
+              y: s.posY,
+              z: s.posZ,
+              rotation: s.rotation,
+              scale: s.scale,
+              imageId: s.imageId,
+              w: fitted.w,
+              h: fitted.h,
+            };
+            return item;
+          })
+        );
+
+        setSavedStickers(sized);
+        setDraftStickers(cloneStickers(sized));
+      })
+      .catch(() => {});
 
     getRandomLetter()
       .then((data) => {
@@ -89,7 +124,7 @@ export default function HomePage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [setHomeBgColor]);
 
   const handlePin = async (letterId: number) => {
     try {
@@ -116,44 +151,56 @@ export default function HomePage() {
   };
 
   const openEditor = () => {
-    setDraftStickers(savedStickers);
+    setDraftStickers(cloneStickers(savedStickers));
     setSelectedId(null);
     setOpenSheet(true);
   };
 
   const addStickerFromFile = async (file: File) => {
-    const url = URL.createObjectURL(file);
     const rect = containerRef.current?.getBoundingClientRect();
-
     const cx = rect ? rect.width / 2 : 196;
     const cy = rect ? rect.height / 2 : 320;
 
-    const id =
-      typeof crypto !== 'undefined' && 'randomUUID' in crypto
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const localUrl = URL.createObjectURL(file);
 
-    const { w, h } = await loadImageSize(url);
-    const fitted = fitToMaxSide(w, h, 160);
+    const size = await loadImageSize(localUrl).catch(() => ({ w: 160, h: 160 }));
+    const fitted = fitToMaxSide(size.w, size.h, 160);
+
+    const uploaded = await uploadImage(file, 'sticker');
+
+    const maxZ = draftStickers.reduce((m, s) => Math.max(m, s.z), 0);
+
+    const body = {
+      imageId: uploaded.imageId,
+      posX: cx,
+      posY: cy,
+      posZ: maxZ + 1,
+      rotation: 0,
+      scale: 1,
+    };
+
+    const created = await createSticker(body);
 
     setDraftStickers((prev) => {
-      const z = prev.length;
+      const maxZ = prev.reduce((m, s) => Math.max(m, s.z), 0);
+
       const next: StickerItem = {
-        id,
-        src: url,
-        x: cx,
-        y: cy,
-        z,
-        rotation: 0,
-        scale: 1,
-        imageId: null,
+        id: String(created.stickerId),
+        src: uploaded.url ?? localUrl,
+        x: body.posX,
+        y: body.posY,
+        z: maxZ + 1,
+        rotation: body.rotation,
+        scale: body.scale,
+        imageId: body.imageId,
         w: fitted.w,
         h: fitted.h,
       };
+
       return [...prev, next];
     });
 
-    setSelectedId(id);
+    setSelectedId(String(created.stickerId));
     setOpenSheet(true);
   };
 
@@ -162,10 +209,25 @@ export default function HomePage() {
     setDraftStickers(next);
   };
 
-  const onDeleteSticker = (id: string) => {
+  const onDeleteSticker = async (id: string) => {
     if (!openSheet) return;
+    await deleteSticker(id);
     setDraftStickers((prev) => prev.filter((s) => s.id !== id));
     setSelectedId((cur) => (cur === id ? null : cur));
+  };
+
+  const commitSticker = async (id: string) => {
+    if (!openSheet) return;
+    const s = draftStickers.find((x) => x.id === id);
+    if (!s) return;
+
+    await updateSticker(id, {
+      posX: s.x,
+      posY: s.y,
+      posZ: s.z,
+      rotation: s.rotation,
+      scale: s.scale,
+    });
   };
 
   return (
@@ -186,6 +248,9 @@ export default function HomePage() {
           }}
           onChange={onChangeStickers}
           onDelete={onDeleteSticker}
+          onCommit={(id) => {
+            commitSticker(id);
+          }}
         />
       </div>
 
@@ -202,15 +267,21 @@ export default function HomePage() {
         onClose={() => {
           setOpenSheet(false);
           setSelectedId(null);
-          setDraftStickers(savedStickers);
+          setDraftStickers(cloneStickers(savedStickers));
         }}
         onComplete={async () => {
-          await updateHomeColor(homeBgColor);
+          const saved = await updateHomeColor(homeBgColor);
+          setHomeBgColor(saved);
           setOpenSheet(false);
           setSelectedId(null);
+          setDraftStickers(cloneStickers(draftStickers));
         }}
-        onPickStickerFile={(file) => {
-          addStickerFromFile(file);
+        onPickStickerFile={async (file) => {
+          try {
+            await addStickerFromFile(file);
+          } catch (e) {
+            console.error(e);
+          }
         }}
       />
 
