@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import ProfileCard from '@/components/home/ProfileCard';
 import ConfirmModal from '@/components/common/ConfirmModal';
@@ -7,7 +7,7 @@ import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
-import { updateLetterPinned } from '@/api/letter';
+import { updateLetterPinned, getRandomLetter } from '@/api/letter';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -27,14 +27,7 @@ const fitToMaxSide = (w: number, h: number, maxSide: number) => {
 export default function HomePage() {
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
 
-  const [letter] = useState<Letter | null>({
-    id: 1,
-    content:
-      '책은 우리 안의 얼어붙은 바다를 깨부수는 도끼여야 한다. 우리가 책을 읽는 이유는 바로 그 때문이다.',
-    month: 'Jan',
-    day: 22,
-    dayOfWeek: '월',
-  });
+  const [letter, setLetter] = useState<Letter | null>(null);
 
   const [pinnedLetterId, setPinnedLetterId] = useState<number | null>(null);
   const [pendingUnpinId, setPendingUnpinId] = useState<number | null>(null);
@@ -49,6 +42,37 @@ export default function HomePage() {
 
   const enabled = openSheet;
   const stickers = openSheet ? draftStickers : savedStickers;
+
+  useEffect(() => {
+    let mounted = true;
+
+    getRandomLetter()
+      .then((data) => {
+        if (!mounted) return;
+
+        if (!data.hasLetter) {
+          setLetter(null);
+          setPinnedLetterId(null);
+          return;
+        }
+
+        const next: Letter = {
+          id: data.letterId,
+          content: data.randomPhrase,
+          month: data.date.month,
+          day: data.date.day,
+          dayOfWeek: data.date.dayOfWeek,
+        };
+
+        setLetter(next);
+        setPinnedLetterId(data.isPinned ? data.letterId : null);
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const handlePin = async (letterId: number) => {
     try {
