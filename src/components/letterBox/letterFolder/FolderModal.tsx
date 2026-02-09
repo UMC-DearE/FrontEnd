@@ -5,9 +5,9 @@ type UploadImageResult = { imageId: number; url: string };
 
 interface FolderModalProps {
   title?: string;
-  initialName?: string;
-  initialImageUrl?: string | null;
-  initialImageId?: number | null;
+  initialName: string;
+  initialImageUrl: string | null;
+  initialImageId: number | null;
   onCancel: () => void;
   onConfirm: (data: { folder_name: string; imageId: number | null }) => void;
   uploadImage: (file: File, dir: string) => Promise<UploadImageResult>;

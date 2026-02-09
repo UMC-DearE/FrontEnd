@@ -17,6 +17,7 @@ import {
   updateFolderOrders,
 } from '@/api/folder';
 import { uploadImage } from '@/api/image';
+import { refreshAccessToken } from '@/api/http';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
@@ -45,10 +46,16 @@ export default function LetterBox() {
 
   useEffect(() => {
     const run = async () => {
+      try {
+        await refreshAccessToken();
+      } catch {
+        return;
+      }
+
       const data = await getFolderList();
       setFolders([...data].sort((a, b) => a.folderOrder - b.folderOrder));
     };
-    run();
+    void run();
   }, []);
 
   const editingFolder = useMemo(() => {
@@ -63,7 +70,10 @@ export default function LetterBox() {
     if (editingFolderId == null) {
       await createFolder(data.folder_name, data.imageId);
     } else {
-      await updateFolder(editingFolderId, { name: data.folder_name, imageId: data.imageId });
+      await updateFolder(editingFolderId, {
+        name: data.folder_name,
+        imageId: data.imageId ?? null,
+      });
     }
 
     const next = await getFolderList();

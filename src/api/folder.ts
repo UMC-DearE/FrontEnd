@@ -1,4 +1,4 @@
-import { api } from '@/api/client';
+import { api } from '@/api/http';
 import type { Folder, FolderListResponse } from '@/types/folder';
 
 export async function getFolderList(): Promise<Folder[]> {
@@ -11,7 +11,10 @@ export async function createFolder(folder_name: string, imageId: number | null):
   return res.data.data;
 }
 
-export async function updateFolder(folderId: number, body: { name: string; imageId?: number }) {
+export async function updateFolder(
+  folderId: number,
+  body: { name: string; imageId: number | null }
+) {
   await api.patch(`/folders/${folderId}`, body);
 }
 
