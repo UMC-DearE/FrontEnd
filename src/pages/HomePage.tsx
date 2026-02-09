@@ -24,6 +24,14 @@ const fitToMaxSide = (w: number, h: number, maxSide: number) => {
   return { w: Math.round(w * r), h: Math.round(h * r) };
 };
 
+const getToday = () => {
+  const now = new Date();
+  const month = now.toLocaleString('en-US', { month: 'short' });
+  const day = now.getDate();
+  const dayOfWeek = now.toLocaleString('ko-KR', { weekday: 'short' });
+  return { month, day, dayOfWeek };
+};
+
 export default function HomePage() {
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
 
@@ -50,8 +58,16 @@ export default function HomePage() {
       .then((data) => {
         if (!mounted) return;
 
+        const today = getToday();
+
         if (!data.hasLetter) {
-          setLetter(null);
+          setLetter({
+            id: 0,
+            content: '',
+            month: today.month,
+            day: today.day,
+            dayOfWeek: today.dayOfWeek,
+          });
           setPinnedLetterId(null);
           return;
         }
@@ -59,9 +75,9 @@ export default function HomePage() {
         const next: Letter = {
           id: data.letterId,
           content: data.randomPhrase,
-          month: data.date.month,
-          day: data.date.day,
-          dayOfWeek: data.date.dayOfWeek,
+          month: today.month,
+          day: today.day,
+          dayOfWeek: today.dayOfWeek,
         };
 
         setLetter(next);
