@@ -8,6 +8,7 @@ import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
 import { updateLetterPinned, getRandomLetter } from '@/api/letter';
+import { updateHomeColor } from '@/api/home';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -199,8 +200,8 @@ export default function HomePage() {
           setSelectedId(null);
           setDraftStickers(savedStickers);
         }}
-        onComplete={() => {
-          setSavedStickers(draftStickers);
+        onComplete={async () => {
+          await updateHomeColor(homeBgColor);
           setOpenSheet(false);
           setSelectedId(null);
         }}
