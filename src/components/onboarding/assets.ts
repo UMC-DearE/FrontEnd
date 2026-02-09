@@ -1,6 +1,6 @@
 // login buttons
-import KakaoIcon from "@/assets/onboarding/kakaoButton.svg";
-import GoogleIcon from "@/assets/onboarding/googleButton.svg";
+import KakaoIcon from "@/assets/onboarding/kakao.svg";
+import GoogleIcon from "@/assets/onboarding/google.svg";
 import RobotIcon from "@/assets/onboarding/robotIcon.svg";
 
 // keep

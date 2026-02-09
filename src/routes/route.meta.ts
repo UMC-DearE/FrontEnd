@@ -25,13 +25,13 @@ export const ROUTE_META: Array<{
 
     // 회원가입 플로우
   {
-    match: (pathname) => pathname === "/setup/terms",
+    match: (pathname) => pathname === "/auth/terms",
     header: "BACK_TITLE",
     title: "약관 동의",
     bg: "white",
   },
   {
-    match: (pathname) => pathname === "/setup/setnickname",
+    match: (pathname) => pathname === "/auth/signup",
     header: "BACK_TITLE",
     title: "회원 가입",
     bg: "white",
