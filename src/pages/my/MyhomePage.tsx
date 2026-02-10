@@ -11,6 +11,7 @@ import ConfirmModal from '@/components/common/ConfirmModal';
 import { useStyleStore } from '@/stores/styleStores';
 import { useMembershipStore } from '@/stores/membershipStores';
 import { FONT_LABEL } from '@/utils/fontLabelMap';
+import { logout } from '@/api/http';
 
 function MyProfileSection({ isPlus }: { isPlus: boolean }) {
   const navigate = useNavigate();
@@ -62,13 +63,15 @@ export default function MyhomePage() {
 
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-
-    navigate('/login', { replace: true });
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } finally {
+      setOpenLogoutModal(false);
+      navigate('/login', { replace: true });
+    }
   };
-
+  
   return (
     <>
       <main className="bg-white -mt-[20px]">

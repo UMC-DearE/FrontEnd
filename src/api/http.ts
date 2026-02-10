@@ -90,7 +90,10 @@ api.interceptors.response.use(
       return api(originalRequest);
     } catch (refreshError) {
       delete api.defaults.headers.common.Authorization;
-      // 로그아웃 처리 등 추가 작업 필요 시 여기서 수행
+      useAuthStore.getState().setAuthStatus("unauthenticated");
+
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
 
       return Promise.reject(refreshError);
     } finally {
@@ -98,3 +101,17 @@ api.interceptors.response.use(
     }
   }
 );
+
+export async function logout() {
+  try {
+    // 서버: Redis refresh 삭제 + 쿠키 만료
+    await api.post("/auth/logout");
+  } finally {
+    // 프론트: 메모리 access 토큰 제거 + 인증 상태 초기화
+    delete api.defaults.headers.common.Authorization;
+    useAuthStore.getState().setAuthStatus("unauthenticated");
+
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+  }
+}
