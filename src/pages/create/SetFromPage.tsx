@@ -1,6 +1,6 @@
 // 서버 응답 X - goBackWithDraft로 상태 전달하여 이전 페이지에서 처리
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { CreateResultPayload } from '@/types/create';
 import type { CreateFrom } from '@/types/from';
@@ -9,7 +9,7 @@ import { InputField } from '@/components/common/InputField';
 import FromCreator from '@/components/common/FromCreator';
 import erasebtn from '@/assets/create/erasebtn.svg';
 import type { From } from '@/types/from';
-import { getFromList } from '@/api/from';
+import { useFromList } from '@/hooks/queries/useFromList';
 
 type FromItem = From;
 
@@ -33,17 +33,8 @@ export default function SetFromPage() {
   const location = useLocation();
   const state = location.state as SetFromPageState;
 
-  const [fromList, setFromList] = useState<FromItem[]>([]);
+  const { data: fromList = [] } = useFromList();
   const [input, setInput] = useState('');
-
-  useEffect(() => {
-    const fetchFromList = async () => {
-      const res = await getFromList();
-      setFromList(res);
-    };
-
-    fetchFromList();
-  }, []);
 
   const goBackWithDraft = (draft: CreateFrom) => {
     if (state && 'mode' in state && state.mode === 'edit') {

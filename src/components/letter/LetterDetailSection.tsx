@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import FolderSelect from "@/components/letter/FolderSelect";
-import { getFolderList } from "@/api/folder";
 import type { Folder } from "@/types/folder";
 import useToast from "@/hooks/useToast";
 import type { CreateFrom } from "@/types/from";
@@ -14,9 +13,12 @@ import upBar from "@/assets/letter/up-bar.svg";
 import downBar from "@/assets/letter/down-bar.svg";
 import heartOutlineIcon from "@/assets/letterPage/heart-outline.svg";
 import heartFillIcon from "@/assets/letterPage/heart-filled.svg";
-import { likeLetter, unlikeLetter, patchLetterReply, deleteLetterReply } from "@/api/letter";
 import html2canvas from "html2canvas";
 import type { AnalyzeLetterResponse } from "@/types/create";
+import { useFolderList } from "@/hooks/queries/useFolderList";
+import { useToggleLetterLike } from "@/hooks/mutations/useToggleLetterLike";
+import { usePatchLetterReply } from "@/hooks/mutations/usePatchLetterReply";
+import { useDeleteLetterReply } from "@/hooks/mutations/useDeleteLetterReply";
 
 type LayoutContext = {
   setFixedAction: (
@@ -102,6 +104,10 @@ export default function LetterDetailSection({
   const [draftReply, setDraftReply] = useState("");
   const [isEditingReply, setIsEditingReply] = useState(false);
   const [replyLoading, setReplyLoading] = useState(false);
+  const { data: folderData = [], isLoading: folderLoading } = useFolderList();
+  const toggleLikeMutation = useToggleLetterLike(letterId);
+  const patchReplyMutation = usePatchLetterReply(letterId);
+  const deleteReplyMutation = useDeleteLetterReply(letterId);
 
     // 헤더 더보기 버튼에서 이벤트로 열리는 구조
     useEffect(() => {
@@ -190,9 +196,11 @@ export default function LetterDetailSection({
 
   // 폴더 목록 불러오기 - 폴더 없을 경우 토스트 띄우기(부모 컴포넌트에서 미리 폴더 불러오기 - 폴더 선택 모달에 넘겨줌)
   const handleOpenFolderSelect = async () => {
+    if (folderLoading) return;
+
     try {
-      const list = await getFolderList();
-      if (list.length === 0) {
+      const list = folderData;
+      if (!list || list.length === 0) {
         toast.show("생성된 폴더가 없습니다", 1200);
         return;
       }
@@ -252,18 +260,12 @@ export default function LetterDetailSection({
             <button
               type="button"
               onClick={async () => {
-                if (likeLoading || !letterId) return;
-                setLikeLoading(true);
+                if (likeLoading || toggleLikeMutation.isPending || !letterId) return;
                 const next = !liked;
+                setLikeLoading(true);
                 setLiked(next);
                 try {
-                  if (next) {
-                    const res = await likeLetter(letterId);
-                    setLiked(res.data.liked);
-                  } else {
-                    const res = await unlikeLetter(letterId);
-                    setLiked(res.data.liked);
-                  }
+                  await toggleLikeMutation.mutateAsync(next);
                 } catch {
                   setLiked(!next);
                   toast.show("좋아요 처리에 실패했습니다.");
@@ -273,7 +275,7 @@ export default function LetterDetailSection({
               }}
               className="w-[13px] h-4 cursor-pointer"
               aria-pressed={liked}
-              disabled={likeLoading}
+              disabled={likeLoading || toggleLikeMutation.isPending}
             >
               <img
                 src={liked ? heartFillIcon : heartOutlineIcon}
@@ -377,14 +379,10 @@ export default function LetterDetailSection({
                 <button
                   type="button"
                   onClick={async () => {
-                    if (replyLoading) return;
+                    if (replyLoading || deleteReplyMutation.isPending) return;
                     setReplyLoading(true);
                     try {
-                      const res = await deleteLetterReply(letterId);
-                      if (!res.success) {
-                        toast.show(res.message || "답장 삭제에 실패했습니다.");
-                        return;
-                      }
+                      await deleteReplyMutation.mutateAsync();
                       setSavedReply("");
                       setDraftReply("");
                       setIsEditingReply(false);
@@ -395,19 +393,19 @@ export default function LetterDetailSection({
                     }
                   }}
                   className="h-[30px] px-2 rounded-lg text-xs font-medium bg-[#E6E7E9] text-[#555557]"
-                  disabled={replyLoading}
+                  disabled={replyLoading || deleteReplyMutation.isPending}
                 >
                   삭제
                 </button>
               )}
               <button
                 type="button"
-                disabled={!draftReply.trim() || replyLoading}
+                disabled={!draftReply.trim() || replyLoading || patchReplyMutation.isPending}
                 onClick={async () => {
                   if (!draftReply.trim()) return;
                   setReplyLoading(true);
                   try {
-                    const res = await patchLetterReply(letterId, { reply: draftReply.trim() });
+                    const res = await patchReplyMutation.mutateAsync(draftReply.trim());
                     if (!res.success) {
                       toast.show(res.message || "답장 전송에 실패했습니다.");
                       return;

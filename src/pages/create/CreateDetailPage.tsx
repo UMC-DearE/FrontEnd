@@ -3,9 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import type { CreateResultPayload } from "@/types/create";
 import type { CreateFrom } from "@/types/from";
 import LetterForm from "@/components/common/LetterForm";
-import { createLetter } from "@/api/create";
 import useToast from "@/hooks/useToast";
-import { createFrom } from "@/api/from";
+import { useCreateLetter } from "@/hooks/mutations/useCreateLetter";
+import { useCreateFrom } from "@/hooks/mutations/useCreateFrom";
 
 type LocationState =
   | (CreateResultPayload & {
@@ -30,6 +30,9 @@ export default function CreateDetailPage() {
     state?.unknownDate ?? false
   );
   const toast = useToast();
+  const createLetterMutation = useCreateLetter();
+  const createFromMutation = useCreateFrom();
+
 
   useEffect(() => {
     if (!state) {
@@ -75,7 +78,7 @@ export default function CreateDetailPage() {
 
         try {
           if (!fromId) {
-            const fromRes = await createFrom({
+            const fromRes = await createFromMutation.mutateAsync({
               name: fromDraft.name,
               bgColor: fromDraft.bgColor,
               fontColor: fromDraft.fontColor,
@@ -92,7 +95,7 @@ export default function CreateDetailPage() {
           const receivedAt = payload.unknownDate ? "" : payload.date ?? "";
           const finalContent = payload.content ?? content;
 
-          const res = await createLetter({
+          const letterRes = await createLetterMutation.mutateAsync({
             content: finalContent,
             aiSummary: state.aiResult.summary,
             emotionIds: state.aiResult.emotions.map((e) => e.emotionId),
@@ -101,12 +104,12 @@ export default function CreateDetailPage() {
             imageIds: state.imageIds ?? [],
           });
 
-          if (!res.success) {
-            toast.show(res.message || "편지 생성에 실패했습니다.");
+          if (!letterRes.success) {
+            toast.show(letterRes.message || "편지 생성에 실패했습니다.");
             return;
           }
 
-          navigate(`/letter/${res.data.letterId}`, { replace: true });
+          navigate(`/letter/${letterRes.data.letterId}`, { replace: true });
         } catch {
           toast.show("편지 생성 중 오류가 발생했습니다.");
         }

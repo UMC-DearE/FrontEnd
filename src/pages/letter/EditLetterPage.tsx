@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LetterForm from "@/components/common/LetterForm";
-import { getLetterDetail, patchLetter } from "@/api/letter";
+import { getLetterDetail } from "@/api/letter";
 import type { LetterDetailData } from "@/types/letter";
 import type { CreateFrom } from "@/types/from";
 import useToast from "@/hooks/useToast";
-import { createFrom } from "@/api/from";
+import { useCreateFrom } from "@/hooks/mutations/useCreateFrom";
+import { usePatchLetter } from "@/hooks/mutations/usePatchLetter";
 
 type EditPageLocationState = {
   selectedFromDraft?: CreateFrom;
@@ -19,6 +20,8 @@ export default function EditLetterPage() {
   const location = useLocation();
   const locationState = location.state as EditPageLocationState;
   const toast = useToast();
+  const createFromMutation = useCreateFrom();
+  const patchLetterMutation = usePatchLetter();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -138,6 +141,10 @@ export default function EditLetterPage() {
         const letterId = Number(id);
         if (!letterId) return;
 
+        if (patchLetterMutation.isPending || createFromMutation.isPending) {
+          return;
+        }
+
         let fromId = payload.from?.fromId ?? fromDraft?.fromId;
         
         // 편지 수정 버튼 - fromDraft에 fromId 없으면(기존 목록에서 불러온 프롬이 아님, 새 프롬) 프롬 생성 -> 편지 수정 api 호출
@@ -149,7 +156,7 @@ export default function EditLetterPage() {
 
         try {
           if (!fromId) {
-            const fromRes = await createFrom({
+            const fromRes = await createFromMutation.mutateAsync({
               name: fromDraft.name,
               bgColor: fromDraft.bgColor,
               fontColor: fromDraft.fontColor,
@@ -166,10 +173,13 @@ export default function EditLetterPage() {
           const receivedAt = payload.unknownDate ? "" : payload.date ?? "";
           const finalContent = payload.content ?? content;
 
-          const res = await patchLetter(letterId, {
-            content: finalContent,
-            fromId,
-            receivedAt,
+          const res = await patchLetterMutation.mutateAsync({
+            letterId,
+            payload: {
+              content: finalContent,
+              fromId,
+              receivedAt,
+            },
           });
 
           if (!res.success) {

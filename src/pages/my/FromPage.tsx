@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { FromBadge } from '@/components/common/FromBadge';
 import FromEditPanel from '@/components/my/from/FromEditPanel';
 import type { From } from '@/types/from';
-import { deleteFrom, getFromList, updateFrom } from '@/api/from';
+import { deleteFrom, updateFrom } from '@/api/from';
 import useToast from '@/hooks/useToast';
+import { useFromList } from '@/hooks/queries/useFromList';
 
 type FromItem = From;
 
@@ -13,45 +15,22 @@ export default function FromPage() {
   const createdFrom = location.state?.createdFrom as FromItem | undefined;
   const [editingFromId, setEditingFromId] = useState<number | null>(null);
   const toast = useToast();
-
-  const [fromList, setFromList] = useState<FromItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data: fromList = [], isLoading } = useFromList();
 
   useEffect(() => {
     if (!createdFrom) return;
 
-    setFromList((prev) => {
+    queryClient.setQueryData<FromItem[]>(['froms'], (prev = []) => {
       const exists = prev.some((f) => f.fromId === createdFrom.fromId);
       if (exists) return prev;
       return [createdFrom, ...prev];
     });
 
     window.history.replaceState({}, document.title);
-  }, [createdFrom]);
+  }, [createdFrom, queryClient]);
 
-  useEffect(() => {
-    let mounted = true;
-
-    const load = async () => {
-      try {
-        setLoading(true);
-        const list = await getFromList();
-        if (!mounted) return;
-        setFromList(list);
-      } catch {
-        toast.show('프롬 목록을 불러오지 못했어요.');
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    load();
-    return () => {
-      mounted = false;
-    };
-  }, [toast]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="w-full text-center text-sm text-[#9D9D9F] py-6">
         불러오는 중...
@@ -83,7 +62,7 @@ export default function FromPage() {
                       toast.show(res.message || '프롬 수정에 실패했어요.');
                       return;
                     }
-                    setFromList((prev) =>
+                    queryClient.setQueryData<FromItem[]>(['froms'], (prev = []) =>
                       prev.map((f) =>
                         f.fromId === updated.fromId
                           ? {
@@ -107,7 +86,9 @@ export default function FromPage() {
                       toast.show(res.message || '프롬 삭제에 실패했어요.');
                       return;
                     }
-                    setFromList((prev) => prev.filter((f) => f.fromId !== id));
+                    queryClient.setQueryData<FromItem[]>(['froms'], (prev = []) =>
+                      prev.filter((f) => f.fromId !== id)
+                    );
                     setEditingFromId(null);
                   } catch {
                     toast.show('프롬 삭제 중 오류가 발생했어요.');

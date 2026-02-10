@@ -4,20 +4,19 @@ import { InputField } from '@/components/common/InputField';
 import FromCreator from '@/components/common/FromCreator';
 import type { CreateFrom } from '@/types/from';
 import erasebtn from '@/assets/create/erasebtn.svg';
-import { createFrom } from '@/api/from';
 import useToast from '@/hooks/useToast';
+import { useCreateFrom } from '@/hooks/mutations/useCreateFrom';
 
 export default function FromCreatePage() {
   const navigate = useNavigate();
   const toast = useToast();
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
+  const createFromMutation = useCreateFrom();
 
   const handleCreateImmediate = async (draft: CreateFrom) => {
-    if (loading) return;
-    setLoading(true);
+    if (createFromMutation.isPending) return;
     try {
-      const res = await createFrom(draft);
+      const res = await createFromMutation.mutateAsync(draft);
       if (!res.success) {
         toast.show(res.message || '프롬 생성에 실패했어요.');
         return;
@@ -30,8 +29,6 @@ export default function FromCreatePage() {
       });
     } catch {
       toast.show('프롬 생성 중 오류가 발생했어요.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -63,7 +60,7 @@ export default function FromCreatePage() {
           onCreateImmediate={handleCreateImmediate}
           name={input}
           onNameChange={setInput}
-          disabled={loading}
+          disabled={createFromMutation.isPending}
         />
       </div>
     </div>
