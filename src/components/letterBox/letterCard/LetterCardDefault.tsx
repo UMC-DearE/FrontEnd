@@ -3,18 +3,20 @@
 import heartOutlineIcon from '@/assets/letterPage/heart-outline.svg';
 import heartFillIcon from '@/assets/letterPage/heart-filled.svg';
 import { useEffect, useRef, useState } from 'react';
+import { useToggleLetterLike } from '@/hooks/mutations/useToggleLetterLike';
 
 type LetterCardDefaultProps = {
+  letterId: number;
   content: string;
   isLiked: boolean;
   receiveAt: string;
   fromName: string;
   fromBgColor: string;
   fromFontColor: string;
-  onLikeChange?: (liked: boolean) => void;
 };
 
 export default function LetterCardDefault({
+  letterId,
   content,
   isLiked,
   receiveAt,
@@ -26,6 +28,8 @@ export default function LetterCardDefault({
   const [isTwoLine, setIsTwoLine] = useState(false);
   const textRef = useRef<HTMLParagraphElement | null>(null);
 
+  const toggleLike = useToggleLetterLike(letterId);
+
   useEffect(() => {
     if (!textRef.current) return;
     const lineHeight = 20;
@@ -35,6 +39,16 @@ export default function LetterCardDefault({
   useEffect(() => {
     setLiked(isLiked);
   }, [isLiked]);
+
+  const onClickLike = () => {
+    const next = !liked;
+    setLiked(next);
+    toggleLike.mutate(next, {
+      onError: () => {
+        setLiked((cur) => !cur);
+      },
+    });
+  };
 
   return (
     <div className="w-full">
@@ -47,8 +61,9 @@ export default function LetterCardDefault({
           <div className="text-[#C2C4C7] font-medium text-[12px]">{receiveAt}</div>
           <button
             type="button"
-            onClick={() => setLiked((prev) => !prev)}
-            className="w-[13px] h-4 cursor-pointer"
+            onClick={onClickLike}
+            disabled={toggleLike.isPending}
+            className="w-[13px] h-4 cursor-pointer disabled:opacity-50"
           >
             <img src={liked ? heartFillIcon : heartOutlineIcon} alt="heart-icon" />
           </button>

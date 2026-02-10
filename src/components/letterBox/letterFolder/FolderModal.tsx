@@ -1,3 +1,5 @@
+// 편지함 폴더 모달
+
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import resetIcon from '@/assets/letterPage/resetIcon.svg';
 
@@ -10,7 +12,12 @@ interface FolderModalProps {
   initialImageId: number | null;
   onCancel: () => void;
   onConfirm: (data: { folder_name: string; imageId: number | null }) => void;
-  uploadImage: (file: File, dir: string) => Promise<UploadImageResult>;
+  uploadImage: (
+    file: File,
+    dir: 'profile' | 'letter' | 'sticker' | 'folder'
+  ) => Promise<UploadImageResult>;
+  onImageDelete?: () => Promise<void>;
+  currentFolderId?: number | null;
 }
 
 export default function FolderModal({
@@ -21,6 +28,8 @@ export default function FolderModal({
   onCancel,
   onConfirm,
   uploadImage,
+  onImageDelete,
+  currentFolderId,
 }: FolderModalProps) {
   const [folderName, setFolderName] = useState(initialName);
   const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl);
@@ -59,13 +68,17 @@ export default function FolderModal({
     }
   };
 
-  const handleImageDelete = () => {
+  const handleImageDelete = async () => {
     if (objectUrlRef.current) {
       URL.revokeObjectURL(objectUrlRef.current);
       objectUrlRef.current = null;
     }
     setImageUrl(null);
     setImageId(null);
+
+    if (currentFolderId != null && onImageDelete) {
+      await onImageDelete();
+    }
   };
 
   const handleConfirm = () => {

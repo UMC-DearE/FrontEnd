@@ -19,7 +19,7 @@ interface LetterCardProps {
 }
 
 export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: LetterCardProps) {
-  const isEmpty = !letter;
+  const isEmpty = !letter || !letter.content;
   const letterId = letter?.id;
 
   const handlePinClick = () => {

@@ -1,16 +1,20 @@
-import type { Emotion } from "./create";
-import type { CommonResponse } from "./common";
+import type { Emotion } from './create';
+import type { CommonResponse } from './common';
+
+export type LetterFrom = {
+  fromId: number;
+  name: string;
+  bgColor: string;
+  fontColor: string;
+};
 
 export type Letter = {
   id: number;
-  content: string;
+  excerpt: string;
   isLiked: boolean;
-  receiveAt: string;
+  receivedAt: string;
   createdAt: string;
-  fromId: number;
-  fromName: string;
-  fromBgColor: string;
-  fromFontColor: string;
+  from: LetterFrom;
   folderId: number;
 };
 
@@ -42,7 +46,7 @@ export interface LetterDetailData {
 
   createdAt?: string;
   imageUrls?: string[];
-  
+
   folder?: {
     folderId: number;
     folderName: string;

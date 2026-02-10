@@ -1,4 +1,4 @@
-import type { CommonResponse } from "./common";
+import type { CommonResponse } from './common';
 
 export interface CreateFrom {
   fromId?: number; // 새 프롬 생성 시에는 없음 - optional

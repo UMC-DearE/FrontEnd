@@ -1,10 +1,10 @@
-import { useAuthStore } from "@/stores/authStore";
-import axios, { AxiosError, type AxiosRequestConfig } from "axios";
+import { useAuthStore } from '@/stores/authStore';
+import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   withCredentials: true,
-  headers: { accept: "*/*" },
+  headers: { accept: '*/*' },
 });
 
 // 토큰 재발급 전용 (기존 api 인터셉터 안 탐)
@@ -36,26 +36,23 @@ api.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as
-      | (AxiosRequestConfig & { _retry?: boolean })
-      | undefined;
+    const originalRequest = error.config as (AxiosRequestConfig & { _retry?: boolean }) | undefined;
 
     // 조건 정리
     const is401 = error.response?.status === 401;
-    const isRefreshRequest = originalRequest?.url?.includes("/auth/jwt/refresh");
+    const isRefreshRequest = originalRequest?.url?.includes('/auth/jwt/refresh');
     const authStatus = useAuthStore.getState().authStatus;
 
-    if (authStatus !== "authenticated" && authStatus !== "checking") {
+    if (authStatus !== 'authenticated' && authStatus !== 'checking') {
       return Promise.reject(error);
     }
 
     if (!is401 || !originalRequest || originalRequest._retry || isRefreshRequest) {
       return Promise.reject(error);
     }
-    
+
     originalRequest._retry = true;
 
-    
     // 이미 refresh 중이면 큐에 쌓아서 대기 - 동시에 재발급 하면 오류 생김
     if (isRefreshing) {
       return new Promise((resolve) => {
@@ -68,15 +65,15 @@ api.interceptors.response.use(
         });
       });
     }
-    
+
     isRefreshing = true;
 
     try {
-      const refreshRes = await refreshApi.post("/auth/jwt/refresh");
+      const refreshRes = await refreshApi.post('/auth/jwt/refresh');
 
       const newAuthHeader = refreshRes.headers?.authorization as string | undefined;
       if (!newAuthHeader) {
-        throw new Error("Authorization header missing on refresh response");
+        throw new Error('Authorization header missing on refresh response');
       }
 
       // 전역 access token 갱신
@@ -101,4 +98,3 @@ api.interceptors.response.use(
     }
   }
 );
-
