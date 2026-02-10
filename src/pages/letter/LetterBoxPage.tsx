@@ -4,7 +4,7 @@ import FolderSettingSheet from '@/components/letterBox/letterFolder/FolderSettin
 import ConfirmModal from '@/components/common/ConfirmModal';
 import FolderModal from '@/components/letterBox/letterFolder/FolderModal';
 import type { Folder } from '@/types/folder';
-import type { Letter, LetterFrom } from '@/types/letter';
+import type { Letter } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
 import { useNavigate } from 'react-router-dom';
@@ -15,21 +15,19 @@ import {
   updateFolder,
   updateFolderOrders,
 } from '@/api/folder';
-<<<<<<< HEAD
 import { uploadImage } from '@/api/image';
-import { refreshAccessToken } from '@/api/http';
 import { getLetterLists } from '@/api/letter';
 import LetterBoxHeader from '@/components/header/LetterBoxHeader';
 import SearchButton from '@/components/common/header/SearchButton';
 import SearchBar from '@/components/letterBox/SearchBar';
-=======
+import { getFroms } from '@/api/from';
+import type { From } from '@/types/from';
 import { uploadImage as uploadImageApi } from '@/api/upload';
->>>>>>> origin/develop
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
 
-export default function LetterBox() {
+export default function LetterBoxPage() {
   const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>('all');
   const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
   const navigate = useNavigate();
@@ -55,6 +53,18 @@ export default function LetterBox() {
   const [query, setQuery] = useState('');
   const searchWrapRef = useRef<HTMLDivElement | null>(null);
 
+  const [allFroms, setAllFroms] = useState<From[]>([]);
+
+  useEffect(() => {
+    const run = async () => {
+      const [folderData, fromData] = await Promise.all([getFolderList(), getFroms()]);
+
+      setFolders([...folderData].sort((a, b) => a.folderOrder - b.folderOrder));
+      setAllFroms(fromData.data.froms);
+    };
+    void run();
+  }, []);
+
   useEffect(() => {
     const run = async () => {
       const data = await getFolderList();
@@ -69,12 +79,6 @@ export default function LetterBox() {
 
   useEffect(() => {
     const run = async () => {
-      try {
-        await refreshAccessToken();
-      } catch {
-        return;
-      }
-
       const folderId = typeof selectedFolderId === 'number' ? selectedFolderId : undefined;
       const isLiked = selectedFolderId === 'like' ? true : undefined;
       const fromId = selectedFromId === 'all' ? undefined : selectedFromId;
@@ -170,12 +174,6 @@ export default function LetterBox() {
     await updateFolderOrders(next.map((f) => f.id));
   };
 
-  const froms = useMemo(() => {
-    const map = new Map<number, LetterFrom>();
-    for (const l of letters) map.set(l.from.fromId, l.from);
-    return Array.from(map.values());
-  }, [letters]);
-
   const fromCounts = useMemo(() => {
     const counts: Record<number, number> = {};
     for (const l of letters) {
@@ -264,7 +262,7 @@ export default function LetterBox() {
           <ToolBar
             totalCount={totalElements}
             folderTotalCount={folderTotalCount}
-            froms={froms}
+            froms={allFroms}
             fromCounts={fromCounts}
             selectedFromId={selectedFromId}
             onFromSelect={setSelectedFromId}
@@ -313,9 +311,9 @@ export default function LetterBox() {
           }}
           onConfirm={handleConfirmUpsertFolder}
           uploadImage={async (file) => {
-            const res = await uploadImageApi(file, "folder");
+            const res = await uploadImageApi(file, 'folder');
             if (!res.success) {
-              throw new Error(res.message || "이미지 업로드 실패");
+              throw new Error(res.message || '이미지 업로드 실패');
             }
             return {
               imageId: res.data.imageId,
@@ -374,19 +372,6 @@ export default function LetterBox() {
           }
         }}
       />
-
-      <div className="flex flex-col gap-[10px] mb-3">
-        <ToolBar
-          totalCount={totalElements}
-          folderTotalCount={folderTotalCount}
-          froms={froms}
-          fromCounts={fromCounts}
-          selectedFromId={selectedFromId}
-          onFromSelect={setSelectedFromId}
-          view={viewMode}
-          onViewChange={setViewMode}
-        />
-      </div>
     </>
   );
 }

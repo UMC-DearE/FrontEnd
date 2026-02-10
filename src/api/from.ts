@@ -1,33 +1,16 @@
-import { api } from './http';
-import type {
-  FromListResponse,
-  From,
-  CreateFromRequest,
-  CreateFromResponse,
-  UpdateFromRequest,
-  UpdateFromResponse,
-  DeleteFromResponse,
-} from '@/types/from';
+import type { FromListResponse } from '@/types/from';
 
-export const getFromList = async (): Promise<From[]> => {
-  const { data } = await api.get<FromListResponse>('/froms');
-  return data.data.froms;
-};
+export async function getFroms(): Promise<FromListResponse> {
+  const res = await fetch('/froms', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
+  });
 
-export const createFrom = async (payload: CreateFromRequest): Promise<CreateFromResponse> => {
-  const { data } = await api.post<CreateFromResponse>('/froms', payload);
-  return data;
-};
+  export const createFrom = async (payload: CreateFromRequest): Promise<CreateFromResponse> => {
+    const { data } = await api.post<CreateFromResponse>('/froms', payload);
+    return data;
+  };
 
-export const updateFrom = async (
-  fromId: number,
-  payload: UpdateFromRequest
-): Promise<UpdateFromResponse> => {
-  const { data } = await api.patch<UpdateFromResponse>(`/froms/${fromId}`, payload);
-  return data;
-};
-
-export const deleteFrom = async (fromId: number): Promise<DeleteFromResponse> => {
-  const { data } = await api.delete<DeleteFromResponse>(`/froms/${fromId}`);
-  return data;
-};
+  return (await res.json()) as FromListResponse;
+}
