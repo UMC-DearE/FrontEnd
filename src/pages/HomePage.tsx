@@ -1,7 +1,7 @@
 import { useOutletContext } from 'react-router-dom';
 import ProfileCard from '@/components/home/ProfileCard';
 import ConfirmModal from '@/components/common/ConfirmModal';
-import LetterCard, { type Letter } from '@/components/home/LetterCard';
+import LetterCard, { type HomeCardLetter } from '@/components/home/LetterCard';
 import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
@@ -43,7 +43,7 @@ export default function HomePage() {
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
   const { data: home, isLoading: homeLoading, isError: homeError } = useHomeQuery();
 
-  const [letter, setLetter] = useState<Letter | null>(null);
+  const [letter, setLetter] = useState<HomeCardLetter | null>(null);
   const [pinnedLetterId, setPinnedLetterId] = useState<number | null>(null);
   const [pendingUnpinId, setPendingUnpinId] = useState<number | null>(null);
 
@@ -61,19 +61,38 @@ export default function HomePage() {
   const initialStickerIdsRef = useRef<string[]>([]);
   const initializedRef = useRef(false);
 
+  type RandomLetterApiResponse = {
+    success: boolean;
+    code: string;
+    message: string;
+    data: {
+      hasLetter: boolean;
+      date: {
+        fullDate: string;
+        month: string;
+        day: number;
+        dayOfWeek: string;
+      };
+      letterId: number;
+      randomPhrase: string;
+      isPinned: boolean;
+    };
+  };
+
   useEffect(() => {
     let mounted = true;
 
     getRandomLetter()
-      .then((data) => {
+      .then((response: RandomLetterApiResponse) => {
         if (!mounted) return;
 
         const today = getToday();
+        const data = response.data;
 
         if (!data.hasLetter) {
           setLetter({
             id: 0,
-            content: '',
+            excerpt: '',
             month: today.month,
             day: today.day,
             dayOfWeek: today.dayOfWeek,
@@ -82,12 +101,12 @@ export default function HomePage() {
           return;
         }
 
-        const next: Letter = {
+        const next: HomeCardLetter = {
           id: data.letterId,
-          content: data.randomPhrase,
-          month: today.month,
-          day: today.day,
-          dayOfWeek: today.dayOfWeek,
+          excerpt: data.randomPhrase,
+          month: data.date.month,
+          day: data.date.day,
+          dayOfWeek: data.date.dayOfWeek,
         };
 
         setLetter(next);

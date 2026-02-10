@@ -3,27 +3,27 @@
 import pinOffIcon from '@/assets/homePage/pin-outline.svg';
 import pinOnIcon from '@/assets/homePage/pin-filled.svg';
 
-export interface Letter {
+export type HomeCardLetter = {
   id: number;
-  content: string;
+  excerpt: string;
   month: string;
   day: number;
   dayOfWeek: string;
-}
+};
 
 interface LetterCardProps {
-  letter: Letter | null;
+  letter: HomeCardLetter | null;
   isPinned: boolean;
   onPin: (letterId: number) => void;
   onRequestUnpin: (letterId: number) => void;
 }
 
 export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: LetterCardProps) {
-  const isEmpty = !letter || !letter.content;
-  const letterId = letter?.id;
+  const isEmpty = !letter || !letter.excerpt;
+  const letterId = letter?.id ?? null;
 
   const handlePinClick = () => {
-    if (!letterId) return;
+    if (letterId == null) return;
 
     if (isPinned) {
       onRequestUnpin(letterId);
@@ -41,7 +41,7 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
         <span className="text-[11px] font-medium text-[#FF5F2F]">{letter?.dayOfWeek ?? ''}</span>
       </div>
 
-      <div className="absolute left-[67px] top-[31px] h-[40px] w-[273px] text-[12.3px] leading-[20px]">
+      <div className="absolute left-[67px] top-[31px] w-[273px] text-[12.3px] leading-[20px]">
         {isEmpty ? (
           <p className="break-keep text-[#9D9D9F]">
             아직 추가한 편지가 없어요.
@@ -50,14 +50,14 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
             편지를 추가해 보세요
           </p>
         ) : (
-          <p className="break-all font-medium text-[#555557]">{letter.content}</p>
+          <p className="line-clamp-2 break-all font-medium text-[#555557]">{letter.excerpt}</p>
         )}
       </div>
 
       <button
         type="button"
         onClick={handlePinClick}
-        disabled={!letterId}
+        disabled={letterId == null}
         className="absolute top-2 left-[339px] cursor-pointer"
       >
         <img
