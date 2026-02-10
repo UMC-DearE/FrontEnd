@@ -5,6 +5,7 @@ import type { LetterFrom } from '@/types/letter';
 export type ViewMode = '기본 보기' | '간편 보기';
 
 export type LetterCardProps = {
+  letterId: number;
   excerpt: string;
   isLiked: boolean;
   receivedAt: string;
@@ -13,6 +14,7 @@ export type LetterCardProps = {
 };
 
 export default function LetterCard({
+  letterId,
   viewMode,
   excerpt,
   isLiked,
@@ -25,6 +27,7 @@ export default function LetterCard({
 
   return (
     <LetterCardDefault
+      letterId={letterId}
       content={excerpt}
       isLiked={isLiked}
       receiveAt={receivedAt}

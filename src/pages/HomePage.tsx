@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import ProfileCard from '@/components/home/ProfileCard';
 import ConfirmModal from '@/components/common/ConfirmModal';
@@ -11,6 +10,7 @@ import { updateLetterPinned, getRandomLetter } from '@/api/letter';
 import { uploadImage } from '@/api/upload';
 import { getHome, updateHomeColor } from '@/api/home';
 import { createSticker, updateSticker, deleteSticker } from '@/api/sticker';
+import { useEffect, useRef, useState } from 'react';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -315,11 +315,7 @@ export default function HomePage() {
             persistStickersOnComplete(snapshot),
           ]);
 
-          if (colorRes.status === 'fulfilled') {
-            setHomeBgColor(colorRes.value);
-          } else {
-            console.error(colorRes.reason);
-          }
+          if (colorRes.status !== 'fulfilled') console.error(colorRes.reason);
 
           if (stickerRes.status === 'fulfilled') {
             const persisted = cloneStickers(stickerRes.value);

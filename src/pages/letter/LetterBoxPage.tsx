@@ -93,8 +93,8 @@ export default function LetterBoxPage() {
           isLiked,
         });
 
-        setLetters(res.data.content ?? []);
-        setTotalElements(res.data.totalElements ?? 0);
+        setLetters(res.data.data.content ?? []);
+        setTotalElements(res.data.data.totalElements ?? 0);
       } finally {
         setIsLettersLoading(false);
       }
@@ -280,6 +280,7 @@ export default function LetterBoxPage() {
                 onClick={() => navigate(`/letter/${letter.id}`)}
               >
                 <LetterCard
+                  letterId={letter.id}
                   viewMode={viewMode}
                   excerpt={letter.excerpt}
                   isLiked={letter.isLiked}

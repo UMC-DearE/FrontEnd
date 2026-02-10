@@ -4,8 +4,8 @@ import type { ApiResponse } from '@/types/home';
 export type HomeUserDto = {
   userId: number;
   nickname: string;
-  intro: string;
-  imgUrl: string;
+  intro: string | null;
+  imgUrl: string | null;
 };
 
 export type HomeSettingDto = {
@@ -36,11 +36,9 @@ export async function getHome(): Promise<HomeDataDto> {
   return res.data.data;
 }
 
-type UpdateHomeColorResponse = ApiResponse<{
-  homeColor: string;
-}>;
+type UpdateHomeColorResponse = ApiResponse<{ homeColor: string }>;
 
 export async function updateHomeColor(homeColor: string) {
-  const res = await api.patch<UpdateHomeColorResponse>('/users/me/homeColor', { homeColor });
+  const res = await api.patch<UpdateHomeColorResponse>('/users/me/homecolor', { homeColor });
   return res.data.data.homeColor;
 }
