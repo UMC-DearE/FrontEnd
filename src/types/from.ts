@@ -1,3 +1,5 @@
+import type { CommonResponse } from './common';
+
 export interface CreateFrom {
   fromId?: number; // 새 프롬 생성 시에는 없음 - optional
   name: string;
@@ -15,11 +17,45 @@ export interface From {
   letterCount?: number;
 }
 
-export type FromListResponse = {
-  success: boolean;
-  code: string;
-  message: string;
-  data: {
-    froms: From[];
-  };
-};
+export interface FromListResponseData {
+  froms: From[];
+}
+
+export type FromListResponse = CommonResponse<FromListResponseData>;
+
+// 프롬 생성
+export interface CreateFromRequest {
+  name: string;
+  bgColor: string;
+  fontColor: string;
+}
+
+export interface CreateFromResponseData {
+  fromId: number;
+}
+
+export type CreateFromResponse = CommonResponse<CreateFromResponseData>;
+
+// 프롬 수정
+export interface UpdateFromRequest {
+  name?: string;
+  bgColor?: string;
+  fontColor?: string;
+}
+
+export interface UpdateFromResponseData {
+  fromId: number;
+  name: string;
+  bgColor: string;
+  fontColor: string;
+  updatedAt: string;
+}
+
+export type UpdateFromResponse = CommonResponse<UpdateFromResponseData>;
+
+// 프롬 삭제
+export interface DeleteFromResponseData {
+  fromId: number;
+}
+
+export type DeleteFromResponse = CommonResponse<DeleteFromResponseData>;

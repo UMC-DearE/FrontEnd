@@ -15,14 +15,13 @@ import {
   updateFolder,
   updateFolderOrders,
 } from '@/api/folder';
-import { uploadImage } from '@/api/image';
 import { getLetterLists } from '@/api/letter';
 import LetterBoxHeader from '@/components/header/LetterBoxHeader';
 import SearchButton from '@/components/common/header/SearchButton';
 import SearchBar from '@/components/letterBox/SearchBar';
-import { getFroms } from '@/api/from';
 import type { From } from '@/types/from';
 import { uploadImage as uploadImageApi } from '@/api/upload';
+import { getFromList } from '@/api/from';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
@@ -57,10 +56,10 @@ export default function LetterBoxPage() {
 
   useEffect(() => {
     const run = async () => {
-      const [folderData, fromData] = await Promise.all([getFolderList(), getFroms()]);
+      const [folderData, fromData] = await Promise.all([getFolderList(), getFromList()]);
 
       setFolders([...folderData].sort((a, b) => a.folderOrder - b.folderOrder));
-      setAllFroms(fromData.data.froms);
+      setAllFroms(fromData);
     };
     void run();
   }, []);
@@ -213,13 +212,7 @@ export default function LetterBoxPage() {
                 </h1>
               )
             }
-            right={
-              isSearchOpen ? null : (
-                <button onClick={() => setIsSearchOpen(true)}>
-                  <SearchButton />
-                </button>
-              )
-            }
+            right={isSearchOpen ? null : <SearchButton onClick={() => setIsSearchOpen(true)} />}
           />
         </div>
       </div>
@@ -271,11 +264,11 @@ export default function LetterBoxPage() {
           />
 
           {isLettersLoading ? (
-            <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
+            <div className="absolute left-1/2 top-[275px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
               불러오는 중...
             </div>
           ) : filteredLetters.length === 0 ? (
-            <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
+            <div className="absolute left-1/2 top-[275px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
               {query.trim() ? '검색 결과가 없어요.' : '추가된 편지가 없어요.'}
             </div>
           ) : (
@@ -319,6 +312,9 @@ export default function LetterBoxPage() {
               imageId: res.data.imageId,
               url: res.data.url,
             };
+          }}
+          onImageDelete={async () => {
+            await handleImageDelete(editingFolderId);
           }}
         />
       )}

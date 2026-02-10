@@ -1,4 +1,4 @@
-import { api } from './http';
+import { api } from '@/api/http';
 import type {
   LetterDetailResponse,
   LetterLikeResponse,
@@ -48,5 +48,37 @@ export const deleteLetterReply = async (letterId: number): Promise<DeleteLetterR
 
 export const deleteLetter = async (letterId: number): Promise<DeleteLetterResponse> => {
   const { data } = await api.delete<DeleteLetterResponse>(`/letters/${letterId}`);
+  return data;
+};
+
+export const getLetterLists = async (params: {
+  page: number;
+  size: number;
+  sort?: string;
+  folderId?: number;
+  fromId?: number;
+  isLiked?: boolean;
+}) => {
+  const { data } = await api.get('/letters', { params });
+  return { data };
+};
+
+export const updateLetterPinned = async (letterId: number, pinned: boolean) => {
+  const { data } = await api.patch(`/letters/${letterId}/pin`, { pinned });
+  return data;
+};
+
+export const pinLetter = async (letterId: number) => {
+  const { data } = await api.patch(`/letters/${letterId}/pin`, { pinned: true });
+  return data;
+};
+
+export const unpinLetter = async (letterId: number) => {
+  const { data } = await api.patch(`/letters/${letterId}/pin`, { pinned: false });
+  return data;
+};
+
+export const getRandomLetter = async () => {
+  const { data } = await api.get('/letters/random');
   return data;
 };

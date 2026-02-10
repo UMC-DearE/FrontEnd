@@ -8,7 +8,7 @@ import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
 import { updateLetterPinned, getRandomLetter } from '@/api/letter';
-import { uploadImage } from '@/api/image';
+import { uploadImage } from '@/api/upload';
 import { getHome, updateHomeColor } from '@/api/home';
 import { createSticker, updateSticker, deleteSticker } from '@/api/sticker';
 
@@ -179,13 +179,13 @@ export default function HomePage() {
 
       const next: StickerItem = {
         id: tempId,
-        src: uploaded.url ?? localUrl,
+        src: uploaded.data.url ?? localUrl,
         x: cx,
         y: cy,
         z: maxZ + 1,
         rotation: 0,
         scale: 1,
-        imageId: uploaded.imageId ?? null,
+        imageId: uploaded.data.imageId ?? null,
         w: fitted.w,
         h: fitted.h,
       };
