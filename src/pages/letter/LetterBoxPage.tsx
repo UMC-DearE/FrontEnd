@@ -240,27 +240,68 @@ export default function LetterBox() {
           />
         </div>
       )}
+      <div className="absolute top-[125px]">
+        <FolderList
+          folders={folders}
+          selectedId={selectedFolderId}
+          onSelect={(id) => {
+            setSelectedFolderId(id);
+            setSelectedFromId('all');
+          }}
+          onFolderAdd={() => {
+            setEditingFolderId(null);
+            setIsModalOpen(true);
+          }}
+          onOpenFolderSetting={(id) => {
+            setSettingFolderId(id);
+            setIsSettingOpen(true);
+          }}
+          onReorder={(next) => {
+            setFolders(next);
+            void persistOrder(next);
+          }}
+        />
 
-      <FolderList
-        folders={folders}
-        selectedId={selectedFolderId}
-        onSelect={(id) => {
-          setSelectedFolderId(id);
-          setSelectedFromId('all');
-        }}
-        onFolderAdd={() => {
-          setEditingFolderId(null);
-          setIsModalOpen(true);
-        }}
-        onOpenFolderSetting={(id) => {
-          setSettingFolderId(id);
-          setIsSettingOpen(true);
-        }}
-        onReorder={(next) => {
-          setFolders(next);
-          void persistOrder(next);
-        }}
-      />
+        <div className="flex flex-col gap-[10px] mb-3">
+          <ToolBar
+            totalCount={totalElements}
+            folderTotalCount={folderTotalCount}
+            froms={froms}
+            fromCounts={fromCounts}
+            selectedFromId={selectedFromId}
+            onFromSelect={setSelectedFromId}
+            view={viewMode}
+            onViewChange={setViewMode}
+          />
+
+          {isLettersLoading ? (
+            <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
+              불러오는 중...
+            </div>
+          ) : filteredLetters.length === 0 ? (
+            <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
+              {query.trim() ? '검색 결과가 없어요.' : '추가된 편지가 없어요.'}
+            </div>
+          ) : (
+            filteredLetters.map((letter) => (
+              <div
+                key={letter.id}
+                role="button"
+                className="cursor-pointer"
+                onClick={() => navigate(`/letter/${letter.id}`)}
+              >
+                <LetterCard
+                  viewMode={viewMode}
+                  excerpt={letter.excerpt}
+                  isLiked={letter.isLiked}
+                  receivedAt={letter.receivedAt}
+                  from={letter.from}
+                />
+              </div>
+            ))
+          )}
+        </div>
+      </div>
 
       {isModalOpen && (
         <FolderModal
@@ -340,33 +381,6 @@ export default function LetterBox() {
           view={viewMode}
           onViewChange={setViewMode}
         />
-
-        {isLettersLoading ? (
-          <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
-            불러오는 중...
-          </div>
-        ) : filteredLetters.length === 0 ? (
-          <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
-            {query.trim() ? '검색 결과가 없어요.' : '추가된 편지가 없어요.'}
-          </div>
-        ) : (
-          filteredLetters.map((letter) => (
-            <div
-              key={letter.id}
-              role="button"
-              className="cursor-pointer"
-              onClick={() => navigate(`/letter/${letter.id}`)}
-            >
-              <LetterCard
-                viewMode={viewMode}
-                excerpt={letter.excerpt}
-                isLiked={letter.isLiked}
-                receivedAt={letter.receivedAt}
-                from={letter.from}
-              />
-            </div>
-          ))
-        )}
       </div>
     </>
   );

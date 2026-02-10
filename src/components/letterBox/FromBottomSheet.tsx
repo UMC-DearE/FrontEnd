@@ -1,24 +1,88 @@
-// 편지함 From 모달
-
+import { useEffect, useMemo, useState } from 'react';
 import type { LetterFrom } from '@/types/letter';
 
+type GetFomsResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    froms: Array<{
+      fromId: number;
+      name: string;
+      bgColor: string;
+      fontColor: string;
+      letterCount: number;
+    }>;
+  };
+};
+
 export type FromBottomSheetProps = {
-  froms: LetterFrom[];
-  totalCount: number;
-  fromCounts: Record<number, number>;
   selectedId: number | 'all';
   onSelect: (fromId: number | 'all') => void;
   onClose: () => void;
 };
 
-export default function FromBottomSheet({
-  froms,
-  totalCount,
-  fromCounts,
-  selectedId,
-  onSelect,
-  onClose,
-}: FromBottomSheetProps) {
+export default function FromBottomSheet({ selectedId, onSelect, onClose }: FromBottomSheetProps) {
+  const [items, setItems] = useState<GetFomsResponse['data']['froms']>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        setIsLoading(true);
+        setHasError(false);
+
+        const res = await fetch('/foms', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+        });
+
+        if (!res.ok) throw new Error(`GET /foms failed: ${res.status}`);
+
+        const json = (await res.json()) as GetFomsResponse;
+        if (!json.success) throw new Error(json.message);
+
+        if (mounted) setItems(json.data.froms ?? []);
+      } catch {
+        if (mounted) setHasError(true);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const froms: LetterFrom[] = useMemo(
+    () =>
+      items.map((v) => ({
+        fromId: v.fromId,
+        name: v.name,
+        bgColor: v.bgColor,
+        fontColor: v.fontColor,
+      })),
+    [items]
+  );
+
+  const fromCounts = useMemo(() => {
+    const map: Record<number, number> = {};
+    for (const v of items) map[v.fromId] = v.letterCount ?? 0;
+    return map;
+  }, [items]);
+
+  const totalCount = useMemo(
+    () => items.reduce((acc, v) => acc + (v.letterCount ?? 0), 0),
+    [items]
+  );
+
+  if (isLoading || hasError) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="relative w-[393px] min-h-screen overflow-hidden">

@@ -22,3 +22,18 @@ export interface FromListResponse {
     froms: From[];
   };
 }
+
+export type GetFromsResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    froms: Array<{
+      fromId: number;
+      name: string;
+      bgColor: string;
+      fontColor: string;
+      letterCount: number;
+    }>;
+  };
+};
