@@ -1,10 +1,10 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import FolderList from '@/components/letterBox/letterFolder/FolderList';
 import FolderSettingSheet from '@/components/letterBox/letterFolder/FolderSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import FolderModal from '@/components/letterBox/letterFolder/FolderModal';
 import type { Folder } from '@/types/folder';
-import type { Letter } from '@/types/letter';
+import type { Letter, LetterFrom } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
 import { useNavigate } from 'react-router-dom';
@@ -15,20 +15,21 @@ import {
   updateFolder,
   updateFolderOrders,
 } from '@/api/folder';
+import { uploadImage } from '@/api/image';
+import { refreshAccessToken } from '@/api/http';
 import { getLetterLists } from '@/api/letter';
-import LetterBoxHeader from '@/components/header/LetterBoxHeader';
-import SearchButton from '@/components/common/header/SearchButton';
-import SearchBar from '@/components/letterBox/SearchBar';
-import type { From } from '@/types/from';
-import { uploadImage as uploadImageApi } from '@/api/upload';
-import { getFromList } from '@/api/from';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
 
-export default function LetterBoxPage() {
+type LetterBoxProps = {
+  keyword: string;
+};
+
+export default function LetterBox({ keyword }: LetterBoxProps) {
   const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>('all');
   const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
+  const [debouncedKeyword, setDebouncedKeyword] = useState('');
   const navigate = useNavigate();
 
   const [viewMode, setViewMode] = useState<ViewMode>('기본 보기');
@@ -48,24 +49,19 @@ export default function LetterBoxPage() {
   const [size] = useState(20);
   const [isLettersLoading, setIsLettersLoading] = useState(false);
 
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [query, setQuery] = useState('');
-  const searchWrapRef = useRef<HTMLDivElement | null>(null);
-
-  const [allFroms, setAllFroms] = useState<From[]>([]);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedKeyword(keyword.trim()), 300);
+    return () => clearTimeout(t);
+  }, [keyword]);
 
   useEffect(() => {
     const run = async () => {
-      const [folderData, fromData] = await Promise.all([getFolderList(), getFromList()]);
+      try {
+        await refreshAccessToken();
+      } catch {
+        return;
+      }
 
-      setFolders([...folderData].sort((a, b) => a.folderOrder - b.folderOrder));
-      setAllFroms(fromData);
-    };
-    void run();
-  }, []);
-
-  useEffect(() => {
-    const run = async () => {
       const data = await getFolderList();
       setFolders([...data].sort((a, b) => a.folderOrder - b.folderOrder));
     };
@@ -74,13 +70,20 @@ export default function LetterBoxPage() {
 
   useEffect(() => {
     setPage(0);
-  }, [selectedFolderId, selectedFromId]);
+  }, [selectedFolderId, selectedFromId, debouncedKeyword]);
 
   useEffect(() => {
     const run = async () => {
+      try {
+        await refreshAccessToken();
+      } catch {
+        return;
+      }
+
       const folderId = typeof selectedFolderId === 'number' ? selectedFolderId : undefined;
       const isLiked = selectedFolderId === 'like' ? true : undefined;
       const fromId = selectedFromId === 'all' ? undefined : selectedFromId;
+      const keywordParam = debouncedKeyword.length > 0 ? debouncedKeyword : undefined;
 
       setIsLettersLoading(true);
       try {
@@ -91,39 +94,18 @@ export default function LetterBoxPage() {
           folderId,
           fromId,
           isLiked,
+          keyword: keywordParam,
         });
 
-        setLetters(res.data.data.content ?? []);
-        setTotalElements(res.data.data.totalElements ?? 0);
+        setLetters(res.data.content ?? []);
+        setTotalElements(res.data.totalElements ?? 0);
       } finally {
         setIsLettersLoading(false);
       }
     };
 
     void run();
-  }, [selectedFolderId, selectedFromId, page, size]);
-
-  useEffect(() => {
-    setQuery('');
-    setIsSearchOpen(false);
-  }, [selectedFolderId, selectedFromId]);
-
-  useEffect(() => {
-    if (!isSearchOpen) return;
-
-    const onPointerDown = (e: PointerEvent) => {
-      const el = searchWrapRef.current;
-      if (!el) return;
-
-      if (e.target instanceof Node && !el.contains(e.target)) {
-        setIsSearchOpen(false);
-        setQuery('');
-      }
-    };
-
-    document.addEventListener('pointerdown', onPointerDown);
-    return () => document.removeEventListener('pointerdown', onPointerDown);
-  }, [isSearchOpen]);
+  }, [selectedFolderId, selectedFromId, debouncedKeyword, page, size]);
 
   const editingFolder = useMemo(() => {
     if (editingFolderId == null) return null;
@@ -173,6 +155,12 @@ export default function LetterBoxPage() {
     await updateFolderOrders(next.map((f) => f.id));
   };
 
+  const froms = useMemo(() => {
+    const map = new Map<number, LetterFrom>();
+    for (const l of letters) map.set(l.from.fromId, l.from);
+    return Array.from(map.values());
+  }, [letters]);
+
   const fromCounts = useMemo(() => {
     const counts: Record<number, number> = {};
     for (const l of letters) {
@@ -188,110 +176,28 @@ export default function LetterBoxPage() {
     return totalElements;
   }, [selectedFolderId, totalElements]);
 
-  const filteredLetters = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return letters;
-
-    return letters.filter((l) => {
-      const excerpt = (l.excerpt ?? '').toLowerCase();
-      const fromName = (l.from?.name ?? '').toLowerCase();
-      return excerpt.includes(q) || fromName.includes(q);
-    });
-  }, [letters, query]);
-
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
-        <div className="w-full max-w-[393px]">
-          <LetterBoxHeader
-            title="편지함"
-            left={
-              isSearchOpen ? null : (
-                <h1 className="flex items-center text-xl font-semibold leading-none text-primary">
-                  편지함
-                </h1>
-              )
-            }
-            right={isSearchOpen ? null : <SearchButton onClick={() => setIsSearchOpen(true)} />}
-          />
-        </div>
-      </div>
-
-      {isSearchOpen && (
-        <div ref={searchWrapRef} className="fixed top-[60px] left-1/2 z-50 -translate-x-1/2">
-          <SearchBar
-            value={query}
-            onChange={setQuery}
-            onClose={() => {
-              setQuery('');
-              setIsSearchOpen(false);
-            }}
-          />
-        </div>
-      )}
-      <div className="mt-[105px]">
-        <FolderList
-          folders={folders}
-          selectedId={selectedFolderId}
-          onSelect={(id) => {
-            setSelectedFolderId(id);
-            setSelectedFromId('all');
-          }}
-          onFolderAdd={() => {
-            setEditingFolderId(null);
-            setIsModalOpen(true);
-          }}
-          onOpenFolderSetting={(id) => {
-            setSettingFolderId(id);
-            setIsSettingOpen(true);
-          }}
-          onReorder={(next) => {
-            setFolders(next);
-            void persistOrder(next);
-          }}
-        />
-
-        <div className="flex flex-col gap-[10px] mb-3">
-          <ToolBar
-            totalCount={totalElements}
-            folderTotalCount={folderTotalCount}
-            froms={allFroms}
-            fromCounts={fromCounts}
-            selectedFromId={selectedFromId}
-            onFromSelect={setSelectedFromId}
-            view={viewMode}
-            onViewChange={setViewMode}
-          />
-
-          {isLettersLoading ? (
-            <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
-              불러오는 중...
-            </div>
-          ) : filteredLetters.length === 0 ? (
-            <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
-              {query.trim() ? '검색 결과가 없어요.' : '추가된 편지가 없어요.'}
-            </div>
-          ) : (
-            filteredLetters.map((letter) => (
-              <div
-                key={letter.id}
-                role="button"
-                className="cursor-pointer"
-                onClick={() => navigate(`/letter/${letter.id}`)}
-              >
-                <LetterCard
-                  letterId={letter.id}
-                  viewMode={viewMode}
-                  excerpt={letter.excerpt}
-                  isLiked={letter.isLiked}
-                  receivedAt={letter.receivedAt}
-                  from={letter.from}
-                />
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+      <FolderList
+        folders={folders}
+        selectedId={selectedFolderId}
+        onSelect={(id) => {
+          setSelectedFolderId(id);
+          setSelectedFromId('all');
+        }}
+        onFolderAdd={() => {
+          setEditingFolderId(null);
+          setIsModalOpen(true);
+        }}
+        onOpenFolderSetting={(id) => {
+          setSettingFolderId(id);
+          setIsSettingOpen(true);
+        }}
+        onReorder={(next) => {
+          setFolders(next);
+          void persistOrder(next);
+        }}
+      />
 
       {isModalOpen && (
         <FolderModal
@@ -304,19 +210,9 @@ export default function LetterBoxPage() {
             setEditingFolderId(null);
           }}
           onConfirm={handleConfirmUpsertFolder}
-          uploadImage={async (file) => {
-            const res = await uploadImageApi(file, 'folder');
-            if (!res.success) {
-              throw new Error(res.message || '이미지 업로드 실패');
-            }
-            return {
-              imageId: res.data.imageId,
-              url: res.data.url,
-            };
-          }}
-          onImageDelete={async () => {
-            await handleImageDelete(editingFolderId);
-          }}
+          uploadImage={uploadImage}
+          onImageDelete={() => handleImageDelete(editingFolderId)}
+          currentFolderId={editingFolderId}
         />
       )}
 
@@ -369,6 +265,46 @@ export default function LetterBoxPage() {
           }
         }}
       />
+
+      <div className="flex flex-col gap-[10px] mb-3">
+        <ToolBar
+          totalCount={totalElements}
+          folderTotalCount={folderTotalCount}
+          froms={froms}
+          fromCounts={fromCounts}
+          selectedFromId={selectedFromId}
+          onFromSelect={setSelectedFromId}
+          view={viewMode}
+          onViewChange={setViewMode}
+        />
+
+        {isLettersLoading ? (
+          <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
+            불러오는 중...
+          </div>
+        ) : letters.length === 0 ? (
+          <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
+            추가된 편지가 없어요.
+          </div>
+        ) : (
+          letters.map((letter) => (
+            <div
+              key={letter.id}
+              role="button"
+              className="cursor-pointer"
+              onClick={() => navigate(`/letter/${letter.id}`)}
+            >
+              <LetterCard
+                viewMode={viewMode}
+                excerpt={letter.excerpt}
+                isLiked={letter.isLiked}
+                receivedAt={letter.receivedAt}
+                from={letter.from}
+              />
+            </div>
+          ))
+        )}
+      </div>
     </>
   );
 }

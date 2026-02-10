@@ -30,7 +30,7 @@ export default function LetterCard({
       letterId={letterId}
       content={excerpt}
       isLiked={isLiked}
-      receiveAt={receivedAt}
+      receivedAt={receivedAt}
       fromName={from.name}
       fromBgColor={from.bgColor}
       fromFontColor={from.fontColor}

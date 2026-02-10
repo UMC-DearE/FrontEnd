@@ -9,7 +9,7 @@ type LetterCardDefaultProps = {
   letterId: number;
   content: string;
   isLiked: boolean;
-  receiveAt: string;
+  receivedAt: string;
   fromName: string;
   fromBgColor: string;
   fromFontColor: string;
@@ -19,7 +19,7 @@ export default function LetterCardDefault({
   letterId,
   content,
   isLiked,
-  receiveAt,
+  receivedAt,
   fromName,
   fromBgColor,
   fromFontColor,
@@ -51,14 +51,12 @@ export default function LetterCardDefault({
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full shadow-[0_0_4px_0_rgba(217,217,217,0.5)] rounded-lg">
       <div
-        className={`rounded-lg bg-white px-3 py-3 ${
-          isTwoLine ? 'h-[121px]' : 'h-[100px]'
-        } flex flex-col`}
+        className={`rounded-lg bg-white px-3 py-3 ${isTwoLine ? 'h-[121px]' : 'h-[100px]'} flex flex-col`}
       >
         <div className="flex justify-between">
-          <div className="text-[#C2C4C7] font-medium text-[12px]">{receiveAt}</div>
+          <div className="text-[#C2C4C7] font-medium text-[12px]">{receivedAt}</div>
           <button
             type="button"
             onClick={(e: MouseEvent<HTMLButtonElement>) => {
