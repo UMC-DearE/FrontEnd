@@ -3,7 +3,6 @@ import { createBrowserRouter } from "react-router-dom";
 import { BaseLayout } from "@/layouts/BaseLayout";
 import { AppLayout } from "@/layouts/AppLayout";
 import NotFoundPage from "@/pages/NotFoundPage";
-import ProtectedRoute from "./ProtectedRoute";
 
 import LoginPage from "@/pages/onboarding/LoginPage";
 import OAuthCallbackPage from "@/pages/onboarding/OAuthCallbackPage";
@@ -32,6 +31,7 @@ import ThemePage from "@/pages/my/ThemePage";
 import MyTermsPage from "@/pages/my/TermsPage";
 import PrivacyPage from "@/pages/my/PrivacyPage";
 import EditLetterPage from "@/pages/letter/EditLetterPage";
+import AuthGuard from "@/routes/AuthGuard";
 
 const router = createBrowserRouter([
   {
@@ -43,22 +43,22 @@ const router = createBrowserRouter([
         children: [
           { path: "login", element: <LoginPage /> },
           { path: "auth/oauth2/:provider/callback", element: <OAuthCallbackPage /> },
+
+          {
+            path: "auth",
+            children: [
+              { path: "terms", element: <TermsPage /> },
+              { path: "signup", element: <SetNickamePage /> },
+            ],
+          },
         ],
       },
       {
-        element: <ProtectedRoute />,
+        element: <AuthGuard />,
         children: [
           {
             element: <AppLayout />,
             children: [
-              {
-                path: "auth",
-                children: [
-                  { path: "terms", element: <TermsPage /> },
-                  { path: "signup", element: <SetNickamePage /> },
-                ],
-              },
-
               { index: true, element: <HomePage /> },
 
               {

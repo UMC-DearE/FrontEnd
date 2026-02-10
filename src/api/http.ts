@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/stores/authStore";
 import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 
 export const api = axios.create({
@@ -42,11 +43,16 @@ api.interceptors.response.use(
     // 조건 정리
     const is401 = error.response?.status === 401;
     const isRefreshRequest = originalRequest?.url?.includes("/auth/jwt/refresh");
+    const authStatus = useAuthStore.getState().authStatus;
+
+    if (authStatus !== "authenticated" && authStatus !== "checking") {
+      return Promise.reject(error);
+    }
 
     if (!is401 || !originalRequest || originalRequest._retry || isRefreshRequest) {
       return Promise.reject(error);
     }
-
+    
     originalRequest._retry = true;
 
     
