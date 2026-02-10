@@ -10,7 +10,7 @@ import type { AppLayoutContext } from '@/layouts/AppLayout';
 import { updateLetterPinned, getRandomLetter } from '@/api/letter';
 import { uploadImage } from '@/api/image';
 import { getHome, updateHomeColor } from '@/api/home';
-import { createSticker, updateSticker } from '@/api/sticker';
+import { createSticker, updateSticker, deleteSticker } from '@/api/sticker';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -55,6 +55,8 @@ export default function HomePage() {
 
   const enabled = openSheet;
   const stickers = openSheet ? draftStickers : savedStickers;
+
+  const initialStickerIdsRef = useRef<string[]>([]);
 
   useEffect(() => {
     let mounted = true;
@@ -152,6 +154,7 @@ export default function HomePage() {
   };
 
   const openEditor = () => {
+    initialStickerIdsRef.current = savedStickers.map((s) => s.id);
     setDraftStickers(cloneStickers(savedStickers));
     setSelectedId(null);
     setOpenSheet(true);
@@ -211,6 +214,11 @@ export default function HomePage() {
   };
 
   const persistStickersOnComplete = async (draft: StickerItem[]) => {
+    const draftIds = new Set(draft.map((s) => s.id));
+    const toDelete = initialStickerIdsRef.current.filter((id) => !draftIds.has(id));
+
+    await Promise.all(toDelete.map((id) => deleteSticker(Number(id))));
+
     const existing = draft.filter((s) => !isTempStickerId(s.id));
     const temps = draft.filter((s) => isTempStickerId(s.id));
 
@@ -281,7 +289,7 @@ export default function HomePage() {
 
       <ProfileCard
         nickname="키르"
-        bio="안녕하세요 잘 부탁합니다 ദ്ദി^ᴗ ̫ ᴗ^₎"
+        bio="안녕하세요 잘 부탁합니다 ദ്ദi^ᴗ ̫ ᴗ^₎"
         onClickSettings={openEditor}
       />
 
