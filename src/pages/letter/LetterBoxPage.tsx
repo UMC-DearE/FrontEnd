@@ -44,6 +44,7 @@ export default function LetterBoxPage() {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [totalElements, setTotalElements] = useState(0);
+  const [allCount, setAllCount] = useState(0);
   const [page, setPage] = useState(0);
   const [size] = useState(20);
   const [isLettersLoading, setIsLettersLoading] = useState(false);
@@ -57,7 +58,6 @@ export default function LetterBoxPage() {
   useEffect(() => {
     const run = async () => {
       const [folderData, fromData] = await Promise.all([getFolderList(), getFromList()]);
-
       setFolders([...folderData].sort((a, b) => a.folderOrder - b.folderOrder));
       setAllFroms(fromData);
     };
@@ -66,11 +66,27 @@ export default function LetterBoxPage() {
 
   useEffect(() => {
     const run = async () => {
-      const data = await getFolderList();
-      setFolders([...data].sort((a, b) => a.folderOrder - b.folderOrder));
+      const folderId = typeof selectedFolderId === 'number' ? selectedFolderId : undefined;
+      const isLiked = selectedFolderId === 'like' ? true : undefined;
+
+      try {
+        const res = await getLetterLists({
+          page: 0,
+          size: 1,
+          sort: 'receivedAt,desc',
+          folderId,
+          isLiked,
+        });
+
+        setAllCount(res.data.data.totalElements ?? 0);
+      } catch (e) {
+        setAllCount(0);
+        console.log(e);
+      }
     };
+
     void run();
-  }, []);
+  }, [selectedFolderId]);
 
   useEffect(() => {
     setPage(0);
@@ -157,10 +173,7 @@ export default function LetterBoxPage() {
       const folder = folders.find((f) => f.id === folderId);
       if (!folder) return;
 
-      await updateFolder(folderId, {
-        name: folder.name,
-        imageId: null,
-      });
+      await updateFolder(folderId, { name: folder.name, imageId: null });
 
       const next = await getFolderList();
       setFolders([...next].sort((a, b) => a.folderOrder - b.folderOrder));
@@ -182,11 +195,7 @@ export default function LetterBoxPage() {
     return counts;
   }, [letters]);
 
-  const folderTotalCount = useMemo(() => {
-    if (selectedFolderId === 'all') return totalElements;
-    if (selectedFolderId === 'like') return totalElements;
-    return totalElements;
-  }, [selectedFolderId, totalElements]);
+  const folderTotalCount = useMemo(() => totalElements, [totalElements]);
 
   const filteredLetters = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -198,6 +207,12 @@ export default function LetterBoxPage() {
       return excerpt.includes(q) || fromName.includes(q);
     });
   }, [letters, query]);
+
+  const emptyMessage = useMemo(() => {
+    if (query.trim()) return '검색 결과가 없어요.';
+    if (selectedFromId !== 'all') return '필터링 결과가 없어요.';
+    return '추가된 편지가 없어요.';
+  }, [query, selectedFromId]);
 
   return (
     <>
@@ -229,6 +244,7 @@ export default function LetterBoxPage() {
           />
         </div>
       )}
+
       <div className="mt-[105px]">
         <FolderList
           folders={folders}
@@ -253,8 +269,8 @@ export default function LetterBoxPage() {
 
         <div className="flex flex-col gap-[10px] mb-3">
           <ToolBar
-            totalCount={totalElements}
             folderTotalCount={folderTotalCount}
+            allCount={allCount}
             froms={allFroms}
             fromCounts={fromCounts}
             selectedFromId={selectedFromId}
@@ -269,7 +285,7 @@ export default function LetterBoxPage() {
             </div>
           ) : filteredLetters.length === 0 ? (
             <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
-              {query.trim() ? '검색 결과가 없어요.' : '추가된 편지가 없어요.'}
+              {emptyMessage}
             </div>
           ) : (
             filteredLetters.map((letter) => (
@@ -309,10 +325,7 @@ export default function LetterBoxPage() {
             if (!res.success) {
               throw new Error(res.message || '이미지 업로드 실패');
             }
-            return {
-              imageId: res.data.imageId,
-              url: res.data.url,
-            };
+            return { imageId: res.data.imageId, url: res.data.url };
           }}
           onImageDelete={async () => {
             await handleImageDelete(editingFolderId);
