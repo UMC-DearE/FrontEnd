@@ -229,7 +229,7 @@ export default function LetterBoxPage() {
           />
         </div>
       )}
-      <div className="absolute top-[125px]">
+      <div className="mt-[105px]">
         <FolderList
           folders={folders}
           selectedId={selectedFolderId}
