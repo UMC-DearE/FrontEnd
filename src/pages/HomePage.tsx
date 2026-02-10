@@ -28,14 +28,6 @@ const fitToMaxSide = (w: number, h: number, maxSide: number) => {
   return { w: Math.round(w * r), h: Math.round(h * r) };
 };
 
-const getToday = () => {
-  const now = new Date();
-  const month = now.toLocaleString('en-US', { month: 'short' });
-  const day = now.getDate();
-  const dayOfWeek = now.toLocaleString('ko-KR', { weekday: 'short' });
-  return { month, day, dayOfWeek };
-};
-
 const cloneStickers = (arr: StickerItem[]) => arr.map((s) => ({ ...s }));
 const isTempStickerId = (id: string) => id.startsWith('tmp-');
 
@@ -86,16 +78,15 @@ export default function HomePage() {
       .then((response: RandomLetterApiResponse) => {
         if (!mounted) return;
 
-        const today = getToday();
         const data = response.data;
 
         if (!data.hasLetter) {
           setLetter({
             id: 0,
             excerpt: '',
-            month: today.month,
-            day: today.day,
-            dayOfWeek: today.dayOfWeek,
+            month: data.date.month,
+            day: data.date.day,
+            dayOfWeek: data.date.dayOfWeek,
           });
           setPinnedLetterId(null);
           return;
@@ -161,8 +152,8 @@ export default function HomePage() {
 
   const handlePin = async (letterId: number) => {
     try {
-      const pinned = await updateLetterPinned(letterId, true);
-      setPinnedLetterId(pinned ? letterId : null);
+      await updateLetterPinned(letterId, true);
+      setPinnedLetterId(letterId);
     } catch (error) {
       console.error(error);
     }
@@ -175,9 +166,34 @@ export default function HomePage() {
     if (pendingUnpinId === null) return;
 
     try {
-      const pinned = await updateLetterPinned(pendingUnpinId, false);
-      setPinnedLetterId(pinned ? pendingUnpinId : null);
+      await updateLetterPinned(pendingUnpinId, false);
       setPendingUnpinId(null);
+
+      const response = (await getRandomLetter()) as RandomLetterApiResponse;
+      const data = response.data;
+
+      if (!data.hasLetter) {
+        setLetter({
+          id: 0,
+          excerpt: '',
+          month: data.date.month,
+          day: data.date.day,
+          dayOfWeek: data.date.dayOfWeek,
+        });
+        setPinnedLetterId(null);
+        return;
+      }
+
+      const next: HomeCardLetter = {
+        id: data.letterId,
+        excerpt: data.randomPhrase,
+        month: data.date.month,
+        day: data.date.day,
+        dayOfWeek: data.date.dayOfWeek,
+      };
+
+      setLetter(next);
+      setPinnedLetterId(data.isPinned ? data.letterId : null);
     } catch (error) {
       console.error(error);
     }
