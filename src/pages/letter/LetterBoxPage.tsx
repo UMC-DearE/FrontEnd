@@ -15,12 +15,16 @@ import {
   updateFolder,
   updateFolderOrders,
 } from '@/api/folder';
+<<<<<<< HEAD
 import { uploadImage } from '@/api/image';
 import { refreshAccessToken } from '@/api/http';
 import { getLetterLists } from '@/api/letter';
 import LetterBoxHeader from '@/components/header/LetterBoxHeader';
 import SearchButton from '@/components/common/header/SearchButton';
 import SearchBar from '@/components/letterBox/SearchBar';
+=======
+import { uploadImage as uploadImageApi } from '@/api/upload';
+>>>>>>> origin/develop
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
@@ -53,12 +57,6 @@ export default function LetterBox() {
 
   useEffect(() => {
     const run = async () => {
-      try {
-        await refreshAccessToken();
-      } catch {
-        return;
-      }
-
       const data = await getFolderList();
       setFolders([...data].sort((a, b) => a.folderOrder - b.folderOrder));
     };
@@ -314,9 +312,16 @@ export default function LetterBox() {
             setEditingFolderId(null);
           }}
           onConfirm={handleConfirmUpsertFolder}
-          uploadImage={uploadImage}
-          onImageDelete={() => handleImageDelete(editingFolderId)}
-          currentFolderId={editingFolderId}
+          uploadImage={async (file) => {
+            const res = await uploadImageApi(file, "folder");
+            if (!res.success) {
+              throw new Error(res.message || "이미지 업로드 실패");
+            }
+            return {
+              imageId: res.data.imageId,
+              url: res.data.url,
+            };
+          }}
         />
       )}
 

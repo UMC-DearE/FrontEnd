@@ -2,23 +2,23 @@
 
 interface FromBadgeProps {
   name: string;
-  backgroundColor: string;
-  textColor: string;
+  bgColor: string;
+  fontColor: string;
   size?: 'sm' | 'md';
 }
 
 export function FromBadge({
   name,
-  backgroundColor,
-  textColor,
+  bgColor,
+  fontColor,
   size = 'md',
 }: FromBadgeProps) {
   const outerClass = size === 'sm' ? 'inline-flex h-[20px] px-[8px] rounded-[6px]' : 'inline-flex h-[24px] px-[11px] rounded-[6px]';
   const textClass = size === 'sm' ? 'flex items-center text-[12px] font-medium' : 'flex items-center text-[14px] font-medium';
 
   return (
-    <span data-from-badge className={outerClass} style={{ backgroundColor }}>
-      <span data-from-badge-text className={textClass} style={{ color: textColor }}>
+    <span data-from-badge className={outerClass} style={{ backgroundColor: bgColor }}>
+      <span data-from-badge-text className={textClass} style={{ color: fontColor }}>
         {name}
       </span>
     </span>

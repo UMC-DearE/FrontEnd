@@ -1,7 +1,5 @@
-/**
- * - 오른쪽에 rightElement를 넣을 수 있는 입력 필드
- * - rightElement의 width에 따라 paddingRight 자동 조정
- */
+// 오른쪽에 rightElement를 넣을 수 있는 입력 필드
+// rightElement의 width에 따라 paddingRight 자동 조정
 
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";

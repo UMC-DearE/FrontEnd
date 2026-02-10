@@ -1,3 +1,5 @@
+import type { CommonResponse } from "./common";
+
 export type Folder = {
   id: number;
   name: string;
@@ -24,3 +26,6 @@ export type UpdateFolderRequest = {
   name: string;
   imageId: number | null;
 };
+
+export type FolderLetterResponse = CommonResponse<Record<string, never>>;
+

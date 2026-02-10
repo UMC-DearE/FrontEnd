@@ -1,14 +1,17 @@
 import type { CreateFrom } from "./from";
-import type { AiAnalyzeResult } from "./letter";
+import type { AnalyzeLetterResponse } from "./create";
 
 export interface LetterFormProps {
   mode: "create" | "edit";
   content: string;
-  aiResult: AiAnalyzeResult;
+  aiResult: AnalyzeLetterResponse;
   from?: CreateFrom;
 
   initialDate?: string;
   initialUnknownDate?: boolean;
+
+  onDateChange?: (value: string) => void;
+  onUnknownDateChange?: (value: boolean) => void;
 
   onSelectRecipient?: () => void;
   onSubmit: (payload: {

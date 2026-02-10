@@ -1,15 +1,33 @@
-import type { GetFromsResponse } from '@/types/from';
+import { api } from './http';
+import type {
+  FromListResponse,
+  From,
+  CreateFromRequest,
+  CreateFromResponse,
+  UpdateFromRequest,
+  UpdateFromResponse,
+  DeleteFromResponse,
+} from '@/types/from';
 
-export async function getFroms(): Promise<GetFromsResponse> {
-  const res = await fetch('/froms', {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    cache: 'no-store',
-  });
+export const getFromList = async (): Promise<From[]> => {
+  const { data } = await api.get<FromListResponse>('/froms');
+  return data.data.froms;
+};
 
-  if (!res.ok) {
-    throw new Error(`GET /froms failed: ${res.status}`);
-  }
+export const createFrom = async (payload: CreateFromRequest): Promise<CreateFromResponse> => {
+  const { data } = await api.post<CreateFromResponse>('/froms', payload);
+  return data;
+};
 
-  return (await res.json()) as GetFromsResponse;
-}
+export const updateFrom = async (
+  fromId: number,
+  payload: UpdateFromRequest
+): Promise<UpdateFromResponse> => {
+  const { data } = await api.patch<UpdateFromResponse>(`/froms/${fromId}`, payload);
+  return data;
+};
+
+export const deleteFrom = async (fromId: number): Promise<DeleteFromResponse> => {
+  const { data } = await api.delete<DeleteFromResponse>(`/froms/${fromId}`);
+  return data;
+};

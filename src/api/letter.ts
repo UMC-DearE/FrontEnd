@@ -1,52 +1,52 @@
-import { api } from '@/api/http';
-import type { LetterListPage } from '@/types/letter';
+import { api } from './http';
+import type {
+  LetterDetailResponse,
+  LetterLikeResponse,
+  DeleteLetterResponse,
+  DeleteLetterReplyResponse,
+  PatchLetterReplyRequest,
+  PatchLetterReplyResponse,
+  PatchLetterRequest,
+  PatchLetterResponse,
+} from '@/types/letter';
 
-type ApiResponse<T> = {
-  success: boolean;
-  code: string;
-  message: string;
-  data: T;
+export const getLetterDetail = async (letterId: number): Promise<LetterDetailResponse> => {
+  const { data } = await api.get<LetterDetailResponse>(`/letters/${letterId}`);
+  return data;
 };
 
-// 랜덤 편지 고정
-type UpdatePinnedResponse = ApiResponse<{ pinned: boolean }>;
-
-export async function updateLetterPinned(letterId: number, pinned: boolean) {
-  const res = await api.patch<UpdatePinnedResponse>(`/letters/${letterId}/pin`, { pinned });
-  return res.data.data.pinned;
-}
-
-// 랜덤 편지
-type RandomLetterResponse = ApiResponse<{
-  hasLetter: boolean;
-  date: {
-    fullDate: string;
-    month: string;
-    day: number;
-    dayOfWeek: string;
-  };
-  letterId: number;
-  randomPhrase: string;
-  isPinned: boolean;
-}>;
-
-export async function getRandomLetter() {
-  const res = await api.get<RandomLetterResponse>('/letters/random');
-  return res.data.data;
-}
-
-// 편지함 편지 목록
-export type GetLetterListsParams = {
-  page: number;
-  size: number;
-  sort?: string | string[];
-  folderId?: number;
-  fromId?: number;
-  isLiked?: boolean;
-  keyword?: string;
+export const patchLetter = async (
+  letterId: number,
+  payload: PatchLetterRequest
+): Promise<PatchLetterResponse> => {
+  const { data } = await api.patch<PatchLetterResponse>(`/letters/${letterId}`, payload);
+  return data;
 };
 
-export const getLetterLists = async (params: GetLetterListsParams) => {
-  const res = await api.get<ApiResponse<LetterListPage>>('/letters', { params });
-  return res.data;
+export const likeLetter = async (letterId: number): Promise<LetterLikeResponse> => {
+  const { data } = await api.put<LetterLikeResponse>(`/letters/${letterId}/like`);
+  return data;
+};
+
+export const unlikeLetter = async (letterId: number): Promise<LetterLikeResponse> => {
+  const { data } = await api.delete<LetterLikeResponse>(`/letters/${letterId}/like`);
+  return data;
+};
+
+export const patchLetterReply = async (
+  letterId: number,
+  payload: PatchLetterReplyRequest
+): Promise<PatchLetterReplyResponse> => {
+  const { data } = await api.patch<PatchLetterReplyResponse>(`/letters/${letterId}/reply`, payload);
+  return data;
+};
+
+export const deleteLetterReply = async (letterId: number): Promise<DeleteLetterReplyResponse> => {
+  const { data } = await api.delete<DeleteLetterReplyResponse>(`/letters/${letterId}/reply`);
+  return data;
+};
+
+export const deleteLetter = async (letterId: number): Promise<DeleteLetterResponse> => {
+  const { data } = await api.delete<DeleteLetterResponse>(`/letters/${letterId}`);
+  return data;
 };
