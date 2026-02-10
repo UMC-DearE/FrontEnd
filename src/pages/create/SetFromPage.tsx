@@ -16,11 +16,15 @@ type FromItem = From;
 type SetFromPageState =
   | (CreateResultPayload & {
       selectedFromDraft?: CreateFrom;
+      date?: string;
+      unknownDate?: boolean;
     })
   | {
       mode: 'edit';
       letterId: string;
       selectedFromDraft?: CreateFrom;
+      date?: string;
+      unknownDate?: boolean;
     }
   | null;
 
@@ -46,6 +50,7 @@ export default function SetFromPage() {
       navigate(`/letter/${state.letterId}/edit`, {
         replace: true,
         state: {
+          ...state,
           selectedFromDraft: draft,
         },
       });

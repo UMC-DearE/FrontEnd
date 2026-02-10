@@ -11,6 +11,8 @@ type LocationState =
   | (CreateResultPayload & {
       selectedFromDraft?: CreateFrom;
       imageIds?: number[];
+      date?: string;
+      unknownDate?: boolean;
     })
   | null;
 
@@ -23,6 +25,10 @@ export default function CreateDetailPage() {
     state?.selectedFromDraft
   );
   const [content, setContent] = useState<string>(state?.content ?? "");
+  const [date, setDate] = useState<string>(state?.date ?? "");
+  const [unknownDate, setUnknownDate] = useState<boolean>(
+    state?.unknownDate ?? false
+  );
   const toast = useToast();
 
   useEffect(() => {
@@ -43,6 +49,10 @@ export default function CreateDetailPage() {
       content={content}
       aiResult={state.aiResult}
       from={fromDraft}
+      initialDate={date}
+      initialUnknownDate={unknownDate}
+      onDateChange={setDate}
+      onUnknownDateChange={setUnknownDate}
       onContentChange={(v) => setContent(v)}
       // 사용자가 content 수정하면 state가 갱신됨, 최종 content는 사용자가 수정한 값
       onSelectRecipient={() =>
@@ -50,6 +60,8 @@ export default function CreateDetailPage() {
           state: {
             ...(state ?? {}),
             selectedFromDraft: fromDraft,
+            date,
+            unknownDate,
           },
         })
       }

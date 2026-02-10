@@ -9,6 +9,8 @@ import { createFrom } from "@/api/from";
 
 type EditPageLocationState = {
   selectedFromDraft?: CreateFrom;
+  date?: string;
+  unknownDate?: boolean;
 } | null;
 
 export default function EditLetterPage() {
@@ -25,6 +27,10 @@ export default function EditLetterPage() {
   // 실제로 LetterForm에 내려줄 from (초기값 + 수정 반영용)
   const [fromDraft, setFromDraft] = useState<CreateFrom | undefined>(undefined);
   const [content, setContent] = useState<string>("");
+  const [date, setDate] = useState<string>(locationState?.date ?? "");
+  const [unknownDate, setUnknownDate] = useState<boolean>(
+    locationState?.unknownDate ?? false
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -43,7 +49,7 @@ export default function EditLetterPage() {
         setData(res.data);
         setContent(res.data.content ?? "");
 
-        // 최초 진입 시 기본 from 세팅
+        // 최초 진입 시 기본 from / 날짜 세팅
         setFromDraft((prev: CreateFrom | undefined) => {
           if (prev) return prev;
 
@@ -56,12 +62,36 @@ export default function EditLetterPage() {
 
           return draft;
         });
-      } catch {
-        setError("편지 수정 정보를 불러오지 못했어요.");
-      } finally {
-        if (mounted) setLoading(false);
-      }
+
+        if (locationState?.date === undefined && locationState?.unknownDate === undefined) {
+          const v = res.data.receivedAt;
+          setUnknownDate(!v);
+
+          // 날짜 포맷 통일(YYYY-MM-DD) - 기존값 세팅
+          if (!v) {
+            setDate("");
+          } else if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+            setDate(v);
+          } else if (/^\d{4}\.\d{2}\.\d{2}$/.test(v)) {
+            setDate(v.replace(/\./g, "-"));
+          } else {
+            const d = new Date(v);
+            if (!Number.isNaN(d.getTime())) {
+              const y = d.getFullYear();
+              const m = String(d.getMonth() + 1).padStart(2, "0");
+              const day = String(d.getDate()).padStart(2, "0");
+              setDate(`${y}-${m}-${day}`);
+            } else {
+              setDate("");
+            }
+          }
+        }
+    } catch {
+      setError("편지 수정 정보를 불러오지 못했어요.");
+    } finally {
+      if (mounted) setLoading(false);
     }
+  }
 
     load();
     return () => {
@@ -79,7 +109,6 @@ export default function EditLetterPage() {
   if (error) return <div className="p-4 text-red-500">{error}</div>;
   if (!data || !fromDraft) return null;
 
-
   return (
     <LetterForm
       mode="edit"
@@ -89,8 +118,10 @@ export default function EditLetterPage() {
         emotions: data.emotionTags ?? [],
       }}
       from={fromDraft}
-      initialDate={data.receivedAt ?? ""}
-      initialUnknownDate={false}
+      initialDate={date}
+      initialUnknownDate={unknownDate}
+      onDateChange={setDate}
+      onUnknownDateChange={setUnknownDate}
       onContentChange={(v) => setContent(v)}
       onSelectRecipient={() =>
         navigate("/create/from", {
@@ -98,6 +129,8 @@ export default function EditLetterPage() {
             mode: "edit",
             letterId: id,
             selectedFromDraft: fromDraft,
+            date,
+            unknownDate,
           },
         })
       }

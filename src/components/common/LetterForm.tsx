@@ -21,6 +21,8 @@ export default function LetterForm({
   initialDate = "",
   initialUnknownDate = false,
   onSelectRecipient,
+  onDateChange,
+  onUnknownDateChange,
   onSubmit,
   onContentChange,
 }: LetterFormProps) {
@@ -52,6 +54,15 @@ export default function LetterForm({
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onContentChange?.(e.target.value);
   };
+
+  // initialDate / initialUnknownDate가 바뀌면 내부 상태도 맞춰줌
+  useEffect(() => {
+    setDate(initialDate);
+  }, [initialDate]);
+
+  useEffect(() => {
+    setUnknownDate(initialUnknownDate);
+  }, [initialUnknownDate]);
 
   useEffect(() => {
     setFixedAction({
@@ -142,7 +153,11 @@ export default function LetterForm({
           <input
             type="date"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={(e) => {
+              const next = e.target.value;
+              setDate(next);
+              onDateChange?.(next);
+            }}
             disabled={unknownDate}
             className={`
               flex-1 h-[45px]
@@ -161,7 +176,11 @@ export default function LetterForm({
               onChange={(e) => {
                 const checked = e.target.checked;
                 setUnknownDate(checked);
-                if (checked) setDate("");
+                onUnknownDateChange?.(checked);
+                if (checked) {
+                  setDate("");
+                  onDateChange?.("");
+                }
               }}
               className="checkbox-accent checkbox-custom"
             />
