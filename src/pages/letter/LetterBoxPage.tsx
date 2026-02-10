@@ -1,11 +1,10 @@
 import { useMemo, useState, useEffect } from 'react';
-import { MOCK_LETTERS } from '@/mocks/mockLetter';
 import FolderList from '@/components/letterBox/letterFolder/FolderList';
 import FolderSettingSheet from '@/components/letterBox/letterFolder/FolderSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import FolderModal from '@/components/letterBox/letterFolder/FolderModal';
 import type { Folder } from '@/types/folder';
-import type { Letter } from '@/types/letter';
+import type { Letter, LetterFrom } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +17,7 @@ import {
 } from '@/api/folder';
 import { uploadImage } from '@/api/image';
 import { refreshAccessToken } from '@/api/http';
+import { getLetterLists } from '@/api/letter';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
@@ -39,10 +39,10 @@ export default function LetterBox() {
 
   const [folders, setFolders] = useState<Folder[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
-
-  useEffect(() => {
-    setLetters(MOCK_LETTERS);
-  }, []);
+  const [totalElements, setTotalElements] = useState(0);
+  const [page, setPage] = useState(0);
+  const [size] = useState(20);
+  const [isLettersLoading, setIsLettersLoading] = useState(false);
 
   useEffect(() => {
     const run = async () => {
@@ -57,6 +57,43 @@ export default function LetterBox() {
     };
     void run();
   }, []);
+
+  useEffect(() => {
+    setPage(0);
+  }, [selectedFolderId, selectedFromId]);
+
+  useEffect(() => {
+    const run = async () => {
+      try {
+        await refreshAccessToken();
+      } catch {
+        return;
+      }
+
+      const folderId = typeof selectedFolderId === 'number' ? selectedFolderId : undefined;
+      const isLiked = selectedFolderId === 'like' ? true : undefined;
+      const fromId = selectedFromId === 'all' ? undefined : selectedFromId;
+
+      setIsLettersLoading(true);
+      try {
+        const res = await getLetterLists({
+          page,
+          size,
+          sort: 'receivedAt,desc',
+          folderId,
+          fromId,
+          isLiked,
+        });
+
+        setLetters(res.data.content ?? []);
+        setTotalElements(res.data.totalElements ?? 0);
+      } finally {
+        setIsLettersLoading(false);
+      }
+    };
+
+    void run();
+  }, [selectedFolderId, selectedFromId, page, size]);
 
   const editingFolder = useMemo(() => {
     if (editingFolderId == null) return null;
@@ -105,6 +142,27 @@ export default function LetterBox() {
   const persistOrder = async (next: Folder[]) => {
     await updateFolderOrders(next.map((f) => f.id));
   };
+
+  const froms = useMemo(() => {
+    const map = new Map<number, LetterFrom>();
+    for (const l of letters) map.set(l.from.fromId, l.from);
+    return Array.from(map.values());
+  }, [letters]);
+
+  const fromCounts = useMemo(() => {
+    const counts: Record<number, number> = {};
+    for (const l of letters) {
+      const id = l.from.fromId;
+      counts[id] = (counts[id] ?? 0) + 1;
+    }
+    return counts;
+  }, [letters]);
+
+  const folderTotalCount = useMemo(() => {
+    if (selectedFolderId === 'all') return totalElements;
+    if (selectedFolderId === 'like') return totalElements;
+    return totalElements;
+  }, [selectedFolderId, totalElements]);
 
   return (
     <>
@@ -198,26 +256,42 @@ export default function LetterBox() {
 
       <div className="flex flex-col gap-[10px] mb-3">
         <ToolBar
-          totalCount={letters.length}
-          folderTotalCount={letters.length}
-          froms={[]}
-          fromCounts={{}}
+          totalCount={totalElements}
+          folderTotalCount={folderTotalCount}
+          froms={froms}
+          fromCounts={fromCounts}
           selectedFromId={selectedFromId}
           onFromSelect={setSelectedFromId}
           view={viewMode}
           onViewChange={setViewMode}
         />
 
-        {letters.map((letter) => (
-          <div
-            key={letter.id}
-            role="button"
-            className="cursor-pointer"
-            onClick={() => navigate(`/letter/${letter.id}`)}
-          >
-            <LetterCard {...letter} viewMode={viewMode} />
+        {isLettersLoading ? (
+          <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
+            불러오는 중...
           </div>
-        ))}
+        ) : letters.length === 0 ? (
+          <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
+            추가된 편지가 없어요.
+          </div>
+        ) : (
+          letters.map((letter) => (
+            <div
+              key={letter.id}
+              role="button"
+              className="cursor-pointer"
+              onClick={() => navigate(`/letter/${letter.id}`)}
+            >
+              <LetterCard
+                viewMode={viewMode}
+                excerpt={letter.excerpt}
+                isLiked={letter.isLiked}
+                receivedAt={letter.receivedAt}
+                from={letter.from}
+              />
+            </div>
+          ))
+        )}
       </div>
     </>
   );

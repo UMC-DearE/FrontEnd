@@ -1,41 +1,36 @@
-// 편지함 편지 카드 뷰 모드
-
 import LetterCardDefault from './LetterCardDefault';
 import LetterCardCompact from './LetterCardCompact';
+import type { LetterFrom } from '@/types/letter';
 
 export type ViewMode = '기본 보기' | '간편 보기';
 
 export type LetterCardProps = {
-  content: string;
+  excerpt: string;
   isLiked: boolean;
-  receiveAt: string;
-  fromName: string;
-  fromBgColor: string;
-  fromFontColor: string;
+  receivedAt: string;
+  from: LetterFrom;
   viewMode: ViewMode;
 };
 
 export default function LetterCard({
   viewMode,
-  content,
+  excerpt,
   isLiked,
-  receiveAt,
-  fromName,
-  fromBgColor,
-  fromFontColor,
+  receivedAt,
+  from,
 }: LetterCardProps) {
   if (viewMode === '간편 보기') {
-    return <LetterCardCompact content={content} fromName={fromName} />;
+    return <LetterCardCompact content={excerpt} fromName={from.name} />;
   }
 
   return (
     <LetterCardDefault
-      content={content}
+      content={excerpt}
       isLiked={isLiked}
-      receiveAt={receiveAt}
-      fromName={fromName}
-      fromBgColor={fromBgColor}
-      fromFontColor={fromFontColor}
+      receiveAt={receivedAt}
+      fromName={from.name}
+      fromBgColor={from.bgColor}
+      fromFontColor={from.fontColor}
     />
   );
 }

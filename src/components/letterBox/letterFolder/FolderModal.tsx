@@ -12,7 +12,10 @@ interface FolderModalProps {
   initialImageId: number | null;
   onCancel: () => void;
   onConfirm: (data: { folder_name: string; imageId: number | null }) => void;
-  uploadImage: (file: File, dir: string) => Promise<UploadImageResult>;
+  uploadImage: (
+    file: File,
+    dir: 'profile' | 'letter' | 'sticker' | 'folder'
+  ) => Promise<UploadImageResult>;
   onImageDelete?: () => Promise<void>;
   currentFolderId?: number | null;
 }

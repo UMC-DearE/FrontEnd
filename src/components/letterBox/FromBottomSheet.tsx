@@ -1,9 +1,9 @@
 // 편지함 From 모달
 
-import type { From } from '@/types/from';
+import type { LetterFrom } from '@/types/letter';
 
-type FromBottomSheetProps = {
-  froms: From[];
+export type FromBottomSheetProps = {
+  froms: LetterFrom[];
   totalCount: number;
   fromCounts: Record<number, number>;
   selectedId: number | 'all';

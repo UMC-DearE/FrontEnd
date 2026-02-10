@@ -1,27 +1,36 @@
+export type LetterFrom = {
+  fromId: number;
+  name: string;
+  bgColor: string;
+  fontColor: string;
+};
+
 export type Letter = {
   id: number;
-  content: string;
+  excerpt: string;
   isLiked: boolean;
-  receiveAt: string;
+  receivedAt: string;
   createdAt: string;
-  fromId: number;
-  fromName: string;
-  fromBgColor: string;
-  fromFontColor: string;
+  from: LetterFrom;
   folderId: number;
 };
 
-export type LetterListResponse = {
+export type LetterListPage = {
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  content: Letter[];
+};
+
+export type ApiResponse<T> = {
   success: boolean;
   code: string;
   message: string;
-  result: {
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    content: Letter[];
-  };
+  data: T;
 };
+
+export type LetterListResponse = ApiResponse<LetterListPage>;
 
 export interface EmotionCategory {
   categoryId: number;

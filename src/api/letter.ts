@@ -1,4 +1,5 @@
 import { api } from '@/api/http';
+import type { LetterListPage } from '@/types/letter';
 
 type ApiResponse<T> = {
   success: boolean;
@@ -33,3 +34,18 @@ export async function getRandomLetter() {
   const res = await api.get<RandomLetterResponse>('/letters/random');
   return res.data.data;
 }
+
+// 편지함 편지 목록
+export type GetLetterListsParams = {
+  page: number;
+  size: number;
+  sort?: string | string[];
+  folderId?: number;
+  fromId?: number;
+  isLiked?: boolean;
+};
+
+export const getLetterLists = async (params: GetLetterListsParams) => {
+  const res = await api.get<ApiResponse<LetterListPage>>('/letters', { params });
+  return res.data;
+};

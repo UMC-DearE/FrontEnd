@@ -1,11 +1,9 @@
-// 편지함 툴바
-
 import { useMemo, useState } from 'react';
 import fromIcon from '@/assets/letterPage/fromIcon.svg';
 import dropdownIcon from '@/assets/letterPage/dropdownIcon.svg';
 import Dropdown from '@/components/letterBox/Dropdown';
 import FromBottomSheet from '@/components/letterBox/FromBottomSheet';
-import type { From } from '@/types/from';
+import type { LetterFrom as From } from '@/types/letter';
 
 type Option = '기본 보기' | '간편 보기';
 
