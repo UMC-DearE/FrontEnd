@@ -59,3 +59,23 @@ export interface PatchLetterRequest {
 }
 
 export type PatchLetterResponse = CommonResponse<Record<string, never>>;
+
+// 편지 답장 등록/수정
+export interface PatchLetterReplyRequest {
+  reply: string;
+}
+
+export type PatchLetterReplyResponse = CommonResponse<Record<string, never>>;
+
+// 편지 답장 삭제
+export type DeleteLetterReplyResponse = CommonResponse<Record<string, never>>;
+
+// 편지 삭제
+export type DeleteLetterResponse = CommonResponse<Record<string, never>>;
+
+// 편지 좋아요
+export interface LetterLikeData {
+  liked: boolean;
+}
+
+export type LetterLikeResponse = CommonResponse<LetterLikeData>;

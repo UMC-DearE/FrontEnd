@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BottomButton } from "@/components/common/BottomButton";
 import { postSignup, postJwtRefresh } from "@/api/authSignup";
+import { useAuthStore } from "@/stores/authStore";
 
 const NICKNAME_REGEX = /^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]+$/;
 
@@ -17,6 +18,7 @@ const SetNamePage = () => {
   const [nickname, setNickname] = useState("");
   const [touched, setTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const setAuthStatus = useAuthStore.getState().setAuthStatus;
 
   const errorMessage = useMemo(() => {
     if (!touched) return "";
@@ -67,6 +69,7 @@ const SetNamePage = () => {
 
       // JWT 쿠키/토큰 확정 (refresh token 쿠키 필요)
       await postJwtRefresh();
+      setAuthStatus("authenticated"); // 가입 완료 -> 인증 상태로 업데이트 -> 다시 terms로 안 가고 home으로
       // console.log("[Signup] /auth/jwt/refresh success:", refreshRes);
 
       // console.log("[Signup] signup flow completed");

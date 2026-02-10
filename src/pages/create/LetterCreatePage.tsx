@@ -56,19 +56,7 @@ export default function LetterCreatePage() {
 
       // 3. AI 분석
       const analyzeResponse = await postAnalyzeLetter({ content: finalContent });
-      const aiResult = {
-        summary: analyzeResponse.summary,
-        emotions: analyzeResponse.emotions.map((emotion) => ({
-          emotionId: emotion.emotionId,
-          emotionName: emotion.emotionName,
-          category: {
-            categoryId: emotion.category.categoryId,
-            categoryType: emotion.category.categoryType,
-            bgColor: emotion.category.bgColor,
-            fontColor: emotion.category.fontColor,
-          },
-        })),
-      };
+      const aiResult = analyzeResponse;
 
       // 4. 내용 분석 페이지로 이동 (이미지 모드일 경우 업로드된 File 배열을 함께 전달(서버 책임 줄어듦) 혹은 s3에 업로드 된 URL 전달 받아서 띄워도 됨)
       navigate("/create/detail", {

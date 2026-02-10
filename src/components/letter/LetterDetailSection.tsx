@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import FolderSelect from "@/components/letter/FolderSelect";
-import { getMockFolders, type MockFolder } from "@/mocks/mockFolder";
+import type { Folder } from "@/types/folder";
 import useToast from "@/hooks/useToast";
 import type { CreateFrom } from "@/types/from";
 import { EmotionTag } from "@/components/common/EmotionTag";
@@ -11,9 +11,14 @@ import LetterDetailBottomSheet from "./LetterDetailBottomSheet";
 import aiSummary from "@/assets/create/ai-summary.svg";
 import upBar from "@/assets/letter/up-bar.svg";
 import downBar from "@/assets/letter/down-bar.svg";
-import heartbtn from "@/assets/letter/heart.svg";
+import heartOutlineIcon from "@/assets/letterPage/heart-outline.svg";
+import heartFillIcon from "@/assets/letterPage/heart-filled.svg";
 import html2canvas from "html2canvas";
 import type { AnalyzeLetterResponse } from "@/types/create";
+import { useFolderList } from "@/hooks/queries/useFolderList";
+import { useToggleLetterLike } from "@/hooks/mutations/useToggleLetterLike";
+import { usePatchLetterReply } from "@/hooks/mutations/usePatchLetterReply";
+import { useDeleteLetterReply } from "@/hooks/mutations/useDeleteLetterReply";
 
 type LayoutContext = {
   setFixedAction: (
@@ -22,17 +27,19 @@ type LayoutContext = {
 };
 
 interface Props {
+  letterId: number;
+  isLiked: boolean;
   content: string;
   aiResult: AnalyzeLetterResponse;
   from: CreateFrom;
   receivedAt?: string | null;
-  // folder metadata object; null if not in a folder
   folder?: { folderId: number; folderName: string } | null;
   reply?: string;
   onSave?: () => void;
   onAddToFolder?: (folderId: number) => void;
   onRemoveFromFolder?: () => void;
   onEdit: () => void;
+  onDeleteLetter?: () => void;
 }
 
 // 캡처한 편지 카드를 둥근 모서리로 자르는 함수
@@ -70,6 +77,8 @@ function roundCanvas(source: HTMLCanvasElement, radius = 16) {
 }
 
 export default function LetterDetailSection({
+  letterId,
+  isLiked,
   content,
   aiResult,
   from,
@@ -80,6 +89,7 @@ export default function LetterDetailSection({
   onAddToFolder,
   onRemoveFromFolder,
   onEdit,
+  onDeleteLetter,
 }: Props) {
   const { setFixedAction } = useOutletContext<LayoutContext>();
 
@@ -89,9 +99,15 @@ export default function LetterDetailSection({
   const [openSummary, setOpenSummary] = useState(false);
   const [openMore, setOpenMore] = useState(false);
   const [openFolderSelect, setOpenFolderSelect] = useState(false);
-  const [folders, setFolders] = useState<MockFolder[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const [savedReply, setSavedReply] = useState(initialReply ?? "");
   const [draftReply, setDraftReply] = useState("");
+  const [isEditingReply, setIsEditingReply] = useState(false);
+  const [replyLoading, setReplyLoading] = useState(false);
+  const { data: folderData = [], isLoading: folderLoading } = useFolderList();
+  const toggleLikeMutation = useToggleLetterLike(letterId);
+  const patchReplyMutation = usePatchLetterReply(letterId);
+  const deleteReplyMutation = useDeleteLetterReply(letterId);
 
     // 헤더 더보기 버튼에서 이벤트로 열리는 구조
     useEffect(() => {
@@ -100,6 +116,12 @@ export default function LetterDetailSection({
     return () =>
       window.removeEventListener("open-letter-more", handleOpen as EventListener);
   }, []);
+  const [liked, setLiked] = useState(isLiked);
+  const [likeLoading, setLikeLoading] = useState(false);
+
+  useEffect(() => {
+    setLiked(isLiked);
+  }, [isLiked]);
   const handleSaveCard = useCallback(async () => {
     if (onSave) onSave();
 
@@ -172,7 +194,22 @@ export default function LetterDetailSection({
     });
   }, [onSave]);
 
-// 폴더 없을 경우 토스트 띄우기(부모 컴포넌트에서 미리 폴더 불러오기 - 폴더 선택 모달에 넘겨줌)
+  // 폴더 목록 불러오기 - 폴더 없을 경우 토스트 띄우기(부모 컴포넌트에서 미리 폴더 불러오기 - 폴더 선택 모달에 넘겨줌)
+  const handleOpenFolderSelect = async () => {
+    if (folderLoading) return;
+
+    try {
+      const list = folderData;
+      if (!list || list.length === 0) {
+        toast.show("생성된 폴더가 없습니다", 1200);
+        return;
+      }
+      setFolders(list);
+      setOpenFolderSelect(true);
+    } catch {
+      toast.show("폴더 목록을 불러오지 못했어요.");
+    }
+  };
 
   useEffect(() => {
     setFixedAction({
@@ -189,16 +226,6 @@ export default function LetterDetailSection({
     };
   }, [setFixedAction, handleSaveCard]);
 
-
-  const handleOpenFolderSelect = async () => {
-    const list = await getMockFolders();
-    if (list.length === 0) {
-      toast.show("생성된 폴더가 없습니다", 1200);
-      return;
-    }
-    setFolders(list);
-    setOpenFolderSelect(true);
-  };
   // receivedAt 포맷
   const displayReceivedAt = (() => {
     if (receivedAt === null) return "-"; // null이면 -로 처리
@@ -227,10 +254,35 @@ export default function LetterDetailSection({
         <div className="mb-3 flex items-center justify-between border-b border-[#E6E7E9] pb-3">
           <FromBadge
             name={from.name}
-            backgroundColor={from.backgroundColor}
-            textColor={from.textColor}
+            bgColor={from.bgColor}
+            fontColor={from.fontColor}
           />
-          <img src={heartbtn} alt="like" className="w-[13px] h-[12px]" />
+            <button
+              type="button"
+              onClick={async () => {
+                if (likeLoading || toggleLikeMutation.isPending || !letterId) return;
+                const next = !liked;
+                setLikeLoading(true);
+                setLiked(next);
+                try {
+                  await toggleLikeMutation.mutateAsync(next);
+                } catch {
+                  setLiked(!next);
+                  toast.show("좋아요 처리에 실패했습니다.");
+                } finally {
+                  setLikeLoading(false);
+                }
+              }}
+              className="w-[13px] h-4 cursor-pointer"
+              aria-pressed={liked}
+              disabled={likeLoading || toggleLikeMutation.isPending}
+            >
+              <img
+                src={liked ? heartFillIcon : heartOutlineIcon}
+                alt="like"
+                className="w-[13px] h-[12px]"
+              />
+            </button>
         </div>
 
         <div className="max-h-[250px] overflow-y-auto pr-2 thin-scrollbar">
@@ -281,52 +333,101 @@ export default function LetterDetailSection({
       <div className="mb-6">
         <p className="mb-2 text-base font-semibold text-primary">답장하기</p>
         {/* 이미 답장이 있는 경우 */}
-        {savedReply ? (
-          <div className="rounded-xl border border-[#E6E7E9] bg-white px-4 py-[14px] text-sm text-[#555557]">
+        {savedReply && !isEditingReply ? (
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => {
+              setDraftReply(savedReply);
+              setIsEditingReply(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setDraftReply(savedReply);
+                setIsEditingReply(true);
+              }
+            }}
+            className="rounded-xl border border-[#E6E7E9] bg-white px-4 py-[14px] text-sm text-[#555557]"
+          >
             {savedReply}
           </div>
         ) : (
-          <>
-            <div className="relative">
-              <input
-                value={draftReply}
-                onChange={(e) => setDraftReply(e.target.value)}
-                maxLength={100} // 공백 포함 100자까지
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                  }
-                }}
-                placeholder="답장을 적어보세요"
-                className={`
-                  w-full h-[45px]
-                  border border-[#E6E7E9]
-                  rounded-xl px-4 pr-18
-                  font-medium text-sm
-                  bg-white text-primary placeholder-[#C2C4C7]
-                  outline-none
-                `}
-              />
+          <div className="relative">
+            <input
+              value={draftReply}
+              onChange={(e) => setDraftReply(e.target.value)}
+              maxLength={100}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                }
+              }}
+              placeholder="답장을 적어보세요"
+              className={`
+                w-full h-[45px]
+                border border-[#E6E7E9]
+                rounded-xl px-4 pr-28
+                font-medium text-sm
+                bg-white text-primary placeholder-[#C2C4C7]
+                outline-none
+              `}
+            />
 
-              {/* 답장 없는 경우 - 임시 전송 버튼 + api 호출 */}
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
+              {savedReply && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (replyLoading || deleteReplyMutation.isPending) return;
+                    setReplyLoading(true);
+                    try {
+                      await deleteReplyMutation.mutateAsync();
+                      setSavedReply("");
+                      setDraftReply("");
+                      setIsEditingReply(false);
+                    } catch {
+                      toast.show("답장 삭제 중 오류가 발생했습니다.");
+                    } finally {
+                      setReplyLoading(false);
+                    }
+                  }}
+                  className="h-[30px] px-2 rounded-lg text-xs font-medium bg-[#E6E7E9] text-[#555557]"
+                  disabled={replyLoading || deleteReplyMutation.isPending}
+                >
+                  삭제
+                </button>
+              )}
               <button
                 type="button"
-                disabled={!draftReply.trim()}
-                onClick={() => {
-                  console.log("답장 전송:", draftReply);
-                  setSavedReply(draftReply);
-                  setDraftReply("");
+                disabled={!draftReply.trim() || replyLoading || patchReplyMutation.isPending}
+                onClick={async () => {
+                  if (!draftReply.trim()) return;
+                  setReplyLoading(true);
+                  try {
+                    const res = await patchReplyMutation.mutateAsync(draftReply.trim());
+                    if (!res.success) {
+                      toast.show(res.message || "답장 전송에 실패했습니다.");
+                      return;
+                    }
+                    setSavedReply(draftReply.trim());
+                    setIsEditingReply(false);
+                  } catch {
+                    toast.show("답장 전송 중 오류가 발생했습니다.");
+                  } finally {
+                    setReplyLoading(false);
+                  }
                 }}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 h-[36px] px-3 rounded-lg text-sm font-medium ${
+                className={`h-[30px] px-2 rounded-lg text-xs font-medium ${
                   draftReply.trim()
                     ? "bg-[#555557] text-white"
                     : "bg-[#E6E7E9] text-[#9D9D9F] cursor-not-allowed"
                 }`}
               >
-                확인
+                전송
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
 
@@ -337,7 +438,7 @@ export default function LetterDetailSection({
         onClose={() => setOpenMore(false)}
         onAddToFolder={handleOpenFolderSelect}
         onRemoveFromFolder={() => onRemoveFromFolder?.()}
-        onDeleteLetter={() => console.log("편지 삭제")}
+        onDeleteLetter={() => onDeleteLetter?.()}
         onEdit={() => {
           setOpenMore(false);
           onEdit();

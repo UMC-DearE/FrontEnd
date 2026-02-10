@@ -10,6 +10,9 @@ export interface LetterFormProps {
   initialDate?: string;
   initialUnknownDate?: boolean;
 
+  onDateChange?: (value: string) => void;
+  onUnknownDateChange?: (value: boolean) => void;
+
   onSelectRecipient?: () => void;
   onSubmit: (payload: {
     from: CreateFrom;
