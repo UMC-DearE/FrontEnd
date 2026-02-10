@@ -22,7 +22,6 @@ const normalizeHex = (v: string) => {
 
 export default function ProfileCustomSheet({
   open,
-  onClose,
   onComplete,
   onPickStickerFile,
   bgColor,
@@ -36,7 +35,6 @@ export default function ProfileCustomSheet({
   const handleComplete = () => {
     setShowPicker(false);
     onComplete?.();
-    onClose();
   };
 
   const handleClickSticker = () => {

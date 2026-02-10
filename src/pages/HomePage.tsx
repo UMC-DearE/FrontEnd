@@ -10,7 +10,7 @@ import type { AppLayoutContext } from '@/layouts/AppLayout';
 import { updateLetterPinned, getRandomLetter } from '@/api/letter';
 import { uploadImage } from '@/api/image';
 import { getHome, updateHomeColor } from '@/api/home';
-import { createSticker, deleteSticker, updateSticker } from '@/api/sticker';
+import { createSticker, updateSticker } from '@/api/sticker';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -36,6 +36,7 @@ const getToday = () => {
 };
 
 const cloneStickers = (arr: StickerItem[]) => arr.map((s) => ({ ...s }));
+const isTempStickerId = (id: string) => id.startsWith('tmp-');
 
 export default function HomePage() {
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
@@ -168,31 +169,20 @@ export default function HomePage() {
 
     const uploaded = await uploadImage(file, 'sticker');
 
-    const maxZ = draftStickers.reduce((m, s) => Math.max(m, s.z), 0);
-
-    const body = {
-      imageId: uploaded.imageId,
-      posX: cx,
-      posY: cy,
-      posZ: maxZ + 1,
-      rotation: 0,
-      scale: 1,
-    };
-
-    const created = await createSticker(body);
+    const tempId = `tmp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
     setDraftStickers((prev) => {
       const maxZ = prev.reduce((m, s) => Math.max(m, s.z), 0);
 
       const next: StickerItem = {
-        id: String(created.stickerId),
+        id: tempId,
         src: uploaded.url ?? localUrl,
-        x: body.posX,
-        y: body.posY,
+        x: cx,
+        y: cy,
         z: maxZ + 1,
-        rotation: body.rotation,
-        scale: body.scale,
-        imageId: body.imageId,
+        rotation: 0,
+        scale: 1,
+        imageId: uploaded.imageId ?? null,
         w: fitted.w,
         h: fitted.h,
       };
@@ -200,7 +190,7 @@ export default function HomePage() {
       return [...prev, next];
     });
 
-    setSelectedId(String(created.stickerId));
+    setSelectedId(tempId);
     setOpenSheet(true);
   };
 
@@ -211,23 +201,58 @@ export default function HomePage() {
 
   const onDeleteSticker = async (id: string) => {
     if (!openSheet) return;
-    await deleteSticker(id);
     setDraftStickers((prev) => prev.filter((s) => s.id !== id));
     setSelectedId((cur) => (cur === id ? null : cur));
   };
 
   const commitSticker = async (id: string) => {
     if (!openSheet) return;
-    const s = draftStickers.find((x) => x.id === id);
-    if (!s) return;
+    if (isTempStickerId(id)) return;
+  };
 
-    await updateSticker(id, {
-      posX: s.x,
-      posY: s.y,
-      posZ: s.z,
-      rotation: s.rotation,
-      scale: s.scale,
-    });
+  const persistStickersOnComplete = async (draft: StickerItem[]) => {
+    const existing = draft.filter((s) => !isTempStickerId(s.id));
+    const temps = draft.filter((s) => isTempStickerId(s.id));
+
+    await Promise.all(
+      existing.map((s) =>
+        updateSticker(s.id, {
+          posX: s.x,
+          posY: s.y,
+          posZ: s.z,
+          rotation: s.rotation,
+          scale: s.scale,
+        })
+      )
+    );
+
+    const created = await Promise.all(
+      temps.map(async (s) => {
+        if (s.imageId === null) return null;
+
+        const body = {
+          imageId: s.imageId,
+          posX: s.x,
+          posY: s.y,
+          posZ: s.z,
+          rotation: s.rotation,
+          scale: s.scale,
+        };
+
+        const res = await createSticker(body);
+
+        const next: StickerItem = {
+          ...s,
+          id: String(res.stickerId),
+        };
+
+        return next;
+      })
+    );
+
+    const merged = [...existing, ...created.filter((x): x is StickerItem => x !== null)];
+
+    return merged;
   };
 
   return (
@@ -270,11 +295,31 @@ export default function HomePage() {
           setDraftStickers(cloneStickers(savedStickers));
         }}
         onComplete={async () => {
-          const saved = await updateHomeColor(homeBgColor);
-          setHomeBgColor(saved);
+          const snapshot = cloneStickers(draftStickers);
+
+          setSavedStickers(snapshot);
+          setDraftStickers(snapshot);
           setOpenSheet(false);
           setSelectedId(null);
-          setDraftStickers(cloneStickers(draftStickers));
+
+          const [colorRes, stickerRes] = await Promise.allSettled([
+            updateHomeColor(homeBgColor),
+            persistStickersOnComplete(snapshot),
+          ]);
+
+          if (colorRes.status === 'fulfilled') {
+            setHomeBgColor(colorRes.value);
+          } else {
+            console.error(colorRes.reason);
+          }
+
+          if (stickerRes.status === 'fulfilled') {
+            const persisted = cloneStickers(stickerRes.value);
+            setSavedStickers(persisted);
+            setDraftStickers(persisted);
+          } else {
+            console.error(stickerRes.reason);
+          }
         }}
         onPickStickerFile={async (file) => {
           try {
