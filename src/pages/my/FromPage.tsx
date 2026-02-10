@@ -4,9 +4,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { FromBadge } from '@/components/common/FromBadge';
 import FromEditPanel from '@/components/my/from/FromEditPanel';
 import type { From } from '@/types/from';
-import { deleteFrom, updateFrom } from '@/api/from';
 import useToast from '@/hooks/useToast';
 import { useFromList } from '@/hooks/queries/useFromList';
+import { useUpdateFrom } from '@/hooks/mutations/useUpdateFrom';
+import { useDeleteFrom } from '@/hooks/mutations/useDeleteFrom';
 
 type FromItem = From;
 
@@ -17,6 +18,8 @@ export default function FromPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const { data: fromList = [], isLoading } = useFromList();
+  const updateFromMutation = useUpdateFrom();
+  const deleteFromMutation = useDeleteFrom();
 
   useEffect(() => {
     if (!createdFrom) return;
@@ -53,27 +56,14 @@ export default function FromPage() {
                 onCancel={() => setEditingFromId(null)}
                 onSave={async (updated) => {
                   try {
-                    const res = await updateFrom(updated.fromId, {
-                      name: updated.name,
-                      bgColor: updated.bgColor,
-                      fontColor: updated.fontColor,
+                    await updateFromMutation.mutateAsync({
+                      fromId: updated.fromId,
+                      payload: {
+                        name: updated.name,
+                        bgColor: updated.bgColor,
+                        fontColor: updated.fontColor,
+                      },
                     });
-                    if (!res.success) {
-                      toast.show(res.message || '프롬 수정에 실패했어요.');
-                      return;
-                    }
-                    queryClient.setQueryData<FromItem[]>(['froms'], (prev = []) =>
-                      prev.map((f) =>
-                        f.fromId === updated.fromId
-                          ? {
-                              ...f,
-                              name: res.data.name,
-                              bgColor: res.data.bgColor,
-                              fontColor: res.data.fontColor,
-                            }
-                          : f
-                      )
-                    );
                     setEditingFromId(null);
                   } catch {
                     toast.show('프롬 수정 중 오류가 발생했어요.');
@@ -81,14 +71,7 @@ export default function FromPage() {
                 }}
                 onDelete={async (id) => {
                   try {
-                    const res = await deleteFrom(id);
-                    if (!res.success) {
-                      toast.show(res.message || '프롬 삭제에 실패했어요.');
-                      return;
-                    }
-                    queryClient.setQueryData<FromItem[]>(['froms'], (prev = []) =>
-                      prev.filter((f) => f.fromId !== id)
-                    );
+                    await deleteFromMutation.mutateAsync(id);
                     setEditingFromId(null);
                   } catch {
                     toast.show('프롬 삭제 중 오류가 발생했어요.');
