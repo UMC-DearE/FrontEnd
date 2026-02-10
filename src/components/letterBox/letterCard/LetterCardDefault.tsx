@@ -2,7 +2,7 @@
 
 import heartOutlineIcon from '@/assets/letterPage/heart-outline.svg';
 import heartFillIcon from '@/assets/letterPage/heart-filled.svg';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useToggleLetterLike } from '@/hooks/mutations/useToggleLetterLike';
 
 type LetterCardDefaultProps = {
@@ -61,7 +61,10 @@ export default function LetterCardDefault({
           <div className="text-[#C2C4C7] font-medium text-[12px]">{receiveAt}</div>
           <button
             type="button"
-            onClick={onClickLike}
+            onClick={(e: MouseEvent<HTMLButtonElement>) => {
+              e.stopPropagation();
+              onClickLike();
+            }}
             disabled={toggleLike.isPending}
             className="w-[13px] h-4 cursor-pointer disabled:opacity-50"
           >
