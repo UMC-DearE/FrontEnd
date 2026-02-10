@@ -29,6 +29,9 @@ export function AppLayout() {
   const matched = ROUTE_META.find((r) => r.match(pathname));
   const Header = matched ? HEADER_REGISTRY[matched.header] : null;
 
+  const hideHeader = matched?.hideHeader === true;
+  const shouldShowHeader = !!Header && !hideHeader;
+
   const isLetterDetail = /^\/letter\/[^/]+/.test(pathname);
   const hideBottomNav =
     pathname.startsWith('/auth') ||
@@ -44,8 +47,9 @@ export function AppLayout() {
 
   const bgClass = matched?.bg === 'white' ? 'bg-white' : 'bg-[#F8F8F8]';
 
-  const NO_MAIN_PADDING_PATHS = ['/my', '/my/account'];
+  const NO_MAIN_PADDING_PATHS = ['/my', '/my/account', 'letterbox'];
   const noMainPadding = NO_MAIN_PADDING_PATHS.includes(pathname);
+
   const HEADER_HEIGHT = 105;
   const BOTTOM_NAV_HEIGHT = 95;
   const FIXED_ACTION_HEIGHT = 52 + 28 + 16;
@@ -60,11 +64,9 @@ export function AppLayout() {
         paddingBottom: `calc(${bottomInset}px + env(safe-area-inset-bottom, 0px))`,
       }}
     >
-      {Header && (
+      {shouldShowHeader && (
         <Suspense fallback={null}>
-          <div
-            className="fixed top-0 left-0 right-0 z-50 flex justify-center"
-          >
+          <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
             <div className="w-full max-w-[393px]">
               <Header title={matched?.title} />
             </div>
@@ -75,7 +77,7 @@ export function AppLayout() {
       <main
         className={[noMainPadding ? '' : 'px-4'].join(' ')}
         style={{
-          paddingTop: Header ? `calc(${HEADER_HEIGHT}px + 20px)` : noMainPadding ? 0 : 20,
+          paddingTop: shouldShowHeader ? `calc(${HEADER_HEIGHT}px + 20px)` : noMainPadding ? 0 : 20,
         }}
       >
         <Outlet context={{ homeBgColor, setHomeBgColor, setFixedAction }} />

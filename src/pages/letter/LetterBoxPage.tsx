@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import FolderList from '@/components/letterBox/letterFolder/FolderList';
 import FolderSettingSheet from '@/components/letterBox/letterFolder/FolderSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
@@ -18,6 +18,9 @@ import {
 import { uploadImage } from '@/api/image';
 import { refreshAccessToken } from '@/api/http';
 import { getLetterLists } from '@/api/letter';
+import LetterBoxHeader from '@/components/header/LetterBoxHeader';
+import SearchButton from '@/components/common/header/SearchButton';
+import SearchBar from '@/components/letterBox/SearchBar';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
@@ -43,6 +46,10 @@ export default function LetterBox() {
   const [page, setPage] = useState(0);
   const [size] = useState(20);
   const [isLettersLoading, setIsLettersLoading] = useState(false);
+
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const searchWrapRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const run = async () => {
@@ -94,6 +101,28 @@ export default function LetterBox() {
 
     void run();
   }, [selectedFolderId, selectedFromId, page, size]);
+
+  useEffect(() => {
+    setQuery('');
+    setIsSearchOpen(false);
+  }, [selectedFolderId, selectedFromId]);
+
+  useEffect(() => {
+    if (!isSearchOpen) return;
+
+    const onPointerDown = (e: PointerEvent) => {
+      const el = searchWrapRef.current;
+      if (!el) return;
+
+      if (e.target instanceof Node && !el.contains(e.target)) {
+        setIsSearchOpen(false);
+        setQuery('');
+      }
+    };
+
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [isSearchOpen]);
 
   const editingFolder = useMemo(() => {
     if (editingFolderId == null) return null;
@@ -164,8 +193,54 @@ export default function LetterBox() {
     return totalElements;
   }, [selectedFolderId, totalElements]);
 
+  const filteredLetters = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return letters;
+
+    return letters.filter((l) => {
+      const excerpt = (l.excerpt ?? '').toLowerCase();
+      const fromName = (l.from?.name ?? '').toLowerCase();
+      return excerpt.includes(q) || fromName.includes(q);
+    });
+  }, [letters, query]);
+
   return (
     <>
+      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
+        <div className="w-full max-w-[393px]">
+          <LetterBoxHeader
+            title="편지함"
+            left={
+              isSearchOpen ? null : (
+                <h1 className="flex items-center text-xl font-semibold leading-none text-primary">
+                  편지함
+                </h1>
+              )
+            }
+            right={
+              isSearchOpen ? null : (
+                <button onClick={() => setIsSearchOpen(true)}>
+                  <SearchButton />
+                </button>
+              )
+            }
+          />
+        </div>
+      </div>
+
+      {isSearchOpen && (
+        <div ref={searchWrapRef} className="fixed top-[60px] left-1/2 z-50 -translate-x-1/2">
+          <SearchBar
+            value={query}
+            onChange={setQuery}
+            onClose={() => {
+              setQuery('');
+              setIsSearchOpen(false);
+            }}
+          />
+        </div>
+      )}
+
       <FolderList
         folders={folders}
         selectedId={selectedFolderId}
@@ -270,12 +345,12 @@ export default function LetterBox() {
           <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
             불러오는 중...
           </div>
-        ) : letters.length === 0 ? (
+        ) : filteredLetters.length === 0 ? (
           <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
-            추가된 편지가 없어요.
+            {query.trim() ? '검색 결과가 없어요.' : '추가된 편지가 없어요.'}
           </div>
         ) : (
-          letters.map((letter) => (
+          filteredLetters.map((letter) => (
             <div
               key={letter.id}
               role="button"

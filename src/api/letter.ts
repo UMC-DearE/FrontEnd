@@ -43,6 +43,7 @@ export type GetLetterListsParams = {
   folderId?: number;
   fromId?: number;
   isLiked?: boolean;
+  keyword?: string;
 };
 
 export const getLetterLists = async (params: GetLetterListsParams) => {
