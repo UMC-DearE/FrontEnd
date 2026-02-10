@@ -1,14 +1,12 @@
-<<<<<<< HEAD
+import type { Emotion } from './create';
+import type { CommonResponse } from './common';
+
 export type LetterFrom = {
   fromId: number;
   name: string;
   bgColor: string;
   fontColor: string;
 };
-=======
-import type { Emotion } from "./create";
-import type { CommonResponse } from "./common";
->>>>>>> origin/develop
 
 export type Letter = {
   id: number;
@@ -20,36 +18,11 @@ export type Letter = {
   folderId: number;
 };
 
-<<<<<<< HEAD
-export type LetterListPage = {
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-  content: Letter[];
-};
-
-export type ApiResponse<T> = {
-  success: boolean;
-  code: string;
-  message: string;
-  data: T;
-};
-
-export type LetterListResponse = ApiResponse<LetterListPage>;
-
-export interface EmotionCategory {
-  categoryId: number;
-  type: string;
-  bgColor: string;
-  fontColor: string;
-=======
 export interface LetterListResult {
   totalElements: number;
   totalPages: number;
   size: number;
   content: Letter[];
->>>>>>> origin/develop
 }
 
 export type LetterListResponse = CommonResponse<LetterListResult>;
@@ -73,7 +46,7 @@ export interface LetterDetailData {
 
   createdAt?: string;
   imageUrls?: string[];
-  
+
   folder?: {
     folderId: number;
     folderName: string;
