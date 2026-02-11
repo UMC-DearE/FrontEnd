@@ -277,7 +277,7 @@ export default function LetterDetailSection({
                   setLikeLoading(false);
                 }
               }}
-              className="w-[13px] h-4 cursor-pointer"
+              className="w-[13px] h-4 mr-1 cursor-pointer"
               aria-pressed={liked}
               disabled={likeLoading || toggleLikeMutation.isPending}
             >
