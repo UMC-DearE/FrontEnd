@@ -21,7 +21,11 @@ export default function ProfileCard({ nickname, bio, imgUrl, onClickSettings }: 
         <img src={setIcon} alt="set-icon" className="h-[19px] w-[19px]" />
       </button>
 
-      <img src={imgUrl || defaultProfile} alt="profile" className="mt-9 h-[74px] w-[74px]" />
+      <img
+        src={imgUrl || defaultProfile}
+        alt="profile"
+        className="mt-9 h-[74px] w-[74px] rounded-[74px]"
+      />
 
       <p className="mt-3 h-[21px] text-[18px] font-semibold">{nickname || '닉네임설정'}</p>
 
@@ -31,3 +35,4 @@ export default function ProfileCard({ nickname, bio, imgUrl, onClickSettings }: 
     </div>
   );
 }
+
