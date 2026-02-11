@@ -53,6 +53,7 @@ export default function LetterCardDefault({
   const bgColor = safeColor(from?.bgColor, '#EDEDED');
   const fontColor = safeColor(from?.fontColor, '#555557');
   const fromName = from?.name ?? '';
+  const displayDate = receivedAt && receivedAt.trim().length > 0 ? receivedAt : '-';
 
   return (
     <div className="w-full shadow-[0_0_4px_0_rgba(217,217,217,0.5)] rounded-lg">
@@ -60,7 +61,7 @@ export default function LetterCardDefault({
         className={`rounded-lg bg-white px-3 py-3 ${isTwoLine ? 'h-[121px]' : 'h-[100px]'} flex flex-col`}
       >
         <div className="flex justify-between">
-          <div className="text-[#C2C4C7] font-medium text-[12px]">{receivedAt}</div>
+          <div className="text-[#C2C4C7] font-medium text-[12px]">{displayDate}</div>
           <button
             type="button"
             onClick={(e: MouseEvent<HTMLButtonElement>) => {
