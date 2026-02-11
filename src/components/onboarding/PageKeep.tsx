@@ -6,19 +6,21 @@ export default function PageKeep({ active }: { active: boolean }) {
   const keepSlides = useMemo(() => {
     const smallSlideIndexes = new Set([0, 1]);
 
-    return onboardingAssets.keep.map((src, idx) => (
-        <div key={idx} className="flex justify-center">
-        <img
-            src={src}
+    return onboardingAssets.keep.map((item, idx) => (
+      <div key={idx} className="flex justify-center">
+        {typeof item === "string" ? (
+          <img
+            src={item}
             alt={`keep-${idx + 1}`}
             draggable={false}
-            className={
-            smallSlideIndexes.has(idx)
-                ? "w-[95px] pt-[40px]"
-                : "w-full"
-            }
-        />
-        </div>
+            className={smallSlideIndexes.has(idx) ? "w-[95px] pt-[40px]" : "w-full"}
+          />
+        ) : (
+          <div className={smallSlideIndexes.has(idx) ? "pt-[40px]" : ""}>
+            {item}
+          </div>
+        )}
+      </div>
     ));
     }, []);
 
