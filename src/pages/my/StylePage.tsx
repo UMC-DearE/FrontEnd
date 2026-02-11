@@ -1,12 +1,13 @@
 // 마이페이지-스타일 수정 페이지
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { FontRow } from "@/components/my/FontRow";
 import { FONT_OPTIONS } from "@/utils/fontOptions";
 import { useStyleStore } from "@/stores/styleStores";
 import { BottomButton } from "@/components/common/BottomButton";
+import { patchMyFont, serverFontToClient } from "@/api/theme";
 
 export default function StylePage() {
   const navigate = useNavigate();
@@ -31,11 +32,14 @@ export default function StylePage() {
 
   const canSave = pendingFont !== font;
 
-  const onSubmit = () => {
-    if (!canSave) return;
-    setFont(pendingFont);
+  const onSubmit = useCallback(async () => {
+    if (pendingFont === font) return;
+
+    const res = await patchMyFont(pendingFont);
+    setFont(serverFontToClient(res.font));
     navigate(-1);
-  };
+  }, [pendingFont, font, setFont, navigate]);
+
 
   useEffect(() => {
     if (!setFixedAction) return;

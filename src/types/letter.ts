@@ -1,46 +1,31 @@
+import type { Emotion } from './create';
+import type { CommonResponse } from './common';
+
+export type LetterFrom = {
+  fromId: number;
+  name: string;
+  bgColor: string;
+  fontColor: string;
+};
+
 export type Letter = {
   id: number;
-  content: string;
+  excerpt: string;
   isLiked: boolean;
-  receiveAt: string;
+  receivedAt: string;
   createdAt: string;
-  fromId: number;
-  fromName: string;
-  fromBgColor: string;
-  fromFontColor: string;
+  from: LetterFrom;
   folderId: number;
 };
 
-export type LetterListResponse = {
-  success: boolean;
-  code: string;
-  message: string;
-  result: {
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    content: Letter[];
-  };
-};
-
-export interface EmotionCategory {
-  categoryId: number;
-  type: string;
-  bgColor: string;
-  fontColor: string;
+export interface LetterListResult {
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  content: Letter[];
 }
 
-export interface Emotion {
-  emotionId: number;
-  emotionName: string;
-  category: EmotionCategory;
-}
-
-// AI 편지 내용 분석 결과(letterID는 params로 전달 - UI에서 몰라도 됨)
-export interface AiAnalyzeResult {
-  summary: string;
-  emotions: Emotion[];
-}
+export type LetterListResponse = CommonResponse<LetterListResult>;
 
 // 편지 상세 조회
 export interface LetterDetailData {
@@ -48,27 +33,71 @@ export interface LetterDetailData {
   receivedAt?: string;
   aiSummary?: string;
 
-  emotions?: Emotion[];
+  emotionTags?: Emotion[];
   isLiked?: boolean;
   reply?: string;
 
-  fromName?: string;
-  fromBgColor?: string;
-  fromFontColor?: string;
+  from?: {
+    fromId: number;
+    name: string;
+    bgColor: string;
+    fontColor: string;
+  };
 
   createdAt?: string;
   imageUrls?: string[];
 
-  // If the letter belongs to a folder, `folder` contains metadata; otherwise `folder` is null.
   folder?: {
     folderId: number;
     folderName: string;
   } | null;
 }
 
-export interface LetterDetailResponse {
+export type LetterDetailResponse = CommonResponse<LetterDetailData>;
+
+// 편지 수정
+export interface PatchLetterRequest {
+  content: string;
+  fromId: number;
+  receivedAt: string;
+}
+
+export type PatchLetterResponse = CommonResponse<Record<string, never>>;
+
+// 편지 답장 등록/수정
+export interface PatchLetterReplyRequest {
+  reply: string;
+}
+
+export type PatchLetterReplyResponse = CommonResponse<Record<string, never>>;
+
+// 편지 답장 삭제
+export type DeleteLetterReplyResponse = CommonResponse<Record<string, never>>;
+
+// 편지 삭제
+export type DeleteLetterResponse = CommonResponse<Record<string, never>>;
+
+// 편지 좋아요
+export interface LetterLikeData {
+  liked: boolean;
+}
+
+export type LetterLikeResponse = CommonResponse<LetterLikeData>;
+
+export type RandomLetterApiResponse = {
   success: boolean;
   code: string;
   message: string;
-  data: LetterDetailData;
-}
+  data: {
+    hasLetter: boolean;
+    date: {
+      fullDate: string;
+      month: string;
+      day: number;
+      dayOfWeek: string;
+    };
+    letterId: number;
+    randomPhrase: string;
+    isPinned: boolean;
+  };
+};

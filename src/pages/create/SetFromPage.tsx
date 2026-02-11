@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+// 서버 응답 X - goBackWithDraft로 상태 전달하여 이전 페이지에서 처리
+
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { CreateResultPayload } from '@/types/create';
 import type { CreateFrom } from '@/types/from';
@@ -6,17 +8,23 @@ import { FromBadge } from '@/components/common/FromBadge';
 import { InputField } from '@/components/common/InputField';
 import FromCreator from '@/components/common/FromCreator';
 import erasebtn from '@/assets/create/erasebtn.svg';
+import type { From } from '@/types/from';
+import { useFromList } from '@/hooks/queries/useFromList';
 
-type FromItem = CreateFrom & { fromId: number };
+type FromItem = From;
 
 type SetFromPageState =
   | (CreateResultPayload & {
       selectedFromDraft?: CreateFrom;
+      date?: string;
+      unknownDate?: boolean;
     })
   | {
       mode: 'edit';
       letterId: string;
       selectedFromDraft?: CreateFrom;
+      date?: string;
+      unknownDate?: boolean;
     }
   | null;
 
@@ -25,36 +33,15 @@ export default function SetFromPage() {
   const location = useLocation();
   const state = location.state as SetFromPageState;
 
-  const [fromList, setFromList] = useState<FromItem[]>([]);
+  const { data: fromList = [] } = useFromList();
   const [input, setInput] = useState('');
-
-  useEffect(() => {
-    const fetchFromList = async () => {
-      const res: FromItem[] = [
-        {
-          fromId: 1,
-          name: '엄마',
-          backgroundColor: '#FEEFEF',
-          textColor: '#333333',
-        },
-        {
-          fromId: 2,
-          name: '아빠',
-          backgroundColor: '#EAF6FF',
-          textColor: '#333333',
-        },
-      ];
-      setFromList(res);
-    };
-
-    fetchFromList();
-  }, []);
 
   const goBackWithDraft = (draft: CreateFrom) => {
     if (state && 'mode' in state && state.mode === 'edit') {
       navigate(`/letter/${state.letterId}/edit`, {
         replace: true,
         state: {
+          ...state,
           selectedFromDraft: draft,
         },
       });
@@ -72,9 +59,10 @@ export default function SetFromPage() {
 
   const handleSelect = (from: FromItem) => {
     goBackWithDraft({
+      fromId: from.fromId,
       name: from.name,
-      backgroundColor: from.backgroundColor,
-      textColor: from.textColor,
+      bgColor: from.bgColor,
+      fontColor: from.fontColor,
     });
   };
 
@@ -117,8 +105,8 @@ export default function SetFromPage() {
                 <div className="flex items-center gap-2">
                   <FromBadge
                     name={from.name}
-                    backgroundColor={from.backgroundColor}
-                    textColor={from.textColor}
+                    bgColor={from.bgColor}
+                    fontColor={from.fontColor}
                   />
                 </div>
                 <button

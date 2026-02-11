@@ -4,7 +4,7 @@ import type { From } from '@/types/from';
 
 type FromBottomSheetProps = {
   froms: From[];
-  totalCount: number;
+  allCount: number;
   fromCounts: Record<number, number>;
   selectedId: number | 'all';
   onSelect: (fromId: number | 'all') => void;
@@ -13,8 +13,7 @@ type FromBottomSheetProps = {
 
 export default function FromBottomSheet({
   froms,
-  totalCount,
-  fromCounts,
+  allCount,
   selectedId,
   onSelect,
   onClose,
@@ -28,14 +27,15 @@ export default function FromBottomSheet({
             <p className="mt-[21px] text-center text-[18px] font-semibold text-[#141517]">
               From 선택
             </p>
+
             <div className="mt-[14px] flex-1 overflow-y-auto px-[24px] pb-4 no-scrollbar">
               <div
-                className={`mx-auto rounded-[8px] transition-all ${selectedId === 'all' ? 'bg-[#FFEEE8] w-full' : 'bg-white w-full'}`}
+                className={`mx-auto rounded-[8px] transition-all ${selectedId === 'all' ? 'bg-[#FFEEE8]' : 'bg-white'}`}
               >
                 <button
                   type="button"
                   onClick={() => onSelect('all')}
-                  className="cursor-pointer flex h-[44px] w-full items-center justify-between px-3"
+                  className="flex h-[44px] w-full items-center justify-between px-3"
                 >
                   <p
                     className={`text-[16px] ${selectedId === 'all' ? 'text-[#FF5F2F] font-semibold' : 'text-[#141517]'}`}
@@ -45,19 +45,21 @@ export default function FromBottomSheet({
                   <p
                     className={`text-[16px] ${selectedId === 'all' ? 'text-[#FF5F2F] font-bold' : 'text-[#45454599]'}`}
                   >
-                    {totalCount}
+                    {allCount}
                   </p>
                 </button>
               </div>
+
               <div className="mt-2 flex flex-col gap-[8px]">
                 {froms.map((from) => {
                   const isSelected = selectedId === from.fromId;
+
                   return (
                     <button
                       key={from.fromId}
                       type="button"
                       onClick={() => onSelect(from.fromId)}
-                      className={`cursor-pointer flex h-[44px] w-full items-center justify-between rounded-[8px] px-3 transition-all ${isSelected ? 'bg-[#FFEEE8]' : 'bg-white'}`}
+                      className={`flex h-[44px] w-full items-center justify-between rounded-[8px] px-3 transition-all ${isSelected ? 'bg-[#FFEEE8]' : 'bg-white'}`}
                     >
                       <p
                         className={`text-[16px] ${isSelected ? 'text-[#FF5F2F] font-semibold' : 'text-[#141517]'}`}
@@ -67,7 +69,7 @@ export default function FromBottomSheet({
                       <p
                         className={`text-[16px] ${isSelected ? 'text-[#FF5F2F] font-bold' : 'text-[#45454599]'}`}
                       >
-                        {fromCounts[from.fromId] ?? 0}
+                        {from.letterCount ?? 0}
                       </p>
                     </button>
                   );

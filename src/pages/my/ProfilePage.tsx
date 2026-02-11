@@ -4,6 +4,7 @@ import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomButton } from "@/components/common/BottomButton";
 import ProfilePlaceholderIcon from "@/components/icons/ProfilePlaceholderIcon";
+import { getMe, updateMe, uploadImage } from "@/api/http";
 
 const MAX_INTRO = 20;
 const NICKNAME_REGEX = /^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]+$/;
@@ -15,7 +16,41 @@ export default function ProfilePage() {
 
   const [nickname, setNickname] = useState("");
   const [intro, setIntro] = useState("");
+
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const [uploadedImageId, setUploadedImageId] = useState<number | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const [initialNickname, setInitialNickname] = useState<string>("");
+  const [initialIntro, setInitialIntro] = useState<string>("");
+
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        const me = await getMe();
+        if (!mounted) return;
+
+        setNickname(me.nickname);
+        setIntro(me.intro ?? "");
+        setProfileImageUrl(me.profileImageUrl);
+
+        setInitialNickname(me.nickname);
+        setInitialIntro(me.intro ?? "");
+      } catch {
+        navigate("/login", { replace: true });
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [navigate]);
 
   useEffect(() => {
     return () => {
@@ -29,18 +64,14 @@ export default function ProfilePage() {
     const value = nickname;
 
     if (value.length === 0) return "";
-
     // 길이 제한(10 초과)
     if (value.length > 10) return "최대 10글자까지 설정이 가능해요.";
-
     // 2 미만
     if (value.length < 2) return "최소 2글자부터 설정이 가능해요.";
-
     // 특수문자 포함(한글/영문/숫자만 허용)
     if (!NICKNAME_REGEX.test(value)) {
       return "특수문자는 사용이 불가해요.";
     }
-
     return "";
   }, [nickname, touched]);
 
@@ -50,41 +81,69 @@ export default function ProfilePage() {
     return "";
   }, [intro]);
 
+  const isChanged = useMemo(() => {
+    const nickChanged = nickname.trim() !== initialNickname.trim();
+    const introChanged = intro.trim() !== initialIntro.trim();
+
+    const imageChanged = uploadedImageId !== null;
+
+    return nickChanged || introChanged || imageChanged;
+  }, [nickname, intro, initialNickname, initialIntro, uploadedImageId]);
+
   const canSave = useMemo(() => {
     const nicknameOk = nickname.length > 0 && !errorMessage;
     const introOk = !introError;
-    return nicknameOk && introOk;
-  }, [nickname, errorMessage, introError]);
+    return nicknameOk && introOk && isChanged && !saving && !uploading;
+  }, [nickname, errorMessage, introError, isChanged, saving, uploading]);
 
   const onPickImage = () => fileRef.current?.click();
 
-  const onChangeFile: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  const onChangeFile: React.ChangeEventHandler<HTMLInputElement> = async(e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
 
+    try {
+      setUploading(true);
+
+      const uploaded = await uploadImage(file, "profile");
+      setUploadedImageId(uploaded.imageId);
+    } finally {
+      setUploading(false);
+    }
+
     e.target.value = "";
   };
 
   const onSubmit = async () => {
     if (!canSave) return;
-    console.log("SAVE", { nickname, intro, previewUrl });
-    navigate(-1);
+
+    try {
+      setSaving(true);
+
+      await updateMe({
+        nickname: nickname.trim(),
+        intro: intro.trim() === "" ? undefined : intro.trim(),
+        ...(uploadedImageId ? { imageId: uploadedImageId } : {}),
+      });
+
+      navigate(-1);
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const shownImage = previewUrl ?? profileImageUrl;
 
   return (
     <div className="min-h-screen bg-white">
       <div>
         <div className="flex flex-col items-center">
           <div className="h-[80px] w-[80px] rounded-full bg-[#F2F3F5] flex items-center justify-center overflow-hidden">
-            {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="profile"
-                className="h-full w-full object-cover"
-              />
+            {shownImage ? (
+              <img src={shownImage} alt="profile" className="h-full w-full object-cover" />
             ) : (
               <ProfilePlaceholderIcon size={34} />
             )}

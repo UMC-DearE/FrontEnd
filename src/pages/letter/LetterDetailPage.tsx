@@ -1,75 +1,97 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import LetterDetailSection from "@/components/letter/LetterDetailSection";
-import { getMockLetterDetail } from "@/mocks/mockLetterDetail";
-import type { LetterDetailData } from "@/types/letter";
+import LetterDetailSkeleton from "@/components/skeleton/LetterDetailSkeleton";
+import useToast from "@/hooks/useToast";
+import { useLetterDetail } from "@/hooks/queries/useLetterDetail";
+import { useDeleteLetter } from "@/hooks/mutations/useDeleteLetter";
+import { useLetterFolder } from "@/hooks/mutations/useLetterFolder";
 
 export default function LetterDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const toast = useToast();
+  const letterId = Number(id);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<LetterDetailData | null>(null);
+  const { data, isLoading, isError } = useLetterDetail(letterId);
+  const [showSkeleton, setShowSkeleton] = useState(false);
+  const deleteMutation = useDeleteLetter();
+  const { addFolderMutation, removeFolderMutation } = useLetterFolder(letterId);
+
+  if (!id || Number.isNaN(letterId)) {
+    return <div className="p-4 text-red-500">잘못된 편지 ID입니다.</div>;
+  }
 
   useEffect(() => {
-    let mounted = true;
-
-    async function load() {
-      try {
-        setLoading(true);
-        const res = await getMockLetterDetail(Number(id));
-        if (!mounted) return;
-
-        if (!res.success) {
-          setError(res.message);
-          return;
-        }
-
-        setData(res.data);
-      } catch {
-        setError("편지 조회 중 오류가 발생했습니다.");
-      } finally {
-        if (mounted) setLoading(false);
-      }
+    if (!isLoading) {
+      setShowSkeleton(false);
+      return;
     }
 
-    load();
-    return () => {
-      mounted = false;
-    };
-  }, [id]);
+    const timer = setTimeout(() => {
+      setShowSkeleton(true);
+    }, 250);
 
-  if (loading) return <div className="p-4">로딩 중...</div>;
-  if (error) return <div className="p-4 text-red-500">{error}</div>;
-  if (!data) return null;
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [isLoading]);
+
+  if (isLoading && showSkeleton) return <LetterDetailSkeleton />;
+  if (isLoading) return null;
+  if (isError || !data || !data.success) {
+    return <div className="p-4 text-red-500">편지를 불러오지 못했어요.</div>;
+  }
+
+  const detail = data.data;
 
   return (
     <LetterDetailSection
-      content={data.content}
+      letterId={letterId}
+      isLiked={detail.isLiked ?? false}
+      content={detail.content}
       aiResult={{
-        summary: data.aiSummary ?? "",
-        emotions: data.emotions ?? [],
+        summary: detail.aiSummary ?? "",
+        emotions: detail.emotionTags ?? [],
       }}
       from={{
-        name: data.fromName ?? "",
-        backgroundColor: data.fromBgColor ?? "#FFF",
-        textColor: data.fromFontColor ?? "#000",
+        fromId: detail.from?.fromId ?? 0,
+        name: detail.from?.name ?? "",
+        bgColor: detail.from?.bgColor ?? "#FFF",
+        fontColor: detail.from?.fontColor ?? "#000",
       }}
-      receivedAt={data.receivedAt}
-      folder={data.folder ?? null}
-      reply={data.reply}
+      receivedAt={detail.receivedAt}
+      folder={detail.folder ?? null}
+      reply={detail.reply}
       onSave={() => {
         console.log("편지 카드 저장");
       }}
-      onAddToFolder={(folderId) => {
-        setData((prev) => (prev ? { ...prev, folder: { folderId, folderName: '' } } : prev));
+
+      onAddToFolder={async (folderId) => {
+        if (addFolderMutation.isPending || detail.folder) return;
+        await addFolderMutation.mutateAsync(folderId);
       }}
-      onRemoveFromFolder={() => {
-        setData((prev) => (prev ? { ...prev, folder: null } : prev));
+
+      onRemoveFromFolder={async () => {
+        if (removeFolderMutation.isPending || !detail.folder) return;
+        await removeFolderMutation.mutateAsync(detail.folder.folderId);
       }}
+
       onEdit={() => {
-        navigate(`/letter/${id}/edit`);
+        navigate(`/letter/${letterId}/edit`, {
+          state: {
+            imageUrls: detail.imageUrls ?? [],
+          },
+        });
+      }}
+
+      onDeleteLetter={async () => {
+        try {
+          await deleteMutation.mutateAsync(letterId);
+          navigate("/letter", { replace: true });
+        } catch {
+          toast.show("편지 삭제 중 오류가 발생했어요.");
+        }
       }}
     />
   );

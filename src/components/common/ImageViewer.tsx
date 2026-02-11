@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 
+type ImageSource = File | string;
+
 export function ImageViewer({
   images,
   initialIndex,
   onClose,
 }: {
-  images: File[];
+  images: ImageSource[];
   initialIndex: number;
   onClose: () => void;
 }) {
@@ -19,14 +21,20 @@ export function ImageViewer({
   const touchStartX = useRef<number | null>(null);
   const lastDistance = useRef<number | null>(null);
 
-  const file = images[currentIndex];
+  const source = images[currentIndex];
 
-  useEffect(() => {
-    const objectUrl = URL.createObjectURL(file);
+   useEffect(() => {
+    if (typeof source === "string") {
+      setUrl(source);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(source);
     setUrl(objectUrl);
-    setScale(1); // 이미지 바뀌면 초기화
     return () => URL.revokeObjectURL(objectUrl);
-  }, [file]);
+  }, [source]);
+
+  if (!url) return null;
 
   type TouchPoint = {
   clientX: number;
@@ -115,7 +123,7 @@ const getDistance = (t1: TouchPoint, t2: TouchPoint) => {
           src={url}
           alt="이미지 크게 보기"
           draggable={false}
-          className="w-full max-h-[80vh] object-contain select-none transition-transform"
+          className="w-full max-h-[80vh] object-cover select-none transition-transform"
           style={{
             transform: `scale(${scale})`,
           }}

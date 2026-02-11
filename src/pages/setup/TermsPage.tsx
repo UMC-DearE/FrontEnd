@@ -1,15 +1,20 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import TermsRow from "@/components/terms/TermsRow";
 import CheckCircle from "@/components/terms/CheckCircle";
 import { BottomButton } from "@/components/common/BottomButton";
 import type { TermsKey, TermsState } from "@/types/terms";
 import { useNavigate } from "react-router-dom";
+import { getSignupTerms, type ApiTerm } from "@/api/authSignup";
+import { termTypeToKey } from "@/utils/terms";
 
-const TERMS_ITEMS = [
-  { key: "service", title: "서비스 이용 약관", required: true },
-  { key: "privacy", title: "개인정보 수집 및 이용", required: true },
-  { key: "marketing", title: "마케팅 정보 수신 동의", required: false },
-] as const;
+type TermMeta = {
+  termId: number;
+  title: string;
+  required: boolean;
+  content: string;
+};
+
+type TermMetaMap = Partial<Record<TermsKey, TermMeta>>;
 
 export default function TermsPage() {
   const [terms, setTerms] = useState<TermsState>({
@@ -18,40 +23,96 @@ export default function TermsPage() {
     marketing: false,
   });
 
+  const navigate = useNavigate();
+
+  // 서버 약관 메타(termId/required/title/content) 저장
+  const [metaMap, setMetaMap] = useState<TermMetaMap>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const run = async () => {
+      const apiTerms: ApiTerm[] = await getSignupTerms();
+
+      // console.log("apiTerms:", apiTerms);
+      // console.log("mapped keys:", apiTerms.map(t => [t.type, termTypeToKey(t.type), t.isActive]));
+
+      const next: TermMetaMap = {};
+
+      apiTerms
+        .filter((t) => t.isActive ?? true)
+        .forEach((t) => {
+          const key = termTypeToKey(t.type);
+          if (!key) return;
+
+          next[key] = {
+            termId: t.termId,
+            title: t.title,
+            required: t.isRequired,
+            content: t.content,
+          };
+        });
+      
+      // console.log("next:", next);
+
+      setMetaMap(next);
+      setLoading(false);
+    };
+
+    run().catch((e) => {
+      console.error(e);
+      setLoading(false);
+      navigate("/login", { replace: true });
+    });
+    
+  }, [navigate]);
+
+  const items = useMemo(() => {
+    const order: TermsKey[] = ["service", "privacy", "marketing"];
+    return order
+      .map((key) => {
+        const m = metaMap[key];
+        if (!m) return null;
+        return { key, title: m.title, required: m.required };
+      })
+      .filter(Boolean) as { key: TermsKey; title: string; required: boolean }[];
+  }, [metaMap]);
+
   const allChecked = useMemo(
-    () => TERMS_ITEMS.every((item) => terms[item.key]),
-    [terms]
+    () => items.length > 0 && items.every((item) => terms[item.key]),
+    [items, terms]
   );
 
   const canProceed = useMemo(
-    () =>
-      TERMS_ITEMS.filter((item) => item.required).every(
-        (item) => terms[item.key]
-      ),
-    [terms]
+    () => items.filter((item) => item.required).every((item) => terms[item.key]),
+    [items, terms]
   );
 
   const toggleAll = () => {
     const next = !allChecked;
-    setTerms(
-      TERMS_ITEMS.reduce((acc, item) => {
-        acc[item.key] = next;
-        return acc;
-      }, {} as TermsState)
-    );
+    setTerms((prev) => {
+      const copy = { ...prev };
+      items.forEach((item) => {
+        copy[item.key] = next;
+      });
+      return copy;
+    });
   };
 
   const toggleOne = (key: TermsKey) => {
     setTerms((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const navigate = useNavigate();
-
   const onNext = () => {
     if (!canProceed) return;
-    navigate("/setup/setnickname");
+
+    const termIds = items
+      .filter((item) => terms[item.key])
+      .map((item) => metaMap[item.key]!.termId);
+
+    navigate("/auth/signup", { state: { termIds }, replace: true });
   };
 
+  if (loading) return <div className="p-4">약관 불러오는 중...</div>;
 
   return (
     <div>
@@ -74,7 +135,7 @@ export default function TermsPage() {
       <div className="h-px bg-[#E6E7E9]" />
 
       <div className="mt-[10px]">
-        {TERMS_ITEMS.map((item) => (
+        {items.map((item) => (
           <TermsRow
             key={item.key}
             checked={terms[item.key]}

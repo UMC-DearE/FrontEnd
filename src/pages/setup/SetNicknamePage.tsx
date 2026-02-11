@@ -1,15 +1,24 @@
 // 닉네임 설정 페이지
 
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BottomButton } from "@/components/common/BottomButton";
+import { postSignup, postJwtRefresh } from "@/api/authSignup";
+import { useAuthStore } from "@/stores/authStore";
 
 const NICKNAME_REGEX = /^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]+$/;
 
+type LocationState = { termIds: number[] };
+
 const SetNamePage = () => {
   const navigate = useNavigate();
+  const { state } = useLocation() as { state: LocationState | null };
+  const termIds = state?.termIds ?? [];
+
   const [nickname, setNickname] = useState("");
   const [touched, setTouched] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const setAuthStatus = useAuthStore.getState().setAuthStatus;
 
   const errorMessage = useMemo(() => {
     if (!touched) return "";
@@ -33,12 +42,44 @@ const SetNamePage = () => {
   }, [nickname, touched]);
 
   const canProceed = useMemo(() => {
-    return NICKNAME_REGEX.test(nickname);
+    const v = nickname;
+    if (v.length < 2 || v.length > 10) return false;
+    if (!NICKNAME_REGEX.test(v)) return false;
+    if (v.trim().length < 2) return false;
+    return true;
   }, [nickname]);
 
-  const onNext = () => {
-    if (!canProceed) return;
-    navigate("/");
+  const onNext = async () => {
+    if (!canProceed || submitting) return;
+
+    if (termIds.length === 0) {
+      // console.warn("[Signup] termIds missing → redirect to /auth/terms");
+      navigate("/auth/terms", { replace: true });
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      // console.log("[Signup] start", { nickname, termIds });
+
+      // 회원가입 (signup_token 쿠키 필요)
+      await postSignup({ nickname, termIds });
+      // console.log("[Signup] /auth/signup success:", signupRes);
+
+      // JWT 쿠키/토큰 확정 (refresh token 쿠키 필요)
+      await postJwtRefresh();
+      setAuthStatus("authenticated"); // 가입 완료 -> 인증 상태로 업데이트 -> 다시 terms로 안 가고 home으로
+      // console.log("[Signup] /auth/jwt/refresh success:", refreshRes);
+
+      // console.log("[Signup] signup flow completed");
+      navigate("/", { replace: true });
+    } catch (e) {
+      console.error(e);
+      navigate("/login", { replace: true });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

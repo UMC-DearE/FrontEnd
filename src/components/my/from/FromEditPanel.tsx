@@ -20,9 +20,9 @@ type Props = {
   onDelete?: (fromId: number) => void;
 };
 
-export default function FromEditPanel({ from, onCancel, onSave}: Props) {
+export default function FromEditPanel({ from, onCancel, onSave, onDelete }: Props) {
   const [name, setName] = useState(from.name);
-  const [selectedColor, setSelectedColor] = useState(from.backgroundColor);
+  const [selectedColor, setSelectedColor] = useState(from.bgColor);
   const [showPicker, setShowPicker] = useState(false);
 
   const handleSave = () => {
@@ -31,8 +31,8 @@ export default function FromEditPanel({ from, onCancel, onSave}: Props) {
     onSave({
       ...from,
       name: name.trim().slice(0, 7),
-      backgroundColor: selectedColor,
-      textColor: getHarmoniousTextColor(selectedColor),
+      bgColor: selectedColor,
+      fontColor: getHarmoniousTextColor(selectedColor),
     });
   };
 
@@ -41,8 +41,9 @@ export default function FromEditPanel({ from, onCancel, onSave}: Props) {
 
   const handleDeleteConfirm = async () => {
     setDeleting(true);
-    // 프롬 삭제 api 호출
-  }
+    onDelete?.(from.fromId);
+    setDeleting(false);
+  };
 
   return (
     <div className="border border-[#E6E7E9] rounded-xl p-4 bg-white mb-4">
@@ -108,8 +109,8 @@ export default function FromEditPanel({ from, onCancel, onSave}: Props) {
       <div className="mb-5">
         <FromBadge
           name={name || '이름'}
-          backgroundColor={selectedColor}
-          textColor={getHarmoniousTextColor(selectedColor)}
+          bgColor={selectedColor}
+          fontColor={getHarmoniousTextColor(selectedColor)}
           size="sm"
         />
       </div>

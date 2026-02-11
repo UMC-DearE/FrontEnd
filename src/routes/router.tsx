@@ -3,9 +3,9 @@ import { createBrowserRouter } from "react-router-dom";
 import { BaseLayout } from "@/layouts/BaseLayout";
 import { AppLayout } from "@/layouts/AppLayout";
 import NotFoundPage from "@/pages/NotFoundPage";
-import ProtectedRoute from "./ProtectedRoute";
 
 import LoginPage from "@/pages/onboarding/LoginPage";
+import OAuthCallbackPage from "@/pages/onboarding/OAuthCallbackPage";
 
 import TermsPage from "@/pages/setup/TermsPage";
 import SetNickamePage from "@/pages/setup/SetNicknamePage";
@@ -26,12 +26,12 @@ import ProfilePage from "@/pages/my/ProfilePage";
 import AccountPage from "@/pages/my/AccountPage";
 import FromPage from "@/pages/my/FromPage";
 import FromCreatePage from "@/pages/my/FromCreatePage";
-import FromEditPage from "@/pages/my/FromEditPage";
 import StylePage from "@/pages/my/StylePage";
 import ThemePage from "@/pages/my/ThemePage";
 import MyTermsPage from "@/pages/my/TermsPage";
 import PrivacyPage from "@/pages/my/PrivacyPage";
 import EditLetterPage from "@/pages/letter/EditLetterPage";
+import AuthGuard from "@/routes/AuthGuard";
 
 const router = createBrowserRouter([
   {
@@ -42,22 +42,23 @@ const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { path: "login", element: <LoginPage /> },
+          { path: "auth/oauth2/:provider/callback", element: <OAuthCallbackPage /> },
+
+          {
+            path: "auth",
+            children: [
+              { path: "terms", element: <TermsPage /> },
+              { path: "signup", element: <SetNickamePage /> },
+            ],
+          },
         ],
       },
       {
-        element: <ProtectedRoute />,
+        element: <AuthGuard />,
         children: [
           {
             element: <AppLayout />,
             children: [
-              {
-                path: "setup",
-                children: [
-                  { path: "terms", element: <TermsPage /> },
-                  { path: "setnickname", element: <SetNickamePage /> },
-                ],
-              },
-
               { index: true, element: <HomePage /> },
 
               {
@@ -91,7 +92,6 @@ const router = createBrowserRouter([
                     children: [
                       { index: true, element: <FromPage /> },
                       { path: "create", element: <FromCreatePage /> },
-                      { path: ":id/edit", element: <FromEditPage /> },
                     ],
                   },
                   { path: "style", element: <StylePage /> },

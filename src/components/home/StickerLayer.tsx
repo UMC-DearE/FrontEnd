@@ -1,5 +1,3 @@
-// 홈 커스터마이징 스티커 추가
-
 import { useRef } from 'react';
 
 export type StickerItem = {
@@ -24,6 +22,7 @@ type Props = {
   onDeselect: () => void;
   onChange: (next: StickerItem[]) => void;
   onDelete: (id: string) => void;
+  onCommit?: (id: string) => void;
 };
 
 type DragState =
@@ -60,6 +59,7 @@ export default function StickerLayer({
   onDeselect,
   onChange,
   onDelete,
+  onCommit,
 }: Props) {
   const dragRef = useRef<DragState>(null);
 
@@ -182,11 +182,13 @@ export default function StickerLayer({
         if (!enabled) return;
         e.stopPropagation();
         endGesture();
+        if (selectedId) onCommit?.(selectedId);
       }}
       onPointerCancel={(e) => {
         if (!enabled) return;
         e.stopPropagation();
         endGesture();
+        if (selectedId) onCommit?.(selectedId);
       }}
     >
       {stickers

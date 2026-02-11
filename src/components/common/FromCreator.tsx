@@ -13,9 +13,10 @@ type Props = {
   onCreateImmediate?: (draft: CreateFrom) => Promise<any>; // 생성된 draft로 바로 프롬 생성 api 호출(fromCreatePage)
   name: string;
   onNameChange: (v: string) => void;
+  disabled?: boolean;
 };
 
-export default function CreateFrom({ onDraftCreate, onCreateImmediate, name, onNameChange }: Props) {
+export default function CreateFrom({ onDraftCreate, onCreateImmediate, name, onNameChange, disabled }: Props) {
   const [selectedColor, setSelectedColor] = useState('#FEEFEF');
   const [showPicker, setShowPicker] = useState(false);
 
@@ -27,8 +28,8 @@ export default function CreateFrom({ onDraftCreate, onCreateImmediate, name, onN
 
     const draft: CreateFrom = {
       name: shortName,
-      backgroundColor: selectedColor,
-      textColor: getHarmoniousTextColor(selectedColor),
+      bgColor: selectedColor,
+      fontColor: getHarmoniousTextColor(selectedColor),
     };
 
     if (onDraftCreate) {
@@ -90,9 +91,9 @@ export default function CreateFrom({ onDraftCreate, onCreateImmediate, name, onN
         )}
       </div>
 
-      <button onClick={handleCreate} className="flex items-center gap-2 font-medium text-lg text-primary">
+      <button onClick={handleCreate} className="flex items-center gap-2 font-medium text-lg text-primary" disabled={disabled}>
         <img src={Plusbtn} alt="upload" />
-        <FromBadge name={name || '이름'} backgroundColor={selectedColor} textColor={getHarmoniousTextColor(selectedColor)} />
+        <FromBadge name={name || '이름'} bgColor={selectedColor} fontColor={getHarmoniousTextColor(selectedColor)} />
         생성하기
       </button>
     </div>
