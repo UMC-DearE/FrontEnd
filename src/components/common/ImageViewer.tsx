@@ -1,6 +1,7 @@
 // 이미지 크게 보기 뷰어 + 모바일 스와이프, 확대 및 축소
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 type ImageSource = File | string;
 
@@ -107,29 +108,35 @@ const getDistance = (t1: TouchPoint, t2: TouchPoint) => {
 
   if (!url) return null;
 
-  return (
-    <div
-      className="absolute inset-0 z-50 bg-black flex items-center justify-center"
-      onClick={onClose}
-    >
+  const container = document.getElementById("app-frame");
+  if (!container) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className="relative w-full flex justify-center overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        className="relative w-[393px] h-full bg-black flex items-center justify-center"
+        onClick={onClose}
       >
-        <img
-          src={url}
-          alt="이미지 크게 보기"
-          draggable={false}
-          className="w-full max-h-[80vh] object-cover select-none transition-transform"
-          style={{
-            transform: `scale(${scale})`,
-          }}
-        />
+        <div
+          className="relative w-full flex items-center justify-center overflow-hidden"
+          onClick={(e) => e.stopPropagation()}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <img
+            src={url}
+            alt="이미지 크게 보기"
+            draggable={false}
+            className="w-full max-h-[80vh] object-cover select-none transition-transform"
+            style={{
+              transform: `scale(${scale})`,
+            }}
+          />
+        </div>
       </div>
-    </div>
+    </div>,
+    container
   );
 }
 

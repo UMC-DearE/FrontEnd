@@ -8,9 +8,9 @@ import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
 import { updateLetterPinned, getRandomLetter } from '@/api/letter';
 import { uploadImage } from '@/api/upload';
-import { updateHomeColor } from '@/api/home';
 import { createSticker, updateSticker, deleteSticker } from '@/api/sticker';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
+import { useUpdateHomeColor } from '@/hooks/mutations/useUpdateHomeColor';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 const loadImageSize = (src: string) =>
@@ -34,6 +34,7 @@ const isTempStickerId = (id: string) => id.startsWith('tmp-');
 export default function HomePage() {
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
   const { data: home, isLoading: homeLoading, isError: homeError } = useHomeQuery();
+  const updateHomeColorMutation = useUpdateHomeColor();
 
   const [letter, setLetter] = useState<HomeCardLetter | null>(null);
   const [pinnedLetterId, setPinnedLetterId] = useState<number | null>(null);
@@ -334,7 +335,7 @@ export default function HomePage() {
           setSelectedId(null);
 
           const [colorRes, stickerRes] = await Promise.allSettled([
-            updateHomeColor(homeBgColor),
+            updateHomeColorMutation.mutateAsync(homeBgColor),
             persistStickersOnComplete(snapshot),
           ]);
 
