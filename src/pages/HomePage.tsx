@@ -1,16 +1,17 @@
 import { useOutletContext } from 'react-router-dom';
 import ProfileCard from '@/components/home/ProfileCard';
 import ConfirmModal from '@/components/common/ConfirmModal';
-import LetterCard, { type Letter } from '@/components/home/LetterCard';
+import LetterCard, { type HomeCardLetter } from '@/components/home/LetterCard';
 import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
 import { updateLetterPinned, getRandomLetter } from '@/api/letter';
 import { uploadImage } from '@/api/upload';
-import { getHome, updateHomeColor } from '@/api/home';
+import { updateHomeColor } from '@/api/home';
 import { createSticker, updateSticker, deleteSticker } from '@/api/sticker';
-import { useEffect, useRef, useState } from 'react';
+import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -27,21 +28,14 @@ const fitToMaxSide = (w: number, h: number, maxSide: number) => {
   return { w: Math.round(w * r), h: Math.round(h * r) };
 };
 
-const getToday = () => {
-  const now = new Date();
-  const month = now.toLocaleString('en-US', { month: 'short' });
-  const day = now.getDate();
-  const dayOfWeek = now.toLocaleString('ko-KR', { weekday: 'short' });
-  return { month, day, dayOfWeek };
-};
-
 const cloneStickers = (arr: StickerItem[]) => arr.map((s) => ({ ...s }));
 const isTempStickerId = (id: string) => id.startsWith('tmp-');
 
 export default function HomePage() {
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
+  const { data: home, isLoading: homeLoading, isError: homeError } = useHomeQuery();
 
-  const [letter, setLetter] = useState<Letter | null>(null);
+  const [letter, setLetter] = useState<HomeCardLetter | null>(null);
   const [pinnedLetterId, setPinnedLetterId] = useState<number | null>(null);
   const [pendingUnpinId, setPendingUnpinId] = useState<number | null>(null);
 
@@ -58,81 +52,106 @@ export default function HomePage() {
 
   const initialStickerIdsRef = useRef<string[]>([]);
 
+  const applyRandomLetterToState = useCallback(
+    (data: {
+      hasLetter: boolean;
+      date: { month: string; day: number; dayOfWeek: string };
+      letterId: number;
+      randomPhrase: string;
+      isPinned: boolean;
+    }) => {
+      if (!data.hasLetter) {
+        setLetter({
+          id: 0,
+          excerpt: '',
+          month: data.date.month,
+          day: data.date.day,
+          dayOfWeek: data.date.dayOfWeek,
+        });
+        setPinnedLetterId(null);
+        return;
+      }
+
+      const next: HomeCardLetter = {
+        id: data.letterId,
+        excerpt: data.randomPhrase,
+        month: data.date.month,
+        day: data.date.day,
+        dayOfWeek: data.date.dayOfWeek,
+      };
+
+      setLetter(next);
+      setPinnedLetterId(data.isPinned ? data.letterId : null);
+    },
+    []
+  );
+
+  const refetchRandomLetter = useCallback(async () => {
+    const response = await getRandomLetter();
+    applyRandomLetterToState(response.data);
+  }, [applyRandomLetterToState]);
+
   useEffect(() => {
     let mounted = true;
 
-    getHome()
-      .then(async (home) => {
-        if (!mounted) return;
-
-        setHomeBgColor(home.setting.homeColor);
-
-        const sized = await Promise.all(
-          home.stickers.map(async (s) => {
-            const size = await loadImageSize(s.imageUrl).catch(() => ({ w: 160, h: 160 }));
-            const fitted = fitToMaxSide(size.w, size.h, 160);
-
-            const item: StickerItem = {
-              id: String(s.stickerId),
-              src: s.imageUrl,
-              x: s.posX,
-              y: s.posY,
-              z: s.posZ,
-              rotation: s.rotation,
-              scale: s.scale,
-              imageId: s.imageId,
-              w: fitted.w,
-              h: fitted.h,
-            };
-            return item;
-          })
-        );
-
-        setSavedStickers(sized);
-        setDraftStickers(cloneStickers(sized));
-      })
-      .catch(() => {});
-
     getRandomLetter()
-      .then((data) => {
+      .then((response) => {
         if (!mounted) return;
-
-        const today = getToday();
-
-        if (!data.hasLetter) {
-          setLetter({
-            id: 0,
-            content: '',
-            month: today.month,
-            day: today.day,
-            dayOfWeek: today.dayOfWeek,
-          });
-          setPinnedLetterId(null);
-          return;
-        }
-
-        const next: Letter = {
-          id: data.letterId,
-          content: data.randomPhrase,
-          month: today.month,
-          day: today.day,
-          dayOfWeek: today.dayOfWeek,
-        };
-
-        setLetter(next);
-        setPinnedLetterId(data.isPinned ? data.letterId : null);
+        applyRandomLetterToState(response.data);
       })
       .catch(() => {});
 
     return () => {
       mounted = false;
     };
-  }, [setHomeBgColor]);
+  }, [applyRandomLetterToState]);
+
+  useEffect(() => {
+    if (!home) return;
+
+    setHomeBgColor(home.setting.homeColor);
+
+    if (openSheet) return;
+
+    let alive = true;
+
+    Promise.all(
+      home.stickers.map(async (s) => {
+        const size = await loadImageSize(s.imageUrl).catch(() => ({ w: 160, h: 160 }));
+        const fitted = fitToMaxSide(size.w, size.h, 160);
+
+        const item: StickerItem = {
+          id: String(s.stickerId),
+          src: s.imageUrl,
+          x: s.posX,
+          y: s.posY,
+          z: s.posZ,
+          rotation: s.rotation,
+          scale: s.scale,
+          imageId: s.imageId,
+          w: fitted.w,
+          h: fitted.h,
+        };
+
+        return item;
+      })
+    )
+      .then((sized) => {
+        if (!alive) return;
+        setSavedStickers(sized);
+        setDraftStickers(cloneStickers(sized));
+      })
+      .catch(() => {});
+
+    return () => {
+      alive = false;
+    };
+  }, [home, openSheet, setHomeBgColor]);
 
   const handlePin = async (letterId: number) => {
     try {
-      const pinned = await updateLetterPinned(letterId, true);
-      setPinnedLetterId(pinned ? letterId : null);
+      await updateLetterPinned(letterId, true);
+      setPinnedLetterId(letterId);
     } catch (error) {
       console.error(error);
     }
@@ -145,9 +164,9 @@ export default function HomePage() {
     if (pendingUnpinId === null) return;
 
     try {
-      const pinned = await updateLetterPinned(pendingUnpinId, false);
-      setPinnedLetterId(pinned ? pendingUnpinId : null);
+      await updateLetterPinned(pendingUnpinId, false);
       setPendingUnpinId(null);
+      await refetchRandomLetter();
     } catch (error) {
       console.error(error);
     }
@@ -263,6 +282,9 @@ export default function HomePage() {
     return merged;
   };
 
+  if (homeLoading) return <div>로딩 중...</div>;
+  if (homeError || !home) return <div>에러</div>;
+
   return (
     <div ref={containerRef} style={{ backgroundColor: homeBgColor }}>
       <div className={openSheet ? 'relative z-100' : 'relative z-40'}>
@@ -288,8 +310,9 @@ export default function HomePage() {
       </div>
 
       <ProfileCard
-        nickname="키르"
-        bio="안녕하세요 잘 부탁합니다 ദ്ദi^ᴗ ̫ ᴗ^₎"
+        nickname={home.user.nickname}
+        bio={home.user.intro}
+        imgUrl={home.user.imgUrl}
         onClickSettings={openEditor}
       />
 

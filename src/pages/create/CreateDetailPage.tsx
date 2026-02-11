@@ -6,11 +6,13 @@ import LetterForm from "@/components/common/LetterForm";
 import useToast from "@/hooks/useToast";
 import { useCreateLetter } from "@/hooks/mutations/useCreateLetter";
 import { useCreateFrom } from "@/hooks/mutations/useCreateFrom";
+import CreateDetailHeader from "@/components/header/CreateDetailHeader";
 
 type LocationState =
   | (CreateResultPayload & {
       selectedFromDraft?: CreateFrom;
       imageIds?: number[];
+      images?: File[];
       date?: string;
       unknownDate?: boolean;
     })
@@ -46,8 +48,14 @@ export default function CreateDetailPage() {
 
   if (!state) return null;
 
+  const headerImages = state.images ?? [];
+
   return (
-    <LetterForm
+    <>
+      <CreateDetailHeader images={headerImages} />
+
+      <div className="mt-6 flex-1 px-4 pb-24">
+        <LetterForm
       mode="create"
       content={content}
       aiResult={state.aiResult}
@@ -114,7 +122,9 @@ export default function CreateDetailPage() {
           toast.show("편지 생성 중 오류가 발생했습니다.");
         }
       }}
-    />
+        />
+      </div>
+    </>
   );
 }
 

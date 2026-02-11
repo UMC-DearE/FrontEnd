@@ -43,7 +43,7 @@ api.interceptors.response.use(
     // 조건 정리
     const is401 = error.response?.status === 401;
     const isRefreshRequest = originalRequest?.url?.includes('/auth/jwt/refresh');
-    const authStatus = useAuthStore.getState().authStatus;
+    const { authStatus, setAuthStatus } = useAuthStore.getState();
 
     if (authStatus !== 'authenticated' && authStatus !== 'checking') {
       return Promise.reject(error);

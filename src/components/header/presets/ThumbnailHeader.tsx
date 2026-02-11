@@ -5,12 +5,14 @@ import LetterThumbnail from "@/components/common/header/LetterThumbnail";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import ImageViewer from "@/components/common/ImageViewer";
 
+type ImageSource = File | string;
+
 type Props = {
   title: string;
   confirmTitle: string;
   confirmDescription: string;
   onConfirmExit: () => void;
-  images?: File[];
+  images?: ImageSource[];
 };
 
 export default function ThumbnailHeader({
@@ -28,18 +30,23 @@ export default function ThumbnailHeader({
       <TopSection
         left={<CancelButton onClick={() => setOpenConfirm(true)} />}
         center={<div className="text-lg font-semibold">{title}</div>}
-        right={images && images.length > 0 ? (
-          <LetterThumbnail file={images[0]} onClick={() => setOpenViewer(true)} />
-        ) : null} // 이미지 썸네일 조건부 렌더링 - 텍스트 모드인 경우 null
-      />
+        right={
+        images && images.length > 0 ? (
+          <LetterThumbnail
+            source={images[0]}
+            onClick={() => setOpenViewer(true)}
+          />
+        ) : null
+      } // 이미지 썸네일 조건부 렌더링 - 텍스트 모드인 경우 null
+            />
 
-      {openViewer && images && images.length > 0 && (
-        <ImageViewer
-          images={images}
-          initialIndex={0}
-          onClose={() => setOpenViewer(false)}
-        />
-      )}
+      {openViewer && images && (
+      <ImageViewer
+        images={images}
+        initialIndex={0}
+        onClose={() => setOpenViewer(false)}
+      />
+    )}
 
       <ConfirmModal
         open={openConfirm}

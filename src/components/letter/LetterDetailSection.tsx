@@ -109,19 +109,23 @@ export default function LetterDetailSection({
   const patchReplyMutation = usePatchLetterReply(letterId);
   const deleteReplyMutation = useDeleteLetterReply(letterId);
 
-    // 헤더 더보기 버튼에서 이벤트로 열리는 구조
-    useEffect(() => {
-    const handleOpen = () => setOpenMore(true);
-    window.addEventListener("open-letter-more", handleOpen as EventListener);
-    return () =>
-      window.removeEventListener("open-letter-more", handleOpen as EventListener);
-  }, []);
+  // 헤더 더보기 버튼에서 이벤트로 열리는 구조
+  useEffect(() => {
+  const handleOpen = () => setOpenMore(true);
+  window.addEventListener("open-letter-more", handleOpen as EventListener);
+  return () =>
+    window.removeEventListener("open-letter-more", handleOpen as EventListener);
+    }, []);
+
   const [liked, setLiked] = useState(isLiked);
   const [likeLoading, setLikeLoading] = useState(false);
+  const replyBlurBlockRef = useRef(false);
+  const replyTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     setLiked(isLiked);
   }, [isLiked]);
+  
   const handleSaveCard = useCallback(async () => {
     if (onSave) onSave();
 
@@ -331,54 +335,135 @@ export default function LetterDetailSection({
       </div>
 
       <div className="mb-6">
-        <p className="mb-2 text-base font-semibold text-primary">답장하기</p>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-base font-semibold text-primary">답장하기</p>
+        </div>
         {/* 이미 답장이 있는 경우 */}
         {savedReply && !isEditingReply ? (
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => {
-              setDraftReply(savedReply);
-              setIsEditingReply(true);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
+          <>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => {
                 setDraftReply(savedReply);
                 setIsEditingReply(true);
-              }
-            }}
-            className="rounded-xl border border-[#E6E7E9] bg-white px-4 py-[14px] text-sm text-[#555557]"
-          >
-            {savedReply}
-          </div>
+                requestAnimationFrame(() => {
+                  const el = replyTextareaRef.current;
+                  if (!el) return;
+                  el.style.height = "auto";
+                  el.style.height = `${el.scrollHeight}px`;
+                });
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setDraftReply(savedReply);
+                  setIsEditingReply(true);
+                }
+              }}
+              className="rounded-xl border border-[#E6E7E9] bg-white px-4 py-[14px] text-sm text-[#555557]"
+            >
+              {savedReply}
+            </div>
+            <div className="mt-1 flex justify-end">
+              <button
+                type="button"
+                onClick={async () => {
+                  // 삭제 버튼 클릭 시 blur에 의한 자동 저장 방지
+                  replyBlurBlockRef.current = true;
+                  if (replyLoading || deleteReplyMutation.isPending) return;
+                  setReplyLoading(true);
+                  try {
+                    await deleteReplyMutation.mutateAsync();
+                    setSavedReply("");
+                    setDraftReply("");
+                    setIsEditingReply(false);
+                  } catch {
+                    toast.show("답장 삭제 중 오류가 발생했습니다.");
+                  } finally {
+                    setReplyLoading(false);
+                  }
+                }}
+                className="text-xs font-medium text-[#9D9D9F]"
+                disabled={replyLoading || deleteReplyMutation.isPending}
+              >
+                삭제
+              </button>
+            </div>
+          </>
         ) : (
-          <div className="relative">
-            <input
+          <>
+            <div className="relative">
+              <textarea
+              ref={replyTextareaRef}
               value={draftReply}
               onChange={(e) => setDraftReply(e.target.value)}
               maxLength={100}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
+              rows={1}
+              onInput={(e) => {
+                const target = e.currentTarget;
+                target.style.height = "auto";
+                target.style.height = `${target.scrollHeight}px`;
+              }}
+              onBlur={async () => {
+                if (replyBlurBlockRef.current) {
+                  replyBlurBlockRef.current = false;
+                  return;
+                }
+
+                const trimmed = draftReply.trim();
+                // 아무 것도 없으면 서버 전송 없이 초기화만
+                if (!trimmed) {
+                  if (savedReply) {
+                    setDraftReply(savedReply);
+                    setIsEditingReply(false);
+                  }
+                  return;
+                }
+
+                // 기존 답장이 있고 내용 변경이 없으면 저장 없이 편집만 종료
+                if (savedReply && isEditingReply && trimmed === savedReply) {
+                  setIsEditingReply(false);
+                  return;
+                }
+
+                if (replyLoading || patchReplyMutation.isPending) return;
+
+                setReplyLoading(true);
+                try {
+                  const res = await patchReplyMutation.mutateAsync(trimmed);
+                  if (!res.success) {
+                    toast.show(res.message || "답장 전송에 실패했습니다.");
+                    return;
+                  }
+                  setSavedReply(trimmed);
+                  setIsEditingReply(false);
+                } catch {
+                  toast.show("답장 전송 중 오류가 발생했습니다.");
+                } finally {
+                  setReplyLoading(false);
                 }
               }}
               placeholder="답장을 적어보세요"
               className={`
-                w-full h-[45px]
+                w-full
                 border border-[#E6E7E9]
-                rounded-xl px-4 pr-28
+                rounded-xl px-4 py-[10px]
                 font-medium text-sm
                 bg-white text-primary placeholder-[#C2C4C7]
                 outline-none
+                resize-none
+                overflow-y-hidden
               `}
             />
-
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
-              {savedReply && (
+            </div>
+            {savedReply && (
+              <div className="mt-1 flex justify-end">
                 <button
                   type="button"
                   onClick={async () => {
+                    // 삭제 버튼 클릭 시 blur에 의한 자동 저장 방지
+                    replyBlurBlockRef.current = true;
                     if (replyLoading || deleteReplyMutation.isPending) return;
                     setReplyLoading(true);
                     try {
@@ -392,42 +477,14 @@ export default function LetterDetailSection({
                       setReplyLoading(false);
                     }
                   }}
-                  className="h-[30px] px-2 rounded-lg text-xs font-medium bg-[#E6E7E9] text-[#555557]"
+                  className="text-xs font-medium text-[#9D9D9F]"
                   disabled={replyLoading || deleteReplyMutation.isPending}
                 >
                   삭제
                 </button>
-              )}
-              <button
-                type="button"
-                disabled={!draftReply.trim() || replyLoading || patchReplyMutation.isPending}
-                onClick={async () => {
-                  if (!draftReply.trim()) return;
-                  setReplyLoading(true);
-                  try {
-                    const res = await patchReplyMutation.mutateAsync(draftReply.trim());
-                    if (!res.success) {
-                      toast.show(res.message || "답장 전송에 실패했습니다.");
-                      return;
-                    }
-                    setSavedReply(draftReply.trim());
-                    setIsEditingReply(false);
-                  } catch {
-                    toast.show("답장 전송 중 오류가 발생했습니다.");
-                  } finally {
-                    setReplyLoading(false);
-                  }
-                }}
-                className={`h-[30px] px-2 rounded-lg text-xs font-medium ${
-                  draftReply.trim()
-                    ? "bg-[#555557] text-white"
-                    : "bg-[#E6E7E9] text-[#9D9D9F] cursor-not-allowed"
-                }`}
-              >
-                전송
-              </button>
-            </div>
-          </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
