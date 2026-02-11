@@ -1,5 +1,7 @@
 import { useAuthStore } from '@/stores/authStore';
+import { useStyleStore } from "@/stores/styleStores";
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
+import type { UserProfile, UpdateMeRequest, UpdateMeResponse, UploadImageResponse, ImageDir } from '@/types/user';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -41,7 +43,7 @@ api.interceptors.response.use(
     // 조건 정리
     const is401 = error.response?.status === 401;
     const isRefreshRequest = originalRequest?.url?.includes('/auth/jwt/refresh');
-    const { authStatus, setAuthStatus } = useAuthStore.getState();
+    const { authStatus } = useAuthStore.getState();
 
     if (authStatus !== 'authenticated' && authStatus !== 'checking') {
       return Promise.reject(error);
@@ -90,8 +92,7 @@ api.interceptors.response.use(
       return api(originalRequest);
     } catch (refreshError) {
       delete api.defaults.headers.common.Authorization;
-      // 토큰 재발급 실패 - 인증 해제 상태로 전환
-      setAuthStatus('unauthenticated');
+      useAuthStore.getState().setAuthStatus("unauthenticated");
 
       return Promise.reject(refreshError);
     } finally {
@@ -99,3 +100,43 @@ api.interceptors.response.use(
     }
   }
 );
+
+export async function logout() {
+  try {
+    // 서버: Redis refresh 삭제 + 쿠키 만료
+    await api.post("/auth/logout");
+  } finally {
+    // 프론트: 메모리 access 토큰 제거 + 인증 상태 초기화
+    delete api.defaults.headers.common.Authorization;
+    useAuthStore.getState().setAuthStatus("unauthenticated");
+
+    useStyleStore.getState().resetStyle();
+    localStorage.removeItem("deare-style");
+  }
+}
+
+export async function getMe(): Promise<UserProfile> {
+  const res = await api.get('/users/me');
+  return res.data.data as UserProfile;
+}
+
+export async function updateMe(payload: UpdateMeRequest): Promise<UpdateMeResponse> {
+  const res = await api.patch('/users/me', payload);
+  return res.data.data as UpdateMeResponse;
+}
+
+export async function deleteMe(): Promise<void> {
+  await api.delete("/users/me");
+}
+
+export async function uploadImage(file: File, dir: ImageDir): Promise<UploadImageResponse> {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("dir", dir);
+
+  const res = await api.post("/images", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+  return res.data.data as UploadImageResponse;
+}

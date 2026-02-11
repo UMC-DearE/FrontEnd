@@ -1,18 +1,30 @@
 // 마이페이지
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import PlusModal from '@/components/my/PlusModal';
 import { PremiumBadge } from '@/components/common/PremiumBadge';
 import MenuItem from '@/components/my/MenuItem';
 import ChevronRightIcon from '@/components/icons/ChevronRightIcon';
 import ProfilePlaceholderIcon from '@/components/icons/ProfilePlaceholderIcon';
 import ConfirmModal from '@/components/common/ConfirmModal';
+import type { MyProfileSectionProps } from '@/components/my/types';
+
 import { useStyleStore } from '@/stores/styleStores';
 import { useMembershipStore } from '@/stores/membershipStores';
-import { FONT_LABEL } from '@/utils/fontLabelMap';
+import { useAuthStore } from '@/stores/authStore';
 
-function MyProfileSection({ isPlus }: { isPlus: boolean }) {
+import { FONT_LABEL } from '@/utils/fontLabelMap';
+import { logout, getMe } from '@/api/http';
+import { getMyMembership, payMyMembershipTemp } from "@/api/membership";
+import { getMyTheme, serverFontToClient } from '@/api/theme';
+
+export function MyProfileSection({
+  nickname,
+  profileImageUrl,
+  isPlus,
+}: MyProfileSectionProps) {
   const navigate = useNavigate();
 
   return (
@@ -33,16 +45,28 @@ function MyProfileSection({ isPlus }: { isPlus: boolean }) {
     >
       <div className="flex items-center gap-[15px]">
         <div className="w-[60px] h-[60px] rounded-full bg-[#F2F3F5] flex items-center justify-center overflow-hidden">
-          <ProfilePlaceholderIcon size={28} />
+          {profileImageUrl ? (
+            <img
+              src={profileImageUrl}
+              alt="프로필 이미지"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <ProfilePlaceholderIcon size={28} />
+          )}
         </div>
 
         <div className="flex-1">
           <div className="flex items-center gap-[10px]">
-            <span className="font-medium text-[16px] truncate">닉네임여러글자실험</span>
+            <span className="font-medium text-[16px] truncate">
+              {nickname}
+            </span>
             {isPlus && <PremiumBadge label="Plus" />}
           </div>
 
-          <p className="font-medium text-[12px] text-[#9D9D9F] mt-2">프로필 수정</p>
+          <p className="font-medium text-[12px] text-[#9D9D9F] mt-2">
+            프로필 수정
+          </p>
         </div>
 
         <ChevronRightIcon />
@@ -55,24 +79,66 @@ export default function MyhomePage() {
   const [isPlusModalOpen, setIsPlusModalOpen] = useState(false);
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
 
+  const [nickname, setNickname] = useState('');
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+
   const font = useStyleStore((s) => s.font);
+  const setFont = useStyleStore((s) => s.setFont);
 
   const isPlus = useMembershipStore((s) => s.isPlus);
   const setIsPlus = useMembershipStore((s) => s.setIsPlus);
 
+  const setAuthStatus = useAuthStore((s) => s.setAuthStatus);
+
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+  useEffect(() => {
+    let mounted = true;
 
-    navigate('/login', { replace: true });
+    (async () => {
+      try {
+        const me = await getMe();
+        if (!mounted) return;
+
+        setNickname(me.nickname);
+        setProfileImageUrl(me.profileImageUrl);
+
+        const membership = await getMyMembership();
+        if (!mounted) return;
+        
+        setIsPlus(membership.isPlus);
+
+        const theme = await getMyTheme();
+        if (!mounted) return;
+        setFont(serverFontToClient(theme.font));
+
+      } catch {
+        setAuthStatus("unauthenticated");
+        navigate("/login", { replace: true });
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [navigate, setAuthStatus, setIsPlus, setFont]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } finally {
+      setOpenLogoutModal(false);
+      navigate('/login', { replace: true });
+    }
   };
 
   return (
     <>
       <main className="bg-white -mt-[20px]">
-        <MyProfileSection isPlus={isPlus} />
+        <MyProfileSection
+        nickname={nickname || '사용자'}
+        profileImageUrl={profileImageUrl}
+        isPlus={isPlus} 
+        />
 
         <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#9D9D9F]">
           설정
@@ -148,8 +214,9 @@ export default function MyhomePage() {
       <PlusModal
         open={isPlusModalOpen}
         onClose={() => setIsPlusModalOpen(false)}
-        onPay={() => {
-          setIsPlus(true);
+        onPay={async () => {
+          const paid = await payMyMembershipTemp();
+          setIsPlus(paid.isPlus); // true
           setIsPlusModalOpen(false);
         }}
       />
