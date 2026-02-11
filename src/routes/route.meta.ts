@@ -58,6 +58,7 @@ export const ROUTE_META: Array<{
     match: (pathname) => pathname === '/create/detail',
     header: 'CREATE_DETAIL',
     bg: 'white',
+    hideHeader: true,
   },
 
   // 편지 추가 프롬 선택
@@ -81,6 +82,7 @@ export const ROUTE_META: Array<{
     match: (pathname) => pathname.startsWith('/letter/') && pathname.endsWith('/edit'),
     header: 'EDIT_LETTER',
     bg: 'white',
+    hideHeader: true,
   },
 
   // 편지 상세

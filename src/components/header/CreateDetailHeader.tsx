@@ -1,14 +1,16 @@
-// 편지 추가 - 내용 분석 페이지 헤더
+// 편지 추가 - 내용 분석 페이지 헤더 (페이지 내부에서 사용)
 
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ThumbnailHeader from "./presets/ThumbnailHeader";
 
-export default function CreateDetailHeader() {
-  const navigate = useNavigate();
-  const location = useLocation();
+type ImageSource = File | string;
 
-  const state = (location as any).state || {};
-  const images: File[] | undefined = state.images;
+type Props = {
+  images?: ImageSource[];
+};
+
+export default function CreateDetailHeader({ images }: Props) {
+  const navigate = useNavigate();
 
   return (
     <ThumbnailHeader

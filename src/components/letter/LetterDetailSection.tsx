@@ -337,61 +337,64 @@ export default function LetterDetailSection({
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between">
           <p className="text-base font-semibold text-primary">답장하기</p>
-          {savedReply && (
-            <button
-              type="button"
-              onClick={async () => {
-                // 삭제 버튼 클릭 시 blur에 의한 자동 저장 방지
-                replyBlurBlockRef.current = true;
-                if (replyLoading || deleteReplyMutation.isPending) return;
-                setReplyLoading(true);
-                try {
-                  await deleteReplyMutation.mutateAsync();
-                  setSavedReply("");
-                  setDraftReply("");
-                  setIsEditingReply(false);
-                } catch {
-                  toast.show("답장 삭제 중 오류가 발생했습니다.");
-                } finally {
-                  setReplyLoading(false);
-                }
-              }}
-              className="text-xs font-medium text-[#9D9D9F]"
-              disabled={replyLoading || deleteReplyMutation.isPending}
-            >
-              삭제
-            </button>
-          )}
         </div>
         {/* 이미 답장이 있는 경우 */}
         {savedReply && !isEditingReply ? (
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => {
-              setDraftReply(savedReply);
-              setIsEditingReply(true);
-              requestAnimationFrame(() => {
-                const el = replyTextareaRef.current;
-                if (!el) return;
-                el.style.height = "auto";
-                el.style.height = `${el.scrollHeight}px`;
-              });
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
+          <>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => {
                 setDraftReply(savedReply);
                 setIsEditingReply(true);
-              }
-            }}
-            className="rounded-xl border border-[#E6E7E9] bg-white px-4 py-[14px] text-sm text-[#555557]"
-          >
-            {savedReply}
-          </div>
+                requestAnimationFrame(() => {
+                  const el = replyTextareaRef.current;
+                  if (!el) return;
+                  el.style.height = "auto";
+                  el.style.height = `${el.scrollHeight}px`;
+                });
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setDraftReply(savedReply);
+                  setIsEditingReply(true);
+                }
+              }}
+              className="rounded-xl border border-[#E6E7E9] bg-white px-4 py-[14px] text-sm text-[#555557]"
+            >
+              {savedReply}
+            </div>
+            <div className="mt-1 flex justify-end">
+              <button
+                type="button"
+                onClick={async () => {
+                  // 삭제 버튼 클릭 시 blur에 의한 자동 저장 방지
+                  replyBlurBlockRef.current = true;
+                  if (replyLoading || deleteReplyMutation.isPending) return;
+                  setReplyLoading(true);
+                  try {
+                    await deleteReplyMutation.mutateAsync();
+                    setSavedReply("");
+                    setDraftReply("");
+                    setIsEditingReply(false);
+                  } catch {
+                    toast.show("답장 삭제 중 오류가 발생했습니다.");
+                  } finally {
+                    setReplyLoading(false);
+                  }
+                }}
+                className="text-xs font-medium text-[#9D9D9F]"
+                disabled={replyLoading || deleteReplyMutation.isPending}
+              >
+                삭제
+              </button>
+            </div>
+          </>
         ) : (
-          <div className="relative">
-            <textarea
+          <>
+            <div className="relative">
+              <textarea
               ref={replyTextareaRef}
               value={draftReply}
               onChange={(e) => setDraftReply(e.target.value)}
@@ -453,9 +456,35 @@ export default function LetterDetailSection({
                 overflow-y-hidden
               `}
             />
-
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2" />
-          </div>
+            </div>
+            {savedReply && (
+              <div className="mt-1 flex justify-end">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    // 삭제 버튼 클릭 시 blur에 의한 자동 저장 방지
+                    replyBlurBlockRef.current = true;
+                    if (replyLoading || deleteReplyMutation.isPending) return;
+                    setReplyLoading(true);
+                    try {
+                      await deleteReplyMutation.mutateAsync();
+                      setSavedReply("");
+                      setDraftReply("");
+                      setIsEditingReply(false);
+                    } catch {
+                      toast.show("답장 삭제 중 오류가 발생했습니다.");
+                    } finally {
+                      setReplyLoading(false);
+                    }
+                  }}
+                  className="text-xs font-medium text-[#9D9D9F]"
+                  disabled={replyLoading || deleteReplyMutation.isPending}
+                >
+                  삭제
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 

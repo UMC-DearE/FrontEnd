@@ -1,25 +1,32 @@
 import { useEffect, useState } from "react";
 
+type ImageSource = File | string;
+
 type Props = {
-  file?: File;
+  source?: ImageSource;
   onClick?: () => void;
 };
 
-export default function LetterThumbnail({ file, onClick }: Props) {
+export default function LetterThumbnail({ source, onClick }: Props) {
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!file) {
+    if (!source) {
       setUrl(null);
       return;
     }
 
-    const objectUrl = URL.createObjectURL(file);
+    if (typeof source === "string") {
+      setUrl(source);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(source);
     setUrl(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);
-  }, [file]);
+  }, [source]);
 
-  if (!file || !url) {
+  if (!url) {
     return (
       <div
         className="w-[44px] h-[44px] rounded-sm bg-gray-200"
@@ -32,16 +39,20 @@ export default function LetterThumbnail({ file, onClick }: Props) {
     <button
       type="button"
       onClick={onClick}
-      className="w-[44px] h-[44px] rounded-sm overflow-hidden p-0"
-      aria-label="이미지 보기"
+      className="w-[44px] h-[44px] rounded-sm overflow-hidden bg-gray-200"
     >
       <img
+        key={url}
         src={url}
-        alt="썸네일"
-        className="w-full h-full object-cover select-none"
+        alt=""
+        className="w-full h-full object-cover"
         draggable={false}
+        onError={(e) => {
+          e.currentTarget.style.display = "none";
+        }}
       />
     </button>
   );
 }
+
 

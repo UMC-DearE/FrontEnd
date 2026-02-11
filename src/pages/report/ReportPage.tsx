@@ -14,6 +14,7 @@ import {
   fallbackTop3Style,
   fallbackEmotionStyle,
 } from '@/constants/reportStyle';
+import ReportSkeleton from '@/components/skeleton/ReportSkeleton';
 
 type Top3FromUIItem = ReportTop3FromItem & { color: string; textColor: string };
 type EmotionUIItem = ReportEmotionDistributionItem & { color: string; textColor: string };
@@ -25,6 +26,7 @@ export default function ReportPage() {
     []
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -47,6 +49,21 @@ export default function ReportPage() {
       alive = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setShowSkeleton(false);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setShowSkeleton(true);
+    }, 250);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [isLoading]);
 
   const medalIcons = useMemo(() => [goldIcon, silverIcon, bronzeIcon], []);
 
@@ -71,6 +88,14 @@ export default function ReportPage() {
       }),
     [emotionDistribution]
   );
+  if (isLoading && showSkeleton) {
+    return (
+      <div className="flex flex-col">
+        <ReportSkeleton />
+      </div>
+    );
+  }
+  if (isLoading) return null;
 
   return (
     <div className="flex flex-col">
