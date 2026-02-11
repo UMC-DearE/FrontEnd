@@ -1,7 +1,7 @@
 # 💌 Dear.e
 > **아날로그의 온기를 스마트하게, 편지 아카이빙 서비스**
 
-<p><small>디어리의 프론트엔드 저장소입니다!</small></p>
+<p>디어리의 프론트엔드 저장소입니다!</p>
 
 ![메인화면](./public/canvas.png)
 
@@ -43,7 +43,7 @@
 <td align="center" style="width: 200px; padding: 10px;">
 <img src="https://github.com/summinn9.png" width="200"/><br/>
 <b>장수민</b><br/>
-<sub>회원가입, 마이페이지</sub>
+<sub>회원가입, 인증, 마이페이지</sub>
 </td>
 
 <td align="center" style="width: 200px; padding: 10px;">
