@@ -1,7 +1,7 @@
 // 마이페이지 플러스멤버십 모달
 
 import { createPortal } from "react-dom";
-import PayButtonIcon from "@/assets/myPage/paymentButton.svg";
+import PaymentButton from "@/components/common/PaymentButton";
 import type { PlusModalProps } from "@/types/modal";
 import type { ReactNode } from "react";
 import fontIcon from "@/assets/myPage/fontIcon.svg";
@@ -42,7 +42,7 @@ export default function PlusModal({ open, onPay, onClose }: PlusModalProps) {
         </div>
 
         <button type="button" onClick={onPay} className="w-full mb-[36px]">
-          <img src={PayButtonIcon} />
+          <PaymentButton amountText="1,990원" />
         </button>
         </div>
       </div>
