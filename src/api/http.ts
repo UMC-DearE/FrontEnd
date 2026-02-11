@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/stores/authStore';
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
+import type { UserProfile } from '@/types/user';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -114,4 +115,9 @@ export async function logout() {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
   }
+}
+
+export async function getMe(): Promise<UserProfile> {
+  const res = await api.get('/users/me');
+  return res.data.data as UserProfile;
 }
