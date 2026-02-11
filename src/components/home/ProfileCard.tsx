@@ -1,6 +1,6 @@
 // 홈 프로필 카드
 
-import defaultProfile from '@/assets/homePage/defaultProfile.svg';
+import ProfilePlaceholderIcon from '../icons/ProfilePlaceholderIcon';
 import setIcon from '@/assets/homePage/settingIcon.svg';
 
 interface ProfileCardProps {
@@ -21,7 +21,17 @@ export default function ProfileCard({ nickname, bio, imgUrl, onClickSettings }: 
         <img src={setIcon} alt="set-icon" className="h-[19px] w-[19px]" />
       </button>
 
-      <img src={imgUrl || defaultProfile} alt="profile" className="mt-9 h-[74px] w-[74px]" />
+      <div className="mt-9 h-[74px] w-[74px] flex items-center justify-center overflow-hidden rounded-full bg-[#F3F4F6]">
+        {imgUrl ? (
+          <img
+            src={imgUrl}
+            alt="profile"
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <ProfilePlaceholderIcon size={36}/>
+        )}
+      </div>
 
       <p className="mt-3 h-[21px] text-[18px] font-semibold">{nickname || '닉네임설정'}</p>
 
