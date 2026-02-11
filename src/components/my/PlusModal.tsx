@@ -7,15 +7,23 @@ import type { ReactNode } from "react";
 import fontIcon from "@/assets/myPage/fontIcon.svg";
 import stickerIcon from "@/assets/myPage/stickerIcon.svg";
 
-export default function PlusModal({ open, onPay }: PlusModalProps) {
+export default function PlusModal({ open, onPay, onClose }: PlusModalProps) {
   if (!open) return null;
 
   const container = document.getElementById("app-frame");
   if (!container) return null;
 
   return createPortal(
-    <div className="absolute inset-0 z-50 flex items-end bg-black/40">
-      <div className="w-full bg-white rounded-t-2xl p-4">
+    <div className="fixed inset-0 z-50 flex justify-center">
+      <div className="relative w-[393px] min-h-screen">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute inset-0 bg-black/40"
+        />
+
+        <div className="absolute bottom-0 w-full bg-white rounded-t-2xl p-4 flex flex-col items-stretch">
+        
         <h2 className="text-center mt-3">
           <span className="text-[20px] font-medium tracking-tight">
             Dear.e{" "}
@@ -36,6 +44,7 @@ export default function PlusModal({ open, onPay }: PlusModalProps) {
         <button type="button" onClick={onPay} className="w-full mb-[36px]">
           <PaymentButton amountText="1,990원" />
         </button>
+        </div>
       </div>
     </div>,
     container

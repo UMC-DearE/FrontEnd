@@ -4,6 +4,7 @@
 <p>디어리의 프론트엔드 저장소입니다!</p>
 
 ![메인화면](./public/canvas.png)
+<br /><br />
 
 
 ## 🤖 핵심 기능
@@ -20,6 +21,7 @@
 ### 🎨 개인화 및 사용자 경험 강화
 - 배경 색상과 스티커를 활용해 자유롭게 홈 화면을 커스터마이징 할 수 있습니다.
 - 폰트 테마를 선택하여 자신의 취향에 맞게 기록의 분위기를 바꿀 수 있습니다.
+<br /><br />
 
 ## 🛠️ Tech Stack   
 ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=white)
@@ -33,6 +35,7 @@
 ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?logo=prettier&logoColor=white)
 ![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
+<br /><br />
 
 
 ## 💖 FE Developer
@@ -43,7 +46,7 @@
 <td align="center" style="width: 200px; padding: 10px;">
 <img src="https://github.com/summinn9.png" width="200"/><br/>
 <b>장수민</b><br/>
-<sub>회원가입, 인증, 마이페이지</sub>
+<sub>회원가입, 온보딩, 인증, 마이페이지</sub>
 </td>
 
 <td align="center" style="width: 200px; padding: 10px;">
@@ -59,6 +62,7 @@
 </td>
 </tr>
 </table>
+<br />
 
 ## 🔗 Git Convention
 

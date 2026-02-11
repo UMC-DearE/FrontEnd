@@ -41,3 +41,4 @@ export default function ProfileCard({ nickname, bio, imgUrl, onClickSettings }: 
     </div>
   );
 }
+

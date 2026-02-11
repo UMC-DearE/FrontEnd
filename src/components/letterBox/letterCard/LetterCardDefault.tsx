@@ -2,6 +2,7 @@ import heartOutlineIcon from '@/assets/letterPage/heart-outline.svg';
 import heartFillIcon from '@/assets/letterPage/heart-filled.svg';
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useToggleLetterLike } from '@/hooks/mutations/useToggleLetterLike';
+import { FromBadge } from '@/components/common/FromBadge';
 import type { From } from '@/types/from';
 
 type LetterCardDefaultProps = {
@@ -52,7 +53,7 @@ export default function LetterCardDefault({
 
   const bgColor = safeColor(from?.bgColor, '#EDEDED');
   const fontColor = safeColor(from?.fontColor, '#555557');
-  const fromName = from?.name ?? '';
+  const fromName = from?.name ?? '-';
   const displayDate = receivedAt && receivedAt.trim().length > 0 ? receivedAt : '-';
 
   return (
@@ -84,11 +85,8 @@ export default function LetterCardDefault({
           </p>
         </div>
 
-        <div
-          className="flex h-6 w-[45px] items-center justify-center rounded-[6px]"
-          style={{ backgroundColor: bgColor, color: fontColor }}
-        >
-          <p className="font-medium text-[13px] truncate">{fromName}</p>
+        <div className="mt-1 flex justify-start">
+          <FromBadge name={fromName} bgColor={bgColor} fontColor={fontColor} size="sm" />
         </div>
       </div>
     </div>
