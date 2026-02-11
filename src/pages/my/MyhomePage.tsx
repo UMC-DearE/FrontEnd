@@ -18,6 +18,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { FONT_LABEL } from '@/utils/fontLabelMap';
 import { logout, getMe } from '@/api/http';
 import { getMyMembership, payMyMembershipTemp } from "@/api/membership";
+import { getMyTheme, serverFontToClient } from '@/api/theme';
 
 export function MyProfileSection({
   nickname,
@@ -82,6 +83,7 @@ export default function MyhomePage() {
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
 
   const font = useStyleStore((s) => s.font);
+  const setFont = useStyleStore((s) => s.setFont);
 
   const isPlus = useMembershipStore((s) => s.isPlus);
   const setIsPlus = useMembershipStore((s) => s.setIsPlus);
@@ -105,6 +107,11 @@ export default function MyhomePage() {
         if (!mounted) return;
         
         setIsPlus(membership.isPlus);
+
+        const theme = await getMyTheme();
+        if (!mounted) return;
+        setFont(serverFontToClient(theme.font));
+
       } catch {
         setAuthStatus("unauthenticated");
         navigate("/login", { replace: true });
@@ -113,7 +120,7 @@ export default function MyhomePage() {
     return () => {
       mounted = false;
     };
-  }, [navigate, setAuthStatus, setIsPlus]);
+  }, [navigate, setAuthStatus, setIsPlus, setFont]);
 
   const handleLogout = async () => {
     try {

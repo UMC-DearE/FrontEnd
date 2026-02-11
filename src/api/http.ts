@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/authStore';
+import { useStyleStore } from "@/stores/styleStores";
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 import type { UserProfile, UpdateMeRequest, UpdateMeResponse, UploadImageResponse, ImageDir } from '@/types/user';
 
@@ -114,6 +115,9 @@ export async function logout() {
 
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    
+    useStyleStore.getState().resetStyle();
+    localStorage.removeItem("deare-style");
   }
 }
 

@@ -7,6 +7,7 @@ import { FontRow } from "@/components/my/FontRow";
 import { FONT_OPTIONS } from "@/utils/fontOptions";
 import { useStyleStore } from "@/stores/styleStores";
 import { BottomButton } from "@/components/common/BottomButton";
+import { patchMyFont, serverFontToClient } from "@/api/theme";
 
 export default function StylePage() {
   const navigate = useNavigate();
@@ -31,11 +32,14 @@ export default function StylePage() {
 
   const canSave = pendingFont !== font;
 
-  const onSubmit = useCallback(() => {
+  const onSubmit = useCallback(async () => {
     if (pendingFont === font) return;
-    setFont(pendingFont);
+
+    const res = await patchMyFont(pendingFont);
+    setFont(serverFontToClient(res.font));
     navigate(-1);
   }, [pendingFont, font, setFont, navigate]);
+
 
   useEffect(() => {
     if (!setFixedAction) return;
