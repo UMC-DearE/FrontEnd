@@ -54,7 +54,7 @@ export function AppLayout() {
 
   const HEADER_HEIGHT = 105;
   const BOTTOM_NAV_HEIGHT = 95;
-  const FIXED_ACTION_HEIGHT = 52 + 28 + 16;
+  const FIXED_ACTION_HEIGHT = 52 + 20 + 16;
 
   const bottomInset = fixedAction ? FIXED_ACTION_HEIGHT : hideBottomNav ? 0 : BOTTOM_NAV_HEIGHT;
 
@@ -88,10 +88,10 @@ export function AppLayout() {
       {fixedAction && (
         <div className="fixed bottom-0 inset-x-0 z-40 flex justify-center pointer-events-none">
           <div
-            className="w-full max-w-[393px] pt-3 pointer-events-auto pb-safe-bottom"
+            className="w-full max-w-[393px] pt-3 pointer-events-auto"
             style={{
               background: fixedAction.bgColor ?? '#F8F8F8',
-              paddingBottom: `calc(52px + env(safe-area-inset-bottom, 0px))`,
+              paddingBottom: '52px',
             }}
           >
             <div className="px-4">{fixedAction.node}</div>
