@@ -17,6 +17,7 @@ import { useAuthStore } from '@/stores/authStore';
 
 import { FONT_LABEL } from '@/utils/fontLabelMap';
 import { logout, getMe } from '@/api/http';
+import { getMyMembership, payMyMembershipTemp } from "@/api/membership";
 
 export function MyProfileSection({
   nickname,
@@ -100,15 +101,15 @@ export default function MyhomePage() {
         setNickname(me.nickname);
         setProfileImageUrl(me.profileImageUrl);
 
-        // 도메인 타입(UserProfile.membershipPlan: FREE/PLUS)을 UI boolean으로 변환
-        setIsPlus(me.membershipPlan === 'PLUS');
+        const membership = await getMyMembership();
+        if (!mounted) return;
+        
+        setIsPlus(membership.isPlus);
       } catch {
-        // 인증 만료/비로그인 → 로그인 화면으로
-        setAuthStatus('unauthenticated');
-        navigate('/login', { replace: true });
+        setAuthStatus("unauthenticated");
+        navigate("/login", { replace: true });
       }
     })();
-
     return () => {
       mounted = false;
     };
@@ -206,8 +207,9 @@ export default function MyhomePage() {
       <PlusModal
         open={isPlusModalOpen}
         onClose={() => setIsPlusModalOpen(false)}
-        onPay={() => {
-          setIsPlus(true);
+        onPay={async () => {
+          const paid = await payMyMembershipTemp();
+          setIsPlus(paid.isPlus); // true
           setIsPlusModalOpen(false);
         }}
       />
