@@ -10,9 +10,13 @@ import type {
   PatchLetterResponse,
   RandomLetterApiResponse,
 } from '@/types/letter';
+import { normalizeImageUrl } from './upload';
 
 export const getLetterDetail = async (letterId: number): Promise<LetterDetailResponse> => {
   const { data } = await api.get<LetterDetailResponse>(`/letters/${letterId}`);
+  if (data?.data?.imageUrls && Array.isArray(data.data.imageUrls)) {
+    data.data.imageUrls = data.data.imageUrls.map(normalizeImageUrl);
+  }
   return data;
 };
 

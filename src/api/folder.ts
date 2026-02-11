@@ -1,14 +1,25 @@
 import { api } from '@/api/http';
 import type { Folder, FolderListResponse, FolderLetterResponse } from '@/types/folder';
+import { normalizeImageUrl } from '@/api/upload';
 
 export async function getFolderList(): Promise<Folder[]> {
   const res = await api.get<FolderListResponse>('/folders');
-  return res.data.data.items;
+  const items = res.data.data.items;
+
+  return items.map((folder) => ({
+    ...folder,
+    imageUrl: folder.imageUrl ? normalizeImageUrl(folder.imageUrl) : folder.imageUrl,
+  }));
 }
 
 export async function createFolder(folder_name: string, imageId: number | null): Promise<Folder> {
   const res = await api.post<{ data: Folder }>('/folders', { folder_name, imageId });
-  return res.data.data;
+  const folder = res.data.data;
+
+  return {
+    ...folder,
+    imageUrl: folder.imageUrl ? normalizeImageUrl(folder.imageUrl) : folder.imageUrl,
+  };
 }
 
 export async function updateFolder(
