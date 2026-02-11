@@ -3,7 +3,7 @@
 
 디어리의 프론트엔드 저장소입니다!
 
-<img src="./public/canvas.png" alt="메인화면" width="320" />
+<img src="./public/canvas.png" alt="메인화면" width="400" />
 
 
 ## 🤖 핵심 기능
@@ -43,7 +43,7 @@
 <td align="center" style="width: 160px; padding: 10px;">
 <img src="https://github.com/summinn9.png" width="140"/><br/>
 <b>장수민</b><br/>
-<sub>회원가입, 마이페이지</sub>
+<sub>회원가입, 인증, 마이페이지</sub>
 </td>
 
 <td align="center" style="width: 160px; padding: 10px;">
