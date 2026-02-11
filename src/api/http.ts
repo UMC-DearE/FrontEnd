@@ -115,7 +115,7 @@ export async function logout() {
 
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    
+
     useStyleStore.getState().resetStyle();
     localStorage.removeItem("deare-style");
   }
@@ -129,6 +129,10 @@ export async function getMe(): Promise<UserProfile> {
 export async function updateMe(payload: UpdateMeRequest): Promise<UpdateMeResponse> {
   const res = await api.patch('/users/me', payload);
   return res.data.data as UpdateMeResponse;
+}
+
+export async function deleteMe(): Promise<void> {
+  await api.delete("/users/me");
 }
 
 export async function uploadImage(file: File, dir: ImageDir): Promise<UploadImageResponse> {

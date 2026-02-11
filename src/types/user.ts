@@ -1,11 +1,15 @@
 export type MembershipPlan = "FREE" | "PLUS";
 
+export type Provider = "KAKAO" | "GOOGLE";
+
 export interface UserProfile {
   userId: number;
   nickname: string;
   intro: string | null;
   profileImageUrl: string | null;
   membershipPlan: MembershipPlan;
+  email: string | null;
+  provider: Provider;
 }
 
 export interface UpdateMeRequest {
