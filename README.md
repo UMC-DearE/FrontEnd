@@ -1,9 +1,10 @@
 # 💌 Dear.e
 > **감정을 저장하는 디지털 편지함**
 
-<sub>디어리의 프론트엔드 저장소입니다!</sub>
+디어리의 프론트엔드 저장소입니다!
 
-![메인화면](./public/canvas.png)
+<img src="./public/canvas.png" alt="메인화면" width="320" />
+
 
 ## 🤖 핵심 기능
 ###  📭 편지 작성 및 AI 분석
@@ -39,20 +40,20 @@
 
 <table>
 <tr>
-<td align="center" style="width: 200px; padding: 10px;">
-<img src="https://github.com/summinn9.png" width="200"/><br/>
+<td align="center" style="width: 160px; padding: 10px;">
+<img src="https://github.com/summinn9.png" width="140"/><br/>
 <b>장수민</b><br/>
 <sub>회원가입, 마이페이지</sub>
 </td>
 
-<td align="center" style="width: 200px; padding: 10px;">
-<img src="https://github.com/kxxnayun.png" width="200"/><br/>
+<td align="center" style="width: 160px; padding: 10px;">
+<img src="https://github.com/kxxnayun.png" width="140"/><br/>
 <b>김나윤</b><br/>
 <sub>홈, 편지함, 리포트, PWA 설정, 배포</sub>
 </td>
 
-<td align="center" style="width: 200px; padding: 10px;">
-<img src="https://github.com/riveryunny.png" width="200"/><br/>
+<td align="center" style="width: 160px; padding: 10px;">
+<img src="https://github.com/riveryunny.png" width="140"/><br/>
 <b>이가윤</b><br/>
 <sub>편지 추가, 편지 상세, 프롬 관리, 레이아웃, 인증 플로우</sub>
 </td>
