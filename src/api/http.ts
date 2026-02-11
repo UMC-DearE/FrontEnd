@@ -94,9 +94,6 @@ api.interceptors.response.use(
       delete api.defaults.headers.common.Authorization;
       useAuthStore.getState().setAuthStatus("unauthenticated");
 
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
@@ -112,9 +109,6 @@ export async function logout() {
     // 프론트: 메모리 access 토큰 제거 + 인증 상태 초기화
     delete api.defaults.headers.common.Authorization;
     useAuthStore.getState().setAuthStatus("unauthenticated");
-
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
 
     useStyleStore.getState().resetStyle();
     localStorage.removeItem("deare-style");
