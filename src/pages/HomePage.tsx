@@ -51,7 +51,6 @@ export default function HomePage() {
   const stickers = openSheet ? draftStickers : savedStickers;
 
   const initialStickerIdsRef = useRef<string[]>([]);
-  const initializedRef = useRef(false);
 
   const applyRandomLetterToState = useCallback(
     (data: {
@@ -108,10 +107,11 @@ export default function HomePage() {
   }, [applyRandomLetterToState]);
 
   useEffect(() => {
-    if (!home || initializedRef.current) return;
+    if (!home) return;
 
-    initializedRef.current = true;
     setHomeBgColor(home.setting.homeColor);
+
+    if (openSheet) return;
 
     let alive = true;
 
@@ -132,6 +132,7 @@ export default function HomePage() {
           w: fitted.w,
           h: fitted.h,
         };
+
         return item;
       })
     )
@@ -145,7 +146,7 @@ export default function HomePage() {
     return () => {
       alive = false;
     };
-  }, [home, setHomeBgColor]);
+  }, [home, openSheet, setHomeBgColor]);
 
   const handlePin = async (letterId: number) => {
     try {
