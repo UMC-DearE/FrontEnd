@@ -3,7 +3,7 @@
 
 <p style="color: #9EA1A8; font-size: 14px;">디어리의 프론트엔드 저장소입니다!</p>
 
-<img src="./public/canvas.png" alt="메인화면" width="600" />
+![메인화면](./public/canvas.png)
 
 
 ## 🤖 핵심 기능
@@ -40,20 +40,20 @@
 
 <table>
 <tr>
-<td align="center" style="width: 160px; padding: 10px;">
-<img src="https://github.com/summinn9.png" width="140"/><br/>
+<td align="center" style="width: 200px; padding: 10px;">
+<img src="https://github.com/summinn9.png" width="200"/><br/>
 <b>장수민</b><br/>
-<sub>회원가입, 인증, 마이페이지</sub>
+<sub>회원가입, 마이페이지</sub>
 </td>
 
-<td align="center" style="width: 160px; padding: 10px;">
-<img src="https://github.com/kxxnayun.png" width="140"/><br/>
+<td align="center" style="width: 200px; padding: 10px;">
+<img src="https://github.com/kxxnayun.png" width="200"/><br/>
 <b>김나윤</b><br/>
 <sub>홈, 편지함, 리포트, PWA 설정, 배포</sub>
 </td>
 
-<td align="center" style="width: 160px; padding: 10px;">
-<img src="https://github.com/riveryunny.png" width="140"/><br/>
+<td align="center" style="width: 200px; padding: 10px;">
+<img src="https://github.com/riveryunny.png" width="200"/><br/>
 <b>이가윤</b><br/>
 <sub>편지 추가, 편지 상세, 프롬 관리, 레이아웃, 인증 플로우</sub>
 </td>
