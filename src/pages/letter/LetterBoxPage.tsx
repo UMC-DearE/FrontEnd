@@ -81,7 +81,7 @@ export default function LetterBoxPage() {
         setAllCount(res.data.data.totalElements ?? 0);
       } catch (e) {
         setAllCount(0);
-        console.log(e);
+        console.error(e);
       }
     };
 

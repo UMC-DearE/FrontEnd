@@ -83,3 +83,21 @@ export interface LetterLikeData {
 }
 
 export type LetterLikeResponse = CommonResponse<LetterLikeData>;
+
+export type RandomLetterApiResponse = {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    hasLetter: boolean;
+    date: {
+      fullDate: string;
+      month: string;
+      day: number;
+      dayOfWeek: string;
+    };
+    letterId: number;
+    randomPhrase: string;
+    isPinned: boolean;
+  };
+};

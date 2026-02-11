@@ -23,7 +23,7 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
   const letterId = letter?.id ?? null;
 
   const handlePinClick = () => {
-    if (letterId == null) return;
+    if (letterId == null || isEmpty) return;
 
     if (isPinned) {
       onRequestUnpin(letterId);
@@ -57,7 +57,7 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
       <button
         type="button"
         onClick={handlePinClick}
-        disabled={letterId == null}
+        disabled={letterId == null || isEmpty}
         className="absolute top-2 left-[339px] cursor-pointer"
       >
         <img

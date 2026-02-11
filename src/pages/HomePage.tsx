@@ -11,7 +11,7 @@ import { uploadImage } from '@/api/upload';
 import { updateHomeColor } from '@/api/home';
 import { createSticker, updateSticker, deleteSticker } from '@/api/sticker';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -53,62 +53,59 @@ export default function HomePage() {
   const initialStickerIdsRef = useRef<string[]>([]);
   const initializedRef = useRef(false);
 
-  type RandomLetterApiResponse = {
-    success: boolean;
-    code: string;
-    message: string;
-    data: {
+  const applyRandomLetterToState = useCallback(
+    (data: {
       hasLetter: boolean;
-      date: {
-        fullDate: string;
-        month: string;
-        day: number;
-        dayOfWeek: string;
-      };
+      date: { month: string; day: number; dayOfWeek: string };
       letterId: number;
       randomPhrase: string;
       isPinned: boolean;
-    };
-  };
+    }) => {
+      if (!data.hasLetter) {
+        setLetter({
+          id: 0,
+          excerpt: '',
+          month: data.date.month,
+          day: data.date.day,
+          dayOfWeek: data.date.dayOfWeek,
+        });
+        setPinnedLetterId(null);
+        return;
+      }
+
+      const next: HomeCardLetter = {
+        id: data.letterId,
+        excerpt: data.randomPhrase,
+        month: data.date.month,
+        day: data.date.day,
+        dayOfWeek: data.date.dayOfWeek,
+      };
+
+      setLetter(next);
+      setPinnedLetterId(data.isPinned ? data.letterId : null);
+    },
+    []
+  );
+
+  const refetchRandomLetter = useCallback(async () => {
+    const response = await getRandomLetter();
+    applyRandomLetterToState(response.data);
+  }, [applyRandomLetterToState]);
 
   useEffect(() => {
     let mounted = true;
 
     getRandomLetter()
-      .then((response: RandomLetterApiResponse) => {
+      .then((response) => {
         if (!mounted) return;
-
-        const data = response.data;
-
-        if (!data.hasLetter) {
-          setLetter({
-            id: 0,
-            excerpt: '',
-            month: data.date.month,
-            day: data.date.day,
-            dayOfWeek: data.date.dayOfWeek,
-          });
-          setPinnedLetterId(null);
-          return;
-        }
-
-        const next: HomeCardLetter = {
-          id: data.letterId,
-          excerpt: data.randomPhrase,
-          month: data.date.month,
-          day: data.date.day,
-          dayOfWeek: data.date.dayOfWeek,
-        };
-
-        setLetter(next);
-        setPinnedLetterId(data.isPinned ? data.letterId : null);
+        applyRandomLetterToState(response.data);
       })
       .catch(() => {});
 
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [applyRandomLetterToState]);
 
   useEffect(() => {
     if (!home || initializedRef.current) return;
@@ -168,32 +165,7 @@ export default function HomePage() {
     try {
       await updateLetterPinned(pendingUnpinId, false);
       setPendingUnpinId(null);
-
-      const response = (await getRandomLetter()) as RandomLetterApiResponse;
-      const data = response.data;
-
-      if (!data.hasLetter) {
-        setLetter({
-          id: 0,
-          excerpt: '',
-          month: data.date.month,
-          day: data.date.day,
-          dayOfWeek: data.date.dayOfWeek,
-        });
-        setPinnedLetterId(null);
-        return;
-      }
-
-      const next: HomeCardLetter = {
-        id: data.letterId,
-        excerpt: data.randomPhrase,
-        month: data.date.month,
-        day: data.date.day,
-        dayOfWeek: data.date.dayOfWeek,
-      };
-
-      setLetter(next);
-      setPinnedLetterId(data.isPinned ? data.letterId : null);
+      await refetchRandomLetter();
     } catch (error) {
       console.error(error);
     }
