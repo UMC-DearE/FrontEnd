@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/stores/authStore';
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
-import type { UserProfile } from '@/types/user';
+import type { UserProfile, UpdateMeRequest, UpdateMeResponse, UploadImageResponse, ImageDir } from '@/types/user';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -120,4 +120,21 @@ export async function logout() {
 export async function getMe(): Promise<UserProfile> {
   const res = await api.get('/users/me');
   return res.data.data as UserProfile;
+}
+
+export async function updateMe(payload: UpdateMeRequest): Promise<UpdateMeResponse> {
+  const res = await api.patch('/users/me', payload);
+  return res.data.data as UpdateMeResponse;
+}
+
+export async function uploadImage(file: File, dir: ImageDir): Promise<UploadImageResponse> {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("dir", dir);
+
+  const res = await api.post("/images", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+  return res.data.data as UploadImageResponse;
 }
