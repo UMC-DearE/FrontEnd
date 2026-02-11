@@ -1,6 +1,6 @@
 import LetterCardDefault from './LetterCardDefault';
 import LetterCardCompact from './LetterCardCompact';
-import type { LetterFrom } from '@/types/letter';
+import type { From } from '@/types/from';
 
 export type ViewMode = '기본 보기' | '간편 보기';
 
@@ -9,7 +9,7 @@ export type LetterCardProps = {
   excerpt: string;
   isLiked: boolean;
   receivedAt: string;
-  from: LetterFrom;
+  from: From | null;
   viewMode: ViewMode;
 };
 
@@ -22,7 +22,7 @@ export default function LetterCard({
   from,
 }: LetterCardProps) {
   if (viewMode === '간편 보기') {
-    return <LetterCardCompact content={excerpt} fromName={from.name} />;
+    return <LetterCardCompact content={excerpt} fromName={from?.name ?? ''} />;
   }
 
   return (
@@ -31,9 +31,7 @@ export default function LetterCard({
       content={excerpt}
       isLiked={isLiked}
       receivedAt={receivedAt}
-      fromName={from.name}
-      fromBgColor={from.bgColor}
-      fromFontColor={from.fontColor}
+      from={from}
     />
   );
 }

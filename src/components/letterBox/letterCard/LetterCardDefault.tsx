@@ -1,18 +1,22 @@
-// 편지함 편지 카드 기본 보기
-
 import heartOutlineIcon from '@/assets/letterPage/heart-outline.svg';
 import heartFillIcon from '@/assets/letterPage/heart-filled.svg';
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useToggleLetterLike } from '@/hooks/mutations/useToggleLetterLike';
+import type { From } from '@/types/from';
 
 type LetterCardDefaultProps = {
   letterId: number;
   content: string;
   isLiked: boolean;
   receivedAt: string;
-  fromName: string;
-  fromBgColor: string;
-  fromFontColor: string;
+  from: From | null;
+};
+
+const safeColor = (v?: string, fallback = '#EDEDED') => {
+  if (!v) return fallback;
+  const t = v.trim();
+  const withHash = t.startsWith('#') ? t : `#${t}`;
+  return /^#[0-9A-Fa-f]{6}$/.test(withHash) ? withHash : fallback;
 };
 
 export default function LetterCardDefault({
@@ -20,9 +24,7 @@ export default function LetterCardDefault({
   content,
   isLiked,
   receivedAt,
-  fromName,
-  fromBgColor,
-  fromFontColor,
+  from,
 }: LetterCardDefaultProps) {
   const [liked, setLiked] = useState(isLiked);
   const [isTwoLine, setIsTwoLine] = useState(false);
@@ -44,11 +46,13 @@ export default function LetterCardDefault({
     const next = !liked;
     setLiked(next);
     toggleLike.mutate(next, {
-      onError: () => {
-        setLiked((cur) => !cur);
-      },
+      onError: () => setLiked((cur) => !cur),
     });
   };
+
+  const bgColor = safeColor(from?.bgColor, '#EDEDED');
+  const fontColor = safeColor(from?.fontColor, '#555557');
+  const fromName = from?.name ?? '';
 
   return (
     <div className="w-full shadow-[0_0_4px_0_rgba(217,217,217,0.5)] rounded-lg">
@@ -81,7 +85,7 @@ export default function LetterCardDefault({
 
         <div
           className="flex h-6 w-[45px] items-center justify-center rounded-[6px]"
-          style={{ backgroundColor: fromBgColor, color: fromFontColor }}
+          style={{ backgroundColor: bgColor, color: fontColor }}
         >
           <p className="font-medium text-[13px] truncate">{fromName}</p>
         </div>
