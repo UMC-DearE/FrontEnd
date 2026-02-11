@@ -5,14 +5,14 @@ import fromIcon from '@/assets/letterPage/fromIcon.svg';
 import dropdownIcon from '@/assets/letterPage/dropdownIcon.svg';
 import Dropdown from '@/components/letterBox/Dropdown';
 import FromBottomSheet from '@/components/letterBox/FromBottomSheet';
-import type { From } from '@/types/from';
+import type { From as FromType } from '@/types/from';
 
 type Option = '기본 보기' | '간편 보기';
 
 type ToolBarProps = {
-  totalCount: number;
   folderTotalCount: number;
-  froms: From[];
+  allCount: number;
+  froms: FromType[];
   fromCounts?: Record<number, number>;
   selectedFromId: number | 'all';
   onFromSelect: (fromId: number | 'all') => void;
@@ -22,6 +22,7 @@ type ToolBarProps = {
 
 export default function ToolBar({
   folderTotalCount,
+  allCount,
   froms,
   fromCounts,
   selectedFromId,
@@ -43,6 +44,8 @@ export default function ToolBar({
     onFromSelect(fromId);
     setFromSheetOpen(false);
   };
+
+  const handleCloseSheet = () => setFromSheetOpen(false);
 
   return (
     <>
@@ -94,11 +97,11 @@ export default function ToolBar({
       {fromSheetOpen && (
         <FromBottomSheet
           froms={froms}
-          totalCount={folderTotalCount}
+          allCount={allCount}
           fromCounts={safeFromCounts}
           selectedId={selectedFromId}
           onSelect={handleSelectFrom}
-          onClose={() => setFromSheetOpen(false)}
+          onClose={handleCloseSheet}
         />
       )}
     </>

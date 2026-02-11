@@ -8,6 +8,7 @@ import type {
   PatchLetterReplyResponse,
   PatchLetterRequest,
   PatchLetterResponse,
+  RandomLetterApiResponse,
 } from '@/types/letter';
 
 export const getLetterDetail = async (letterId: number): Promise<LetterDetailResponse> => {
@@ -78,7 +79,7 @@ export const unpinLetter = async (letterId: number) => {
   return data;
 };
 
-export const getRandomLetter = async () => {
-  const { data } = await api.get('/letters/random');
+export const getRandomLetter = async (): Promise<RandomLetterApiResponse> => {
+  const { data } = await api.get<RandomLetterApiResponse>('/letters/random');
   return data;
 };
