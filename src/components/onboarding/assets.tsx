@@ -4,8 +4,8 @@ import GoogleIcon from "@/assets/onboarding/google.svg";
 import RobotIcon from "@/assets/onboarding/robotIcon.svg";
 
 // keep
-import keep1 from "@/assets/onboarding/onboarding1-1.svg";
-import keep2 from "@/assets/onboarding/onboarding1-2.svg";
+import AddLetterPill from "@/components/onboarding/AddLetterPill";
+
 import keep3 from "@/assets/onboarding/onboarding1-3.svg";
 import keep4 from "@/assets/onboarding/onboarding1-4.svg";
 
@@ -28,7 +28,12 @@ export const onboardingAssets = {
   KakaoIcon,
   GoogleIcon,
   RobotIcon,
-  keep: [keep1, keep2, keep3, keep4],
+  keep: [
+    <AddLetterPill key="keep1" variant="dark" />,
+    <AddLetterPill key="keep2" variant="orange" />,
+    keep3,
+    keep4,
+  ],
   ai: [aiCard1, aiCard2, aiCard3, aiCard4, aiCard5],
   archive: [archive1, archive2, archive3, archive4, archive5, archive6],
 };
