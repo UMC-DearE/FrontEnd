@@ -41,7 +41,7 @@ api.interceptors.response.use(
     // 조건 정리
     const is401 = error.response?.status === 401;
     const isRefreshRequest = originalRequest?.url?.includes('/auth/jwt/refresh');
-    const authStatus = useAuthStore.getState().authStatus;
+    const { authStatus, setAuthStatus } = useAuthStore.getState();
 
     if (authStatus !== 'authenticated' && authStatus !== 'checking') {
       return Promise.reject(error);
@@ -90,7 +90,8 @@ api.interceptors.response.use(
       return api(originalRequest);
     } catch (refreshError) {
       delete api.defaults.headers.common.Authorization;
-      // 로그아웃 처리 등 추가 작업 필요 시 여기서 수행
+      // 토큰 재발급 실패 - 인증 해제 상태로 전환
+      setAuthStatus('unauthenticated');
 
       return Promise.reject(refreshError);
     } finally {

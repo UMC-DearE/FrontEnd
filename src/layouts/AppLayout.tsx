@@ -47,8 +47,10 @@ export function AppLayout() {
 
   const bgClass = matched?.bg === 'white' ? 'bg-white' : 'bg-[#F8F8F8]';
 
-  const NO_MAIN_PADDING_PATHS = ['/my', '/my/account', 'letterbox'];
-  const noMainPadding = NO_MAIN_PADDING_PATHS.includes(pathname);
+  const NO_MAIN_PADDING_PATHS = ['/my', '/my/account', 'letterbox' ,'/create/detail'];
+  const noMainPadding =
+  NO_MAIN_PADDING_PATHS.includes(pathname) ||
+  (pathname.startsWith('/letter/') && pathname.endsWith('/edit'));
 
   const HEADER_HEIGHT = 105;
   const BOTTOM_NAV_HEIGHT = 95;

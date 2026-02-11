@@ -63,5 +63,9 @@ export default function OAuthCallbackPage() {
     });
   }, [navigate, params, provider, setAuthStatus]);
 
-  return <div>로그인 처리 중...</div>;
+  return (
+    <div className="flex min-h-screen items-center justify-center text-sm font-medium">
+      로그인 처리 중...
+    </div>
+  );
 }

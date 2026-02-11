@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LetterForm from "@/components/common/LetterForm";
+import EditLetterHeader from "@/components/header/EditLetterHeader";
+import EditLetterSkeleton from "@/components/skeleton/EditLetterSkeleton";
 import { getLetterDetail } from "@/api/letter";
 import type { LetterDetailData } from "@/types/letter";
 import type { CreateFrom } from "@/types/from";
@@ -12,6 +14,7 @@ type EditPageLocationState = {
   selectedFromDraft?: CreateFrom;
   date?: string;
   unknownDate?: boolean;
+  imageUrls?: string[];
 } | null;
 
 export default function EditLetterPage() {
@@ -24,6 +27,7 @@ export default function EditLetterPage() {
   const patchLetterMutation = usePatchLetter();
 
   const [loading, setLoading] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<LetterDetailData | null>(null);
 
@@ -55,6 +59,8 @@ export default function EditLetterPage() {
         // 최초 진입 시 기본 from / 날짜 세팅
         setFromDraft((prev: CreateFrom | undefined) => {
           if (prev) return prev;
+
+          console.log("edit imageUrls", res.data.imageUrls);
 
           const draft: CreateFrom = {
             fromId: res.data.from?.fromId,
@@ -108,12 +114,34 @@ export default function EditLetterPage() {
     }
   }, [locationState]);
 
-  if (loading) return <div className="p-4">로딩 중...</div>;
+  useEffect(() => {
+    if (!loading) {
+      setShowSkeleton(false);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setShowSkeleton(true);
+    }, 250);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [loading]);
+
+  if (loading && showSkeleton) return <EditLetterSkeleton />;
+  if (loading) return null;
   if (error) return <div className="p-4 text-red-500">{error}</div>;
   if (!data || !fromDraft) return null;
 
+  const headerImages = locationState?.imageUrls ?? data.imageUrls ?? [];
+
   return (
-    <LetterForm
+    <>
+      <EditLetterHeader images={headerImages} />
+
+      <div className="mt-6 flex-1 px-4 pb-24">
+        <LetterForm
       mode="edit"
       content={content}
       aiResult={{
@@ -192,7 +220,9 @@ export default function EditLetterPage() {
           toast.show("편지 수정 중 오류가 발생했습니다.");
         }
       }}
-    />
+        />
+      </div>
+    </>
   );
 }
 
