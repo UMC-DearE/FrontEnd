@@ -4,7 +4,8 @@ import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomButton } from "@/components/common/BottomButton";
 import ProfilePlaceholderIcon from "@/components/icons/ProfilePlaceholderIcon";
-import { getMe, updateMe, uploadImage } from "@/api/http";
+import { getMe, updateMe } from "@/api/http";
+import { uploadImage } from "@/api/upload";
 
 const MAX_INTRO = 20;
 const NICKNAME_REGEX = /^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]+$/;
@@ -109,7 +110,7 @@ export default function ProfilePage() {
       setUploading(true);
 
       const uploaded = await uploadImage(file, "profile");
-      setUploadedImageId(uploaded.imageId);
+      setUploadedImageId(uploaded.data.imageId);
     } finally {
       setUploading(false);
     }

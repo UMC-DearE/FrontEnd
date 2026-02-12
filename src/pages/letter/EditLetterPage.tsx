@@ -138,9 +138,13 @@ export default function EditLetterPage() {
 
   return (
     <>
-      <EditLetterHeader images={headerImages} />
+      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
+        <div className="w-full max-w-[393px]">
+          <EditLetterHeader images={headerImages} />
+        </div>
+      </div>
 
-      <div className="mt-6 flex-1 px-4 pb-24">
+      <div className="mt-[125px] flex-1 px-4">
         <LetterForm
       mode="edit"
       content={content}
@@ -225,6 +229,3 @@ export default function EditLetterPage() {
     </>
   );
 }
-
-
-

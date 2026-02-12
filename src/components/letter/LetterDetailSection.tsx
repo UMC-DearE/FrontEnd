@@ -290,7 +290,7 @@ export default function LetterDetailSection({
         </div>
 
         <div className="max-h-[250px] overflow-y-auto pr-2 thin-scrollbar">
-          <p className="whitespace-pre-line text-sm leading-relaxed text-primary">
+          <p className="whitespace-pre-line text-sm leading-relaxed text-primary break-all">
             {content}
           </p>
         </div>
@@ -384,7 +384,7 @@ export default function LetterDetailSection({
                     setReplyLoading(false);
                   }
                 }}
-                className="text-xs font-medium text-[#9D9D9F]"
+                className="text-xs font-medium text-[#9D9D9F] cursor-pointer"
                 disabled={replyLoading || deleteReplyMutation.isPending}
               >
                 삭제

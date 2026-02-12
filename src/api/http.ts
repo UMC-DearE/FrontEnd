@@ -1,7 +1,8 @@
 import { useAuthStore } from '@/stores/authStore';
 import { useStyleStore } from "@/stores/styleStores";
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
-import type { UserProfile, UpdateMeRequest, UpdateMeResponse, UploadImageResponse, ImageDir } from '@/types/user';
+import type { UserProfile, UpdateMeRequest, UpdateMeResponse } from '@/types/user';
+import { normalizeImageUrl } from './upload';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -117,26 +118,26 @@ export async function logout() {
 
 export async function getMe(): Promise<UserProfile> {
   const res = await api.get('/users/me');
-  return res.data.data as UserProfile;
+  const me = res.data.data as UserProfile;
+
+  if (me.profileImageUrl) {
+    me.profileImageUrl = normalizeImageUrl(me.profileImageUrl);
+  }
+
+  return me;
 }
 
 export async function updateMe(payload: UpdateMeRequest): Promise<UpdateMeResponse> {
   const res = await api.patch('/users/me', payload);
-  return res.data.data as UpdateMeResponse;
+  const updated = res.data.data as UpdateMeResponse;
+
+  if (updated.profileImageUrl) {
+    updated.profileImageUrl = normalizeImageUrl(updated.profileImageUrl);
+  }
+
+  return updated;
 }
 
 export async function deleteMe(): Promise<void> {
   await api.delete("/users/me");
-}
-
-export async function uploadImage(file: File, dir: ImageDir): Promise<UploadImageResponse> {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("dir", dir);
-
-  const res = await api.post("/images", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-
-  return res.data.data as UploadImageResponse;
 }
