@@ -5,8 +5,13 @@ import type { UploadImageResponse } from '@/types/upload';
 
 export const normalizeImageUrl = (url: string): string => {
   if (!url) return url;
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  return url.replace('${AWS_CLOUDFRONT_DOMAIN}', import.meta.env.VITE_CLOUDFRONT_BASE);
+
+  // 앞뒤 공백 및 쌍따옴표 제거
+  let cleaned = url.trim().replace(/^"|"$/g, '');
+
+  if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) return cleaned;
+
+  return cleaned.replace('${AWS_CLOUDFRONT_DOMAIN}', import.meta.env.VITE_CLOUDFRONT_BASE);
 };
 
 export const uploadImage = async (
