@@ -11,8 +11,8 @@ import LetterDetailBottomSheet from "./LetterDetailBottomSheet";
 import aiSummary from "@/assets/create/ai-summary.svg";
 import upBar from "@/assets/letter/up-bar.svg";
 import downBar from "@/assets/letter/down-bar.svg";
-import heartOutlineIcon from "@/assets/letterPage/heart-outline.svg";
-import heartFillIcon from "@/assets/letterPage/heart-filled.svg";
+import HeartFilledIcon from "@/components/icons/HeartFilledIcon";
+import HeartOutlineIcon from "@/components/icons/HeartOutlineIcon";
 import html2canvas from "html2canvas";
 import type { AnalyzeLetterResponse } from "@/types/create";
 import { useFolderList } from "@/hooks/queries/useFolderList";
@@ -280,15 +280,15 @@ export default function LetterDetailSection({
                   setLikeLoading(false);
                 }
               }}
-              className="w-[13px] h-4 mr-1 cursor-pointer"
+              className="w-[13px] h-4 cursor-pointer"
               aria-pressed={liked}
               disabled={likeLoading || toggleLikeMutation.isPending}
             >
-              <img
-                src={liked ? heartFillIcon : heartOutlineIcon}
-                alt="like"
-                className="w-[13px] h-[12px]"
-              />
+              {liked ? (
+                <HeartFilledIcon className="w-[14px] h-[15px]" />
+              ) : (
+                <HeartOutlineIcon className="w-[14px] h-[15px]" />
+              )}
             </button>
         </div>
 
