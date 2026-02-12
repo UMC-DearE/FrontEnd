@@ -79,7 +79,7 @@ export default function LetterCardDefault({
         <div className="flex-1 flex items-center">
           <p
             ref={textRef}
-            className="mx-auto w-full font-medium text-[14px] leading-[20px] tracking-[-0.01em] line-clamp-2 text-[#555557]"
+            className="mx-auto w-full font-medium text-[14px] leading-[20px] tracking-[-0.01em] line-clamp-2 break-all text-[#555557]"
           >
             {content}
           </p>

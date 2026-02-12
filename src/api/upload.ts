@@ -3,6 +3,12 @@
 import { api } from './http';
 import type { UploadImageResponse } from '@/types/upload';
 
+export const normalizeImageUrl = (url: string): string => {
+  if (!url) return url;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return url.replace('${AWS_CLOUDFRONT_DOMAIN}', import.meta.env.VITE_CLOUDFRONT_BASE);
+};
+
 export const uploadImage = async (
   file: File,
   dir: 'profile' | 'letter' | 'sticker' | 'folder'
@@ -12,5 +18,10 @@ export const uploadImage = async (
   formData.append('dir', dir);
 
   const { data } = await api.post<UploadImageResponse>('/images', formData);
+
+  if (data?.data?.url) {
+    data.data.url = normalizeImageUrl(data.data.url);
+  }
+
   return data;
 };
