@@ -16,6 +16,7 @@ import { useRef, useState } from "react";
 import ImagePreviewItem from "./ImagePreviewItem";
 import uploadImage from "@/assets/create/image-upload.svg";
 import { ImageViewer } from "../common/ImageViewer";
+import useToast from "@/hooks/useToast";
 
 interface Props {
   images: File[];
@@ -25,6 +26,7 @@ interface Props {
 export default function ImagePreviewList({ images, setImages }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+  const toast = useToast();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -57,11 +59,42 @@ export default function ImagePreviewList({ images, setImages }: Props) {
     if (!e.target.files) return;
 
     const files = Array.from(e.target.files);
-    const remain = 10 - images.length;
 
-    if (remain <= 0) return;
+    setImages((prev) => {
+      const remain = 10 - prev.length;
+      if (remain <= 0) {
+        toast.show("이미지는 최대 10장까지 업로드할 수 있어요.");
+        return prev;
+      }
 
-    setImages((prev) => [...prev, ...files.slice(0, remain)]);
+      const existingKeySet = new Set(
+        prev.map((f) => `${f.name}_${f.size}_${f.lastModified}`)
+      );
+
+      const uniqueNewFiles: File[] = [];
+      let hasDuplicate = false;
+
+      for (const file of files) {
+        const key = `${file.name}_${file.size}_${file.lastModified}`;
+        if (existingKeySet.has(key)) {
+          hasDuplicate = true;
+          continue;
+        }
+        existingKeySet.add(key);
+        uniqueNewFiles.push(file);
+      }
+
+      if (hasDuplicate) {
+        toast.show("중복된 이미지입니다.");
+      }
+
+      if (uniqueNewFiles.length === 0) {
+        return prev;
+      }
+
+      return [...prev, ...uniqueNewFiles.slice(0, remain)];
+    });
+
     e.target.value = ""; // 같은 파일 다시 선택 가능
   };
 

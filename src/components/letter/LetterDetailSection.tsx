@@ -132,9 +132,12 @@ export default function LetterDetailSection({
     const el = cardRef.current;
     if (!el) return;
 
+    const devicePixelRatio = window.devicePixelRatio || 1;
+    const captureScale = Math.min(3, devicePixelRatio);
+
     const originalCanvas = await html2canvas(el, {
       backgroundColor: "#ffffff",
-      scale: Math.min(2, window.devicePixelRatio || 1),
+      scale: captureScale,
       useCORS: true,
       onclone: (doc) => {
         const clonedEl = doc.querySelector(

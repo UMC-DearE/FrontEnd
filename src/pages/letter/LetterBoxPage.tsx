@@ -57,10 +57,23 @@ export default function LetterBoxPage() {
 
   useEffect(() => {
     const run = async () => {
-      const [folderData, fromData] = await Promise.all([getFolderList(), getFromList()]);
-      setFolders([...folderData].sort((a, b) => a.folderOrder - b.folderOrder));
-      setAllFroms(fromData);
+      try {
+        const folderData = await getFolderList();
+        setFolders([...folderData].sort((a, b) => a.folderOrder - b.folderOrder));
+      } catch (e) {
+        console.error('getFolderList failed', e);
+        setFolders([]);
+      }
+
+      try {
+        const fromData = await getFromList();
+        setAllFroms(fromData);
+      } catch (e) {
+        console.error('getFromList failed', e);
+        setAllFroms([]);
+      }
     };
+
     void run();
   }, []);
 

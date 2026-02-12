@@ -107,13 +107,15 @@ export default function CreateDetailPage() {
           const receivedAt = payload.unknownDate ? "" : payload.date ?? "";
           const finalContent = payload.content ?? content;
 
+          const uniqueImageIds = Array.from(new Set(state.imageIds ?? []));
+
           const letterRes = await createLetterMutation.mutateAsync({
             content: finalContent,
             aiSummary: state.aiResult.summary,
             emotionIds: state.aiResult.emotions.map((e) => e.emotionId),
             fromId,
             receivedAt,
-            imageIds: state.imageIds ?? [],
+            imageIds: uniqueImageIds,
           });
 
           if (!letterRes.success) {
