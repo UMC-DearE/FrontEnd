@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LetterForm from "@/components/common/LetterForm";
 import EditLetterHeader from "@/components/header/EditLetterHeader";
 import EditLetterSkeleton from "@/components/skeleton/EditLetterSkeleton";
+import LoadingSection from "@/components/create/loading/LoadingSection";
 import { getLetterDetail } from "@/api/letter";
 import type { LetterDetailData } from "@/types/letter";
 import type { CreateFrom } from "@/types/from";
@@ -129,6 +130,9 @@ export default function EditLetterPage() {
     };
   }, [loading]);
 
+  const isSubmitting =
+    patchLetterMutation.isPending || createFromMutation.isPending;
+
   if (loading && showSkeleton) return <EditLetterSkeleton />;
   if (loading) return null;
   if (error) return <div className="p-4 text-red-500">{error}</div>;
@@ -145,7 +149,14 @@ export default function EditLetterPage() {
       </div>
 
       <div className="mt-[125px] flex-1 px-4">
-        <LetterForm
+        {isSubmitting ? (
+          <LoadingSection
+            className="pt-25"
+            title="편지를 수정하고 있어요"
+            subtitle="editing"
+          />
+        ) : (
+          <LetterForm
       mode="edit"
       content={content}
       aiResult={{
@@ -224,7 +235,8 @@ export default function EditLetterPage() {
           toast.show("편지 수정 중 오류가 발생했습니다.");
         }
       }}
-        />
+          />
+        )}
       </div>
     </>
   );
