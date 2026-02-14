@@ -12,6 +12,15 @@ import type {
 } from '@/types/letter';
 import { normalizeImageUrl } from './upload';
 
+export type GetLetterListsParams = {
+  page: number;
+  size: number;
+  sort?: string;
+  folderId?: number;
+  fromId?: number;
+  isLiked?: boolean;
+};
+
 export const getLetterDetail = async (letterId: number): Promise<LetterDetailResponse> => {
   const { data } = await api.get<LetterDetailResponse>(`/letters/${letterId}`);
   if (data?.data?.imageUrls && Array.isArray(data.data.imageUrls)) {
