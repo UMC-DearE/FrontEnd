@@ -33,7 +33,7 @@ function LetterCardCompactSkeleton() {
     <div className="w-full h-[46px] rounded-lg bg-white px-3 py-2 flex items-center justify-between animate-pulse">
       <div className="flex items-center gap-[12px] flex-1 min-w-0">
         <div className="relative h-6 w-6 flex items-center justify-center">
-          <div className=" inset-0 w-[14px] h-[14px] rounded-full bg-gray-200" />
+          <div className="absolute inset-0 m-auto w-[14px] h-[14px] rounded-full bg-gray-200" />
         </div>
 
         <div className="h-[14px] w-full max-w-[240px] rounded bg-gray-200" />

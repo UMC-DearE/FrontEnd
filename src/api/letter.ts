@@ -65,14 +65,7 @@ export const deleteLetter = async (letterId: number): Promise<DeleteLetterRespon
   return data;
 };
 
-export const getLetterLists = async (params: {
-  page: number;
-  size: number;
-  sort?: string;
-  folderId?: number;
-  fromId?: number;
-  isLiked?: boolean;
-}) => {
+export const getLetterLists = async (params: GetLetterListsParams) => {
   const { data } = await api.get('/letters', { params });
   return { data };
 };

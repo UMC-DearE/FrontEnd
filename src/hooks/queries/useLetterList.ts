@@ -2,10 +2,7 @@
 
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getLetterLists, type GetLetterListsParams } from '@/api/letter';
-
-export const letterKeys = {
-  list: (params: GetLetterListsParams) => ['letters', params] as const,
-};
+import { letterKeys } from './letterKeys';
 
 export function useLetterLists(params: GetLetterListsParams) {
   return useQuery({
