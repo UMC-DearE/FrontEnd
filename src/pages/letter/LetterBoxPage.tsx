@@ -103,7 +103,7 @@ export default function LetterBoxPage() {
           isLiked,
         });
 
-        setAllCount(res.data.data.totalElements ?? 0);
+        setAllCount(res.data.totalElements ?? 0);
       } catch (e) {
         setAllCount(0);
         console.error(e);
@@ -139,8 +139,8 @@ export default function LetterBoxPage() {
 
         if (!alive) return;
 
-        setLetters(res.data.data.content ?? []);
-        setTotalElements(res.data.data.totalElements ?? 0);
+        setLetters(res.data.content ?? []);
+        setTotalElements(res.data.totalElements ?? 0);
       } finally {
         if (alive) setIsLettersLoading(false);
       }
