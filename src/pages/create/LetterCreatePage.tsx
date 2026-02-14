@@ -44,7 +44,9 @@ export default function LetterCreatePage() {
           images.map((file) => uploadImage(file, "letter"))
         );
         uploadedImageUrls = uploadResults.map((res) => res.data.url);
-        uploadedImageIds = uploadResults.map((res) => res.data.imageId);
+        uploadedImageIds = Array.from(
+          new Set(uploadResults.map((res) => res.data.imageId))
+        );
 
         // 2. OCR -> text 변환
         const ocrResponse = await runOcr(uploadedImageIds);

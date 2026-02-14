@@ -1,11 +1,11 @@
 // 편지함 편지 카드 기본 보기
 
-import heartOutlineIcon from '@/assets/letterPage/heart-outline.svg';
-import heartFillIcon from '@/assets/letterPage/heart-filled.svg';
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useToggleLetterLike } from '@/hooks/mutations/useToggleLetterLike';
 import { FromBadge } from '@/components/common/FromBadge';
 import type { From } from '@/types/from';
+import HeartFilledIcon from '@/components/icons/HeartFilledIcon';
+import HeartOutlineIcon from '@/components/icons/HeartOutlineIcon';
 
 type LetterCardDefaultProps = {
   letterId: number;
@@ -74,7 +74,11 @@ export default function LetterCardDefault({
             disabled={toggleLike.isPending}
             className="w-[13px] h-4 cursor-pointer disabled:opacity-50"
           >
-            <img src={liked ? heartFillIcon : heartOutlineIcon} alt="heart-icon" />
+            {liked ? (
+              <HeartFilledIcon className="w-[14px] h-[15px]" />
+            ) : (
+              <HeartOutlineIcon className="w-[14px] h-[15px]" />
+            )}
           </button>
         </div>
 
