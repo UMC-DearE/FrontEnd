@@ -127,8 +127,6 @@ export default function LetterBoxPage() {
 
       setIsLettersLoading(true);
 
-      await new Promise((res) => setTimeout(res, 2000));
-
       try {
         const res = await getLetterLists({
           page,
