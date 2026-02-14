@@ -8,40 +8,29 @@ import type { Letter } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
 import { useNavigate } from 'react-router-dom';
-import { deleteFolder, createFolder, updateFolder, updateFolderOrders } from '@/api/folder';
+import {
+  getFolderList,
+  deleteFolder,
+  createFolder,
+  updateFolder,
+  updateFolderOrders,
+} from '@/api/folder';
 import { getLetterLists } from '@/api/letter';
 import LetterBoxHeader from '@/components/header/LetterBoxHeader';
 import SearchButton from '@/components/common/header/SearchButton';
 import SearchBar from '@/components/letterBox/SearchBar';
 import type { From } from '@/types/from';
 import { uploadImage as uploadImageApi } from '@/api/upload';
-import { useFolderList } from '@/hooks/queries/useFolderList';
-import { useFromList } from '@/hooks/queries/useFromList';
-import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { getFromList } from '@/api/from';
+import LetterCardSkeleton from '@/components/skeleton/LetterCardSkeleton';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
-
-type LetterListParams = {
-  page: number;
-  size: number;
-  sort?: string;
-  folderId?: number;
-  fromId?: number;
-  isLiked?: boolean;
-};
-
-const letterKeys = {
-  list: (params: LetterListParams) => ['letters', params] as const,
-  count: (params: Omit<LetterListParams, 'page' | 'size' | 'fromId'>) =>
-    ['letters-count', params] as const,
-};
 
 export default function LetterBoxPage() {
   const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>('all');
   const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const [viewMode, setViewMode] = useState<ViewMode>('기본 보기');
 
@@ -53,89 +42,98 @@ export default function LetterBoxPage() {
   const [deleteTargetFolderId, setDeleteTargetFolderId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [letters, setLetters] = useState<Letter[]>([]);
+  const [totalElements, setTotalElements] = useState(0);
+  const [allCount, setAllCount] = useState(0);
   const [page, setPage] = useState(0);
   const [size] = useState(20);
+  const [isLettersLoading, setIsLettersLoading] = useState(false);
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
   const searchWrapRef = useRef<HTMLDivElement | null>(null);
 
-  const folderId = typeof selectedFolderId === 'number' ? selectedFolderId : undefined;
-  const isLiked = selectedFolderId === 'like' ? true : undefined;
-  const fromId = selectedFromId === 'all' ? undefined : selectedFromId;
+  const [allFroms, setAllFroms] = useState<From[]>([]);
 
-  const foldersQuery = useFolderList();
-  const fromsQuery = useFromList();
+  useEffect(() => {
+    const run = async () => {
+      try {
+        const folderData = await getFolderList();
+        setFolders([...folderData].sort((a, b) => a.folderOrder - b.folderOrder));
+      } catch (e) {
+        console.error('getFolderList failed', e);
+        setFolders([]);
+      }
 
-  const lettersQuery = useQuery({
-    queryKey: letterKeys.list({
-      page,
-      size,
-      sort: 'receivedAt,desc',
-      folderId,
-      fromId,
-      isLiked,
-    }),
-    queryFn: async () => {
-      const res = await getLetterLists({
-        page,
-        size,
-        sort: 'receivedAt,desc',
-        folderId,
-        fromId,
-        isLiked,
-      });
-      return res.data;
-    },
-    placeholderData: keepPreviousData,
-    staleTime: 30_000,
-  });
+      try {
+        const fromData = await getFromList();
+        setAllFroms(fromData);
+      } catch (e) {
+        console.error('getFromList failed', e);
+        setAllFroms([]);
+      }
+    };
 
-  const allCountQuery = useQuery({
-    queryKey: letterKeys.count({
-      sort: 'receivedAt,desc',
-      folderId,
-      isLiked,
-    }),
-    queryFn: async () => {
-      const res = await getLetterLists({
-        page: 0,
-        size: 1,
-        sort: 'receivedAt,desc',
-        folderId,
-        isLiked,
-      });
-      return res.data;
-    },
-    staleTime: 30_000,
-  });
+    void run();
+  }, []);
 
-  const folders = useMemo(() => {
-    const data = foldersQuery.data ?? [];
-    return [...data].sort((a, b) => a.folderOrder - b.folderOrder);
-  }, [foldersQuery.data]);
+  useEffect(() => {
+    const run = async () => {
+      const folderId = typeof selectedFolderId === 'number' ? selectedFolderId : undefined;
+      const isLiked = selectedFolderId === 'like' ? true : undefined;
 
-  const allFroms = useMemo<From[]>(() => fromsQuery.data ?? [], [fromsQuery.data]);
+      try {
+        const res = await getLetterLists({
+          page: 0,
+          size: 1,
+          sort: 'receivedAt,desc',
+          folderId,
+          isLiked,
+        });
 
-  const letters = useMemo<Letter[]>(
-    () => lettersQuery.data?.data?.content ?? [],
-    [lettersQuery.data]
-  );
-  const totalElements = useMemo(
-    () => lettersQuery.data?.data?.totalElements ?? 0,
-    [lettersQuery.data]
-  );
-  const allCount = useMemo(
-    () => allCountQuery.data?.data?.totalElements ?? 0,
-    [allCountQuery.data]
-  );
+        setAllCount(res.data.data.totalElements ?? 0);
+      } catch (e) {
+        setAllCount(0);
+        console.error(e);
+      }
+    };
 
-  const isLettersLoading = lettersQuery.isLoading;
-  const isLettersFetching = lettersQuery.isFetching;
+    void run();
+  }, [selectedFolderId]);
 
   useEffect(() => {
     setPage(0);
   }, [selectedFolderId, selectedFromId]);
+
+  useEffect(() => {
+    const run = async () => {
+      const folderId = typeof selectedFolderId === 'number' ? selectedFolderId : undefined;
+      const isLiked = selectedFolderId === 'like' ? true : undefined;
+      const fromId = selectedFromId === 'all' ? undefined : selectedFromId;
+
+      setIsLettersLoading(true);
+      await new Promise((res) => setTimeout(res, 2000));
+
+      try {
+        const res = await getLetterLists({
+          page,
+          size,
+          sort: 'receivedAt,desc',
+          folderId,
+          fromId,
+          isLiked,
+        });
+
+        setLetters(res.data.data.content ?? []);
+        setTotalElements(res.data.data.totalElements ?? 0);
+      } finally {
+        setIsLettersLoading(false);
+      }
+    };
+
+    void run();
+  }, [selectedFolderId, selectedFromId, page, size]);
 
   useEffect(() => {
     setQuery('');
@@ -148,6 +146,7 @@ export default function LetterBoxPage() {
     const onPointerDown = (e: PointerEvent) => {
       const el = searchWrapRef.current;
       if (!el) return;
+
       if (e.target instanceof Node && !el.contains(e.target)) {
         setIsSearchOpen(false);
         setQuery('');
@@ -163,11 +162,6 @@ export default function LetterBoxPage() {
     return folders.find((f) => f.id === editingFolderId) ?? null;
   }, [folders, editingFolderId]);
 
-  const persistOrder = async (next: Folder[]) => {
-    await updateFolderOrders(next.map((f) => f.id));
-    await queryClient.invalidateQueries({ queryKey: ['folders'] });
-  };
-
   const handleConfirmUpsertFolder = async (data: {
     folder_name: string;
     imageId: number | null;
@@ -181,20 +175,31 @@ export default function LetterBoxPage() {
       });
     }
 
-    await queryClient.invalidateQueries({ queryKey: ['folders'] });
+    const next = await getFolderList();
+    setFolders([...next].sort((a, b) => a.folderOrder - b.folderOrder));
 
     setIsModalOpen(false);
     setEditingFolderId(null);
   };
 
-  const handleImageDelete = async (folderIdToDelete: number | null) => {
-    if (folderIdToDelete == null) return;
+  const handleImageDelete = async (folderId: number | null) => {
+    if (folderId == null) return;
 
-    const folder = folders.find((f) => f.id === folderIdToDelete);
-    if (!folder) return;
+    try {
+      const folder = folders.find((f) => f.id === folderId);
+      if (!folder) return;
 
-    await updateFolder(folderIdToDelete, { name: folder.name, imageId: null });
-    await queryClient.invalidateQueries({ queryKey: ['folders'] });
+      await updateFolder(folderId, { name: folder.name, imageId: null });
+
+      const next = await getFolderList();
+      setFolders([...next].sort((a, b) => a.folderOrder - b.folderOrder));
+    } catch (err) {
+      console.error('이미지 삭제 실패:', err);
+    }
+  };
+
+  const persistOrder = async (next: Folder[]) => {
+    await updateFolderOrders(next.map((f) => f.id));
   };
 
   const fromCounts = useMemo(() => {
@@ -224,9 +229,6 @@ export default function LetterBoxPage() {
     if (selectedFromId !== 'all') return '필터링 결과가 없어요.';
     return '추가된 편지가 없어요.';
   }, [query, selectedFromId]);
-
-  const hasError =
-    foldersQuery.isError || fromsQuery.isError || lettersQuery.isError || allCountQuery.isError;
 
   return (
     <>
@@ -276,6 +278,7 @@ export default function LetterBoxPage() {
             setIsSettingOpen(true);
           }}
           onReorder={(next) => {
+            setFolders(next);
             void persistOrder(next);
           }}
         />
@@ -292,44 +295,32 @@ export default function LetterBoxPage() {
             onViewChange={setViewMode}
           />
 
-          {hasError ? (
-            <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
-              불러오기에 실패했어요.
-            </div>
-          ) : isLettersLoading ? (
-            <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
-              불러오는 중...
+          {isLettersLoading ? (
+            <div className="flex flex-col gap-[10px]">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <LetterCardSkeleton key={i} viewMode={viewMode} />
+              ))}
             </div>
           ) : filteredLetters.length === 0 ? (
-            <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
-              {emptyMessage}
-            </div>
+            <div className="py-12 text-center text-[#9D9D9F] text-[15px]">{emptyMessage}</div>
           ) : (
-            <>
-              {isLettersFetching && (
-                <div className="absolute left-1/2 top-[360px] -translate-x-1/2 text-[#9D9D9F] text-[12px]">
-                  업데이트 중...
-                </div>
-              )}
-
-              {filteredLetters.map((letter) => (
-                <div
-                  key={letter.id}
-                  role="button"
-                  className="cursor-pointer"
-                  onClick={() => navigate(`/letter/${letter.id}`)}
-                >
-                  <LetterCard
-                    letterId={letter.id}
-                    viewMode={viewMode}
-                    excerpt={letter.excerpt}
-                    isLiked={letter.isLiked}
-                    receivedAt={letter.receivedAt}
-                    from={letter.from}
-                  />
-                </div>
-              ))}
-            </>
+            filteredLetters.map((letter) => (
+              <div
+                key={letter.id}
+                role="button"
+                className="cursor-pointer"
+                onClick={() => navigate(`/letter/${letter.id}`)}
+              >
+                <LetterCard
+                  letterId={letter.id}
+                  viewMode={viewMode}
+                  excerpt={letter.excerpt}
+                  isLiked={letter.isLiked}
+                  receivedAt={letter.receivedAt}
+                  from={letter.from}
+                />
+              </div>
+            ))
           )}
         </div>
       </div>
@@ -392,9 +383,8 @@ export default function LetterBoxPage() {
           try {
             await deleteFolder(deleteTargetFolderId);
 
-            await queryClient.invalidateQueries({ queryKey: ['folders'] });
-            await queryClient.invalidateQueries({ queryKey: ['letters'] });
-            await queryClient.invalidateQueries({ queryKey: ['letters-count'] });
+            const next = await getFolderList();
+            setFolders([...next].sort((a, b) => a.folderOrder - b.folderOrder));
 
             if (selectedFolderId === deleteTargetFolderId) {
               setSelectedFolderId('all');
