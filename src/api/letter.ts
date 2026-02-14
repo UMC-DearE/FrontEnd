@@ -9,6 +9,7 @@ import type {
   PatchLetterRequest,
   PatchLetterResponse,
   RandomLetterApiResponse,
+  LetterListResponse,
 } from '@/types/letter';
 import { normalizeImageUrl } from './upload';
 
@@ -65,9 +66,9 @@ export const deleteLetter = async (letterId: number): Promise<DeleteLetterRespon
   return data;
 };
 
-export const getLetterLists = async (params: GetLetterListsParams) => {
-  const { data } = await api.get('/letters', { params });
-  return { data };
+export const getLetterLists = async (params: GetLetterListsParams): Promise<LetterListResponse> => {
+  const { data } = await api.get<LetterListResponse>('/letters', { params });
+  return data;
 };
 
 export const updateLetterPinned = async (letterId: number, pinned: boolean) => {
