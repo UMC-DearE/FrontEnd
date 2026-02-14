@@ -88,7 +88,7 @@ export default function LetterCardDefault({
         </div>
 
         <div className="mt-1 flex justify-start">
-          <FromBadge name={fromName} bgColor={bgColor} fontColor={fontColor} size="sm" />
+          <FromBadge name={fromName} bgColor={bgColor} fontColor={fontColor} size="md" />
         </div>
       </div>
     </div>

@@ -27,12 +27,23 @@ import LetterCardSkeleton from '@/components/skeleton/LetterCardSkeleton';
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
 
+const VIEW_MODE_KEY = 'letterbox:viewMode';
+
+const isViewMode = (v: unknown): v is ViewMode => v === '기본 보기' || v === '간편 보기';
+
 export default function LetterBoxPage() {
   const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>('all');
   const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
   const navigate = useNavigate();
 
-  const [viewMode, setViewMode] = useState<ViewMode>('기본 보기');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem(VIEW_MODE_KEY);
+    return isViewMode(saved) ? saved : '기본 보기';
+  });
+
+  useEffect(() => {
+    localStorage.setItem(VIEW_MODE_KEY, viewMode);
+  }, [viewMode]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingOpen, setIsSettingOpen] = useState(false);
@@ -107,12 +118,15 @@ export default function LetterBoxPage() {
   }, [selectedFolderId, selectedFromId]);
 
   useEffect(() => {
+    let alive = true;
+
     const run = async () => {
       const folderId = typeof selectedFolderId === 'number' ? selectedFolderId : undefined;
       const isLiked = selectedFolderId === 'like' ? true : undefined;
       const fromId = selectedFromId === 'all' ? undefined : selectedFromId;
 
       setIsLettersLoading(true);
+
       await new Promise((res) => setTimeout(res, 2000));
 
       try {
@@ -125,14 +139,20 @@ export default function LetterBoxPage() {
           isLiked,
         });
 
+        if (!alive) return;
+
         setLetters(res.data.data.content ?? []);
         setTotalElements(res.data.data.totalElements ?? 0);
       } finally {
-        setIsLettersLoading(false);
+        if (alive) setIsLettersLoading(false);
       }
     };
 
     void run();
+
+    return () => {
+      alive = false;
+    };
   }, [selectedFolderId, selectedFromId, page, size]);
 
   useEffect(() => {
@@ -297,7 +317,7 @@ export default function LetterBoxPage() {
 
           {isLettersLoading ? (
             <div className="flex flex-col gap-[10px]">
-              {Array.from({ length: 6 }).map((_, i) => (
+              {Array.from({ length: 10 }).map((_, i) => (
                 <LetterCardSkeleton key={i} viewMode={viewMode} />
               ))}
             </div>
