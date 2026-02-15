@@ -22,16 +22,28 @@ import SearchBar from '@/components/letterBox/SearchBar';
 import type { From } from '@/types/from';
 import { uploadImage as uploadImageApi } from '@/api/upload';
 import { getFromList } from '@/api/from';
+import LetterCardSkeleton from '@/components/skeleton/LetterCardSkeleton';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
+
+const VIEW_MODE_KEY = 'letterbox:viewMode';
+
+const isViewMode = (v: unknown): v is ViewMode => v === '기본 보기' || v === '간편 보기';
 
 export default function LetterBoxPage() {
   const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>('all');
   const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
   const navigate = useNavigate();
 
-  const [viewMode, setViewMode] = useState<ViewMode>('기본 보기');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem(VIEW_MODE_KEY);
+    return isViewMode(saved) ? saved : '기본 보기';
+  });
+
+  useEffect(() => {
+    localStorage.setItem(VIEW_MODE_KEY, viewMode);
+  }, [viewMode]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingOpen, setIsSettingOpen] = useState(false);
@@ -91,7 +103,7 @@ export default function LetterBoxPage() {
           isLiked,
         });
 
-        setAllCount(res.data.data.totalElements ?? 0);
+        setAllCount(res.data.totalElements ?? 0);
       } catch (e) {
         setAllCount(0);
         console.error(e);
@@ -106,12 +118,15 @@ export default function LetterBoxPage() {
   }, [selectedFolderId, selectedFromId]);
 
   useEffect(() => {
+    let alive = true;
+
     const run = async () => {
       const folderId = typeof selectedFolderId === 'number' ? selectedFolderId : undefined;
       const isLiked = selectedFolderId === 'like' ? true : undefined;
       const fromId = selectedFromId === 'all' ? undefined : selectedFromId;
 
       setIsLettersLoading(true);
+
       try {
         const res = await getLetterLists({
           page,
@@ -122,14 +137,20 @@ export default function LetterBoxPage() {
           isLiked,
         });
 
-        setLetters(res.data.data.content ?? []);
-        setTotalElements(res.data.data.totalElements ?? 0);
+        if (!alive) return;
+
+        setLetters(res.data.content ?? []);
+        setTotalElements(res.data.totalElements ?? 0);
       } finally {
-        setIsLettersLoading(false);
+        if (alive) setIsLettersLoading(false);
       }
     };
 
     void run();
+
+    return () => {
+      alive = false;
+    };
   }, [selectedFolderId, selectedFromId, page, size]);
 
   useEffect(() => {
@@ -293,13 +314,13 @@ export default function LetterBoxPage() {
           />
 
           {isLettersLoading ? (
-            <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
-              불러오는 중...
+            <div className="flex flex-col gap-[10px]">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <LetterCardSkeleton key={i} viewMode={viewMode} />
+              ))}
             </div>
           ) : filteredLetters.length === 0 ? (
-            <div className="absolute left-1/2 top-[380px] -translate-x-1/2 text-[#9D9D9F] text-[15px]">
-              {emptyMessage}
-            </div>
+            <div className="py-12 text-center text-[#9D9D9F] text-[15px]">{emptyMessage}</div>
           ) : (
             filteredLetters.map((letter) => (
               <div

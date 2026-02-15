@@ -1,3 +1,5 @@
+// 편지함 편지 카드 기본 보기
+
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useToggleLetterLike } from '@/hooks/mutations/useToggleLetterLike';
 import { FromBadge } from '@/components/common/FromBadge';
@@ -90,7 +92,7 @@ export default function LetterCardDefault({
         </div>
 
         <div className="mt-1 flex justify-start">
-          <FromBadge name={fromName} bgColor={bgColor} fontColor={fontColor} size="sm" />
+          <FromBadge name={fromName} bgColor={bgColor} fontColor={fontColor} size="md" />
         </div>
       </div>
     </div>
