@@ -10,6 +10,7 @@ interface ProfileCustomSheetProps {
   onPickStickerFile?: (file: File) => void;
   bgColor: string;
   onChangeBgColor: (color: string) => void;
+  onPickerStateChange?: (isOpen: boolean) => void;
 }
 
 const normalizeHex = (v: string) => {
@@ -26,6 +27,7 @@ export default function ProfileCustomSheet({
   onPickStickerFile,
   bgColor,
   onChangeBgColor,
+  onPickerStateChange,
 }: ProfileCustomSheetProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showPicker, setShowPicker] = useState(false);
@@ -34,16 +36,27 @@ export default function ProfileCustomSheet({
 
   const handleComplete = () => {
     setShowPicker(false);
+    onPickerStateChange?.(false);
     onComplete?.();
   };
 
   const handleClickSticker = () => {
     setShowPicker(false);
+    onPickerStateChange?.(false);
     fileInputRef.current?.click();
   };
 
   const handleToggleBgPicker = () => {
-    setShowPicker((v) => !v);
+    setShowPicker((v) => {
+      const newValue = !v;
+      onPickerStateChange?.(newValue);
+      return newValue;
+    });
+  };
+
+  const handleClosePicker = () => {
+    setShowPicker(false);
+    onPickerStateChange?.(false);
   };
 
   if (!open) return null;
@@ -96,7 +109,7 @@ export default function ProfileCustomSheet({
                       className="w-28 rounded border px-2 py-1 text-sm"
                     />
                     <button
-                      onClick={() => setShowPicker(false)}
+                      onClick={handleClosePicker}
                       className="px-3 py-1 rounded bg-gray-100 text-sm"
                       type="button"
                     >
@@ -118,6 +131,7 @@ export default function ProfileCustomSheet({
             const file = e.target.files?.[0];
             if (!file) return;
             setShowPicker(false);
+            onPickerStateChange?.(false);
             onPickStickerFile?.(file);
             e.currentTarget.value = '';
           }}

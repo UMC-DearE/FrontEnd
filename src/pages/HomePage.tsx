@@ -41,6 +41,7 @@ export default function HomePage() {
   const [pendingUnpinId, setPendingUnpinId] = useState<number | null>(null);
 
   const [openSheet, setOpenSheet] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +49,7 @@ export default function HomePage() {
   const [draftStickers, setDraftStickers] = useState<StickerItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const enabled = openSheet;
+  const enabled = openSheet && !pickerOpen;
   const stickers = openSheet ? draftStickers : savedStickers;
 
   const initialStickerIdsRef = useRef<string[]>([]);
@@ -178,6 +179,7 @@ export default function HomePage() {
     setDraftStickers(cloneStickers(savedStickers));
     setSelectedId(null);
     setOpenSheet(true);
+    setPickerOpen(false);
   };
 
   const addStickerFromFile = async (file: File) => {
@@ -218,18 +220,18 @@ export default function HomePage() {
   };
 
   const onChangeStickers = (next: StickerItem[]) => {
-    if (!openSheet) return;
+    if (!enabled) return;
     setDraftStickers(next);
   };
 
   const onDeleteSticker = async (id: string) => {
-    if (!openSheet) return;
+    if (!enabled) return;
     setDraftStickers((prev) => prev.filter((s) => s.id !== id));
     setSelectedId((cur) => (cur === id ? null : cur));
   };
 
   const commitSticker = async (id: string) => {
-    if (!openSheet) return;
+    if (!enabled) return;
     if (isTempStickerId(id)) return;
   };
 
@@ -295,11 +297,11 @@ export default function HomePage() {
           stickers={stickers}
           selectedId={selectedId}
           onSelect={(id) => {
-            if (!openSheet) return;
+            if (!enabled) return;
             setSelectedId(id);
           }}
           onDeselect={() => {
-            if (!openSheet) return;
+            if (!enabled) return;
             setSelectedId(null);
           }}
           onChange={onChangeStickers}
@@ -321,9 +323,11 @@ export default function HomePage() {
         open={openSheet}
         bgColor={homeBgColor}
         onChangeBgColor={setHomeBgColor}
+        onPickerStateChange={setPickerOpen}
         onClose={() => {
           setOpenSheet(false);
           setSelectedId(null);
+          setPickerOpen(false);
           setDraftStickers(cloneStickers(savedStickers));
         }}
         onComplete={async () => {
@@ -333,6 +337,7 @@ export default function HomePage() {
           setDraftStickers(snapshot);
           setOpenSheet(false);
           setSelectedId(null);
+          setPickerOpen(false);
 
           const [colorRes, stickerRes] = await Promise.allSettled([
             updateHomeColorMutation.mutateAsync(homeBgColor),
