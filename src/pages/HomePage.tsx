@@ -288,7 +288,7 @@ export default function HomePage() {
 
   return (
     <div ref={containerRef} style={{ backgroundColor: homeBgColor }}>
-      <div className={openSheet ? 'relative z-100' : 'relative z-40'}>
+      <div className={openSheet ? 'relative' : 'relative z-40'}>
         <StickerLayer
           enabled={enabled}
           containerRef={containerRef}

@@ -167,7 +167,7 @@ export default function StickerLayer({
 
   return (
     <div
-      className={`absolute inset-0 ${enabled ? 'pointer-events-auto' : 'pointer-events-none'} z-40`}
+      className={`absolute inset-0 ${enabled ? 'pointer-events-auto' : 'pointer-events-none'}`}
       onPointerDown={(e) => {
         if (!enabled) return;
         e.stopPropagation();
@@ -211,7 +211,7 @@ export default function StickerLayer({
                 height: h,
                 transform: `translate(-50%, -50%) rotate(${s.rotation}deg)`,
                 touchAction: 'none',
-                zIndex: s.z,
+                zIndex: isSelected ? 60 : 30,
               }}
               onPointerDown={(e) => startMove(e, s.id)}
             >
