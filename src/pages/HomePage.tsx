@@ -1,17 +1,19 @@
+import { useMemo, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import type { AppLayoutContext } from '@/layouts/AppLayout';
 import ProfileCard from '@/components/home/ProfileCard';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import LetterCard, { type HomeCardLetter } from '@/components/home/LetterCard';
 import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
-import type { AppLayoutContext } from '@/layouts/AppLayout';
-import { updateLetterPinned, getRandomLetter } from '@/api/letter';
 import { uploadImage } from '@/api/upload';
 import { createSticker, updateSticker, deleteSticker } from '@/api/sticker';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
 import { useUpdateHomeColor } from '@/hooks/mutations/useUpdateHomeColor';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useRandomLetterQuery } from '@/hooks/queries/useRandomLetterQuery';
+import { usePinLetter } from '@/hooks/mutations/usePinLetter';
+import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -36,8 +38,38 @@ export default function HomePage() {
   const { data: home, isLoading: homeLoading, isError: homeError } = useHomeQuery();
   const updateHomeColorMutation = useUpdateHomeColor();
 
-  const [letter, setLetter] = useState<HomeCardLetter | null>(null);
-  const [pinnedLetterId, setPinnedLetterId] = useState<number | null>(null);
+  const { data: randomData, isLoading: randomLoading } = useRandomLetterQuery();
+  const pinMutation = usePinLetter();
+  const unpinMutation = useUnpinLetter();
+
+  const letter: HomeCardLetter | null = useMemo(() => {
+    if (!randomData) return null;
+
+    if (!randomData.hasLetter) {
+      return {
+        id: 0,
+        excerpt: '',
+        month: randomData.date.month,
+        day: randomData.date.day,
+        dayOfWeek: randomData.date.dayOfWeek,
+      };
+    }
+
+    return {
+      id: randomData.letterId,
+      excerpt: randomData.randomPhrase,
+      month: randomData.date.month,
+      day: randomData.date.day,
+      dayOfWeek: randomData.date.dayOfWeek,
+    };
+  }, [randomData]);
+
+  const pinnedLetterId = useMemo(() => {
+    if (!randomData) return null;
+    if (!randomData.hasLetter) return null;
+    return randomData.isPinned ? randomData.letterId : null;
+  }, [randomData]);
+
   const [pendingUnpinId, setPendingUnpinId] = useState<number | null>(null);
 
   const [openSheet, setOpenSheet] = useState(false);
@@ -54,108 +86,11 @@ export default function HomePage() {
 
   const initialStickerIdsRef = useRef<string[]>([]);
 
-  const applyRandomLetterToState = useCallback(
-    (data: {
-      hasLetter: boolean;
-      date: { month: string; day: number; dayOfWeek: string };
-      letterId: number;
-      randomPhrase: string;
-      isPinned: boolean;
-    }) => {
-      if (!data.hasLetter) {
-        setLetter({
-          id: 0,
-          excerpt: '',
-          month: data.date.month,
-          day: data.date.day,
-          dayOfWeek: data.date.dayOfWeek,
-        });
-        setPinnedLetterId(null);
-        return;
-      }
-
-      const next: HomeCardLetter = {
-        id: data.letterId,
-        excerpt: data.randomPhrase,
-        month: data.date.month,
-        day: data.date.day,
-        dayOfWeek: data.date.dayOfWeek,
-      };
-
-      setLetter(next);
-      setPinnedLetterId(data.isPinned ? data.letterId : null);
-    },
-    []
-  );
-
-  const refetchRandomLetter = useCallback(async () => {
-    const response = await getRandomLetter();
-    applyRandomLetterToState(response.data);
-  }, [applyRandomLetterToState]);
-
-  useEffect(() => {
-    let mounted = true;
-
-    getRandomLetter()
-      .then((response) => {
-        if (!mounted) return;
-        applyRandomLetterToState(response.data);
-      })
-      .catch(() => {});
-
-    return () => {
-      mounted = false;
-    };
-  }, [applyRandomLetterToState]);
-
-  useEffect(() => {
-    if (!home) return;
-
-    setHomeBgColor(home.setting.homeColor);
-
-    if (openSheet) return;
-
-    let alive = true;
-
-    Promise.all(
-      home.stickers.map(async (s) => {
-        const size = await loadImageSize(s.imageUrl).catch(() => ({ w: 160, h: 160 }));
-        const fitted = fitToMaxSide(size.w, size.h, 160);
-
-        const item: StickerItem = {
-          id: String(s.stickerId),
-          src: s.imageUrl,
-          x: s.posX,
-          y: s.posY,
-          z: s.posZ,
-          rotation: s.rotation,
-          scale: s.scale,
-          imageId: s.imageId,
-          w: fitted.w,
-          h: fitted.h,
-        };
-
-        return item;
-      })
-    )
-      .then((sized) => {
-        if (!alive) return;
-        setSavedStickers(sized);
-        setDraftStickers(cloneStickers(sized));
-      })
-      .catch(() => {});
-
-    return () => {
-      alive = false;
-    };
-  }, [home, openSheet, setHomeBgColor]);
-
   const handlePin = async (letterId: number) => {
     try {
-      await updateLetterPinned(letterId, true);
-      setPinnedLetterId(letterId);
-    } catch (error) {
-      console.error(error);
+      await pinMutation.mutateAsync(letterId);
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -166,11 +101,10 @@ export default function HomePage() {
     if (pendingUnpinId === null) return;
 
     try {
-      await updateLetterPinned(pendingUnpinId, false);
+      await unpinMutation.mutateAsync(pendingUnpinId);
       setPendingUnpinId(null);
-      await refetchRandomLetter();
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -230,11 +164,6 @@ export default function HomePage() {
     setSelectedId((cur) => (cur === id ? null : cur));
   };
 
-  const commitSticker = async (id: string) => {
-    if (!enabled) return;
-    if (isTempStickerId(id)) return;
-  };
-
   const persistStickersOnComplete = async (draft: StickerItem[]) => {
     const draftIds = new Set(draft.map((s) => s.id));
     const toDelete = initialStickerIdsRef.current.filter((id) => !draftIds.has(id));
@@ -280,12 +209,10 @@ export default function HomePage() {
       })
     );
 
-    const merged = [...existing, ...created.filter((x): x is StickerItem => x !== null)];
-
-    return merged;
+    return [...existing, ...created.filter((x): x is StickerItem => x !== null)];
   };
 
-  if (homeLoading) return <div>로딩 중...</div>;
+  if (homeLoading || randomLoading) return <div>로딩 중...</div>;
   if (homeError || !home) return <div>에러</div>;
 
   return (
@@ -306,9 +233,7 @@ export default function HomePage() {
           }}
           onChange={onChangeStickers}
           onDelete={onDeleteSticker}
-          onCommit={(id) => {
-            commitSticker(id);
-          }}
+          onCommit={() => {}}
         />
       </div>
 
