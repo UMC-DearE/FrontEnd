@@ -290,6 +290,7 @@ export default function HomePage() {
         bgColor={homeBgColor}
         onChangeBgColor={setHomeBgColor}
         onPickerStateChange={setPickerOpen}
+        onDeselectSticker={() => setSelectedId(null)}
         onClose={() => {
           setOpenSheet(false);
           setSelectedId(null);
