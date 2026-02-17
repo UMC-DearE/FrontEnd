@@ -47,11 +47,9 @@ export default function ProfileCustomSheet({
   };
 
   const handleToggleBgPicker = () => {
-    setShowPicker((v) => {
-      const newValue = !v;
-      onPickerStateChange?.(newValue);
-      return newValue;
-    });
+    const next = !showPicker;
+    setShowPicker(next);
+    onPickerStateChange?.(next);
   };
 
   const handleClosePicker = () => {

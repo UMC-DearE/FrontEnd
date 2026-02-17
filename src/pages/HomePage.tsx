@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
 import ProfileCard from '@/components/home/ProfileCard';
@@ -85,6 +85,48 @@ export default function HomePage() {
   const stickers = openSheet ? draftStickers : savedStickers;
 
   const initialStickerIdsRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    if (!home) return;
+
+    setHomeBgColor(home.setting.homeColor);
+
+    if (openSheet) return;
+
+    let alive = true;
+
+    Promise.all(
+      home.stickers.map(async (s) => {
+        const size = await loadImageSize(s.imageUrl).catch(() => ({ w: 160, h: 160 }));
+        const fitted = fitToMaxSide(size.w, size.h, 160);
+
+        const item: StickerItem = {
+          id: String(s.stickerId),
+          src: s.imageUrl,
+          x: s.posX,
+          y: s.posY,
+          z: s.posZ,
+          rotation: s.rotation,
+          scale: s.scale,
+          imageId: s.imageId,
+          w: fitted.w,
+          h: fitted.h,
+        };
+
+        return item;
+      })
+    )
+      .then((sized) => {
+        if (!alive) return;
+        setSavedStickers(sized);
+        setDraftStickers(cloneStickers(sized));
+      })
+      .catch(() => {});
+
+    return () => {
+      alive = false;
+    };
+  }, [home, openSheet, setHomeBgColor]);
 
   const handlePin = async (letterId: number) => {
     try {

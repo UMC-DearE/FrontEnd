@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateLetterPinned } from '@/api/letter';
-import { randomLetterKey, type RandomLetterResponse } from '@/hooks/queries/useRandomLetterQuery';
+import { randomLetterKey } from '@/hooks/queries/useRandomLetterQuery';
+import type { RandomLetterData } from '@/types/letter';
 
 export function usePinLetter() {
   const qc = useQueryClient();
@@ -11,7 +12,7 @@ export function usePinLetter() {
       return letterId;
     },
     onSuccess: (letterId) => {
-      qc.setQueryData(randomLetterKey, (prev: RandomLetterResponse | undefined) => {
+      qc.setQueryData(randomLetterKey, (prev: RandomLetterData) => {
         if (!prev) return prev;
         if (!prev.hasLetter) return prev;
         if (prev.letterId !== letterId) return prev;

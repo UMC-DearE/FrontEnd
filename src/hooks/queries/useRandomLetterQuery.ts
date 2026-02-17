@@ -1,22 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { getRandomLetter } from '@/api/letter';
-
-export type RandomLetterResponse = {
-  hasLetter: boolean;
-  date: { month: string; day: number; dayOfWeek: string };
-  letterId: number;
-  randomPhrase: string;
-  isPinned: boolean;
-};
+import type { RandomLetterData } from '@/types/letter';
 
 export const randomLetterKey = ['randomLetter'];
 
 export function useRandomLetterQuery() {
-  return useQuery({
+  return useQuery<RandomLetterData>({
     queryKey: randomLetterKey,
-    queryFn: async () => {
-      const res = await getRandomLetter();
-      return res.data as RandomLetterResponse;
-    },
+    queryFn: getRandomLetter,
   });
 }
