@@ -88,10 +88,9 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!home) return;
+    if (openSheet) return;
 
     setHomeBgColor(home.setting.homeColor);
-
-    if (openSheet) return;
 
     let alive = true;
 

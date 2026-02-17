@@ -12,7 +12,7 @@ export function useUnpinLetter() {
       return letterId;
     },
     onSuccess: (letterId) => {
-      qc.setQueryData(randomLetterKey, (prev: RandomLetterData) => {
+      qc.setQueryData(randomLetterKey, (prev: RandomLetterData | undefined) => {
         if (!prev) return prev;
         if (!prev.hasLetter) return prev;
         if (prev.letterId !== letterId) return prev;
