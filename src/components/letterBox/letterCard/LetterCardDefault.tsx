@@ -13,6 +13,7 @@ type LetterCardDefaultProps = {
   isLiked: boolean;
   receivedAt: string;
   from: From | null;
+  searchQuery?: string;
 };
 
 const safeColor = (v?: string, fallback = '#EDEDED') => {
@@ -22,12 +23,45 @@ const safeColor = (v?: string, fallback = '#EDEDED') => {
   return /^#[0-9A-Fa-f]{6}$/.test(withHash) ? withHash : fallback;
 };
 
+function getContextSnippet(content: string, query: string): string {
+  const lower = content.toLowerCase();
+  const idx = lower.indexOf(query.toLowerCase());
+  if (idx === -1) return content;
+  const start = Math.max(0, idx - 20);
+  return (start > 0 ? '...' : '') + content.slice(start);
+}
+
+function HighlightText({ text, query }: { text: string; query: string }) {
+  if (!query) return <>{text}</>;
+
+  const lower = text.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let idx = lower.indexOf(lowerQuery);
+
+  while (idx !== -1) {
+    if (idx > lastIndex) parts.push(text.slice(lastIndex, idx));
+    parts.push(
+      <mark key={idx} style={{ backgroundColor: '#FF5F2F1A', color: '#FF5F2F' }}>
+        {text.slice(idx, idx + query.length)}
+      </mark>
+    );
+    lastIndex = idx + query.length;
+    idx = lower.indexOf(lowerQuery, lastIndex);
+  }
+
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+  return <>{parts}</>;
+}
+
 export default function LetterCardDefault({
   letterId,
   content,
   isLiked,
   receivedAt,
   from,
+  searchQuery,
 }: LetterCardDefaultProps) {
   const [liked, setLiked] = useState(isLiked);
   const [isTwoLine, setIsTwoLine] = useState(false);
@@ -35,11 +69,13 @@ export default function LetterCardDefault({
 
   const toggleLike = useToggleLetterLike(letterId);
 
+  const displayContent = searchQuery ? getContextSnippet(content, searchQuery) : content;
+
   useEffect(() => {
     if (!textRef.current) return;
     const lineHeight = 20;
     setIsTwoLine(textRef.current.scrollHeight > lineHeight + 1);
-  }, [content]);
+  }, [displayContent]);
 
   useEffect(() => {
     setLiked(isLiked);
@@ -87,7 +123,7 @@ export default function LetterCardDefault({
             ref={textRef}
             className="mx-auto w-full font-medium text-[14px] leading-[20px] tracking-[-0.01em] line-clamp-2 break-all text-[#555557]"
           >
-            {content}
+            <HighlightText text={displayContent} query={searchQuery ?? ''} />
           </p>
         </div>
 
