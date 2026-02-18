@@ -8,6 +8,7 @@ export function useFromList() {
   return useQuery<From[]>({
     queryKey: ['froms'],
     queryFn: getFromList,
-    staleTime: 60_000,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
   });
 }

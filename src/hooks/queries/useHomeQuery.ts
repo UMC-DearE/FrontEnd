@@ -7,10 +7,10 @@ export function useHomeQuery() {
   const authStatus = useAuthStore((s) => s.authStatus);
 
   return useQuery({
-    refetchOnMount: 'always',
     queryKey: homeQueryKey,
     queryFn: getHome,
-    staleTime: 0,
-    enabled: authStatus === 'authenticated' || authStatus === 'checking',
+    staleTime: 1000 * 30,
+    refetchOnWindowFocus: false,
+    enabled: authStatus === 'authenticated',
   });
 }

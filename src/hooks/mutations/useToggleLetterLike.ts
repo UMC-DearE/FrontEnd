@@ -8,7 +8,6 @@ export function useToggleLetterLike(letterId: number) {
     mutationFn: (nextLiked: boolean) =>
       nextLiked ? likeLetter(letterId) : unlikeLetter(letterId),
 
-    // optimistic update
     onMutate: async (nextLiked) => {
       await qc.cancelQueries({ queryKey: ["letter", letterId] });
 
@@ -32,10 +31,6 @@ export function useToggleLetterLike(letterId: number) {
       if (ctx?.prev) {
         qc.setQueryData(["letter", letterId], ctx.prev);
       }
-    },
-
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: ["letter", letterId] });
     },
   });
 }
