@@ -26,7 +26,6 @@ export default function ReportPage() {
     []
   );
   const [isLoading, setIsLoading] = useState(true);
-  const [showSkeleton, setShowSkeleton] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -49,21 +48,6 @@ export default function ReportPage() {
       alive = false;
     };
   }, []);
-
-  useEffect(() => {
-    if (!isLoading) {
-      setShowSkeleton(false);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setShowSkeleton(true);
-    }, 250);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [isLoading]);
 
   const medalIcons = useMemo(() => [goldIcon, silverIcon, bronzeIcon], []);
 
@@ -88,14 +72,13 @@ export default function ReportPage() {
       }),
     [emotionDistribution]
   );
-  if (isLoading && showSkeleton) {
+  if (isLoading) {
     return (
       <div className="flex flex-col">
         <ReportSkeleton />
       </div>
     );
   }
-  if (isLoading) return null;
 
   return (
     <div className="flex flex-col">

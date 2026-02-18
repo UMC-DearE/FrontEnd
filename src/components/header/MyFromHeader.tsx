@@ -10,7 +10,7 @@ export default function MyFromHeader() {
   return (
     <>
       <TopSection
-        left={<BackButton to={-1} />}
+        left={<BackButton to="/my" />}
         center={<div className="text-lg font-semibold">From 관리</div>}
         right={
           <div className="flex items-center space-x-2 mr-2">

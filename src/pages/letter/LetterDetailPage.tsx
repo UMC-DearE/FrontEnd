@@ -14,7 +14,6 @@ export default function LetterDetailPage() {
   const letterId = Number(id);
 
   const { data, isLoading, isError } = useLetterDetail(letterId);
-  const [showSkeleton, setShowSkeleton] = useState(false);
   const deleteMutation = useDeleteLetter();
   const { addFolderMutation, removeFolderMutation } = useLetterFolder(letterId);
 
@@ -22,23 +21,7 @@ export default function LetterDetailPage() {
     return <div className="p-4 text-red-500">잘못된 편지 ID입니다.</div>;
   }
 
-  useEffect(() => {
-    if (!isLoading) {
-      setShowSkeleton(false);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setShowSkeleton(true);
-    }, 250);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [isLoading]);
-
-  if (isLoading && showSkeleton) return <LetterDetailSkeleton />;
-  if (isLoading) return null;
+  if (isLoading) return <LetterDetailSkeleton />;
   if (isError || !data || !data.success) {
     return <div className="p-4 text-red-500">편지를 불러오지 못했어요.</div>;
   }
