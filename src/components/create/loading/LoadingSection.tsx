@@ -1,4 +1,4 @@
-import loadingImg from "@/assets/create/loading.svg";
+import loadingImg from '@/assets/create/loading.svg';
 
 type LoadingSectionProps = {
   className?: string;
@@ -8,13 +8,13 @@ type LoadingSectionProps = {
 
 export default function LoadingSection({
   className,
-  title = "편지를 읽고 있어요",
-  subtitle = "reading",
+  title = '편지를 읽고 있어요',
+  subtitle = 'reading',
 }: LoadingSectionProps) {
   return (
     <div
       className={`h-full flex flex-col items-center justify-center gap-[20px] mt-50 ${
-        className ?? ""
+        className ?? ''
       }`}
     >
       <img src={loadingImg} alt="loading" className="w-[71px] h-[65px] shake" />
@@ -23,7 +23,7 @@ export default function LoadingSection({
         <p className="text-sm font-medium text-[#9D9D9F]">{subtitle}</p>
       </div>
 
-      <div className="w-[135px] h-[15px] bg-[#F4F5F6] rounded-[20px] overflow-hidden px-[2px] py-[1px]">
+      <div className="w-[135px] h-[16px] bg-[#F4F5F6] rounded-[20px] overflow-hidden px-[2px] py-[2px]">
         <div className="loading-grow h-[12px] rounded-[20px]" />
       </div>
     </div>
