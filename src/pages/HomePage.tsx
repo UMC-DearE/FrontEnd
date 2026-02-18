@@ -197,11 +197,9 @@ export default function HomePage() {
     const imageId = uploaded.data.imageId ?? null;
 
     const tempStickerId = -Date.now();
+    const maxZ = draftStickers.reduce((m, s) => Math.max(m, s.z), 0) + 1;
 
-    let maxZ = 1;
     setDraftStickers((prev) => {
-      maxZ = prev.reduce((m, s) => Math.max(m, s.z), 0) + 1;
-
       const next: StickerItem = {
         id: tempStickerId,
         src,
