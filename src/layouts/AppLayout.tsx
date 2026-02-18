@@ -26,6 +26,11 @@ export function AppLayout() {
     document.documentElement.style.setProperty('--app-font', fontFamily);
   }, [font]);
 
+  // 페이지 전환 시 항상 스크롤을 맨 위로 이동
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [pathname]);
+
   const matched = ROUTE_META.find((r) => r.match(pathname));
   const Header = matched ? HEADER_REGISTRY[matched.header] : null;
 
@@ -47,10 +52,10 @@ export function AppLayout() {
 
   const bgClass = matched?.bg === 'white' ? 'bg-white' : 'bg-[#F8F8F8]';
 
-  const NO_MAIN_PADDING_PATHS = ['/my', '/my/account', 'letterbox' ,'/create/detail'];
+  const NO_MAIN_PADDING_PATHS = ['/my', '/my/account', 'letterbox', '/create/detail'];
   const noMainPadding =
-  NO_MAIN_PADDING_PATHS.includes(pathname) ||
-  (pathname.startsWith('/letter/') && pathname.endsWith('/edit'));
+    NO_MAIN_PADDING_PATHS.includes(pathname) ||
+    (pathname.startsWith('/letter/') && pathname.endsWith('/edit'));
 
   const HEADER_HEIGHT = 105;
   const BOTTOM_NAV_HEIGHT = 95;
