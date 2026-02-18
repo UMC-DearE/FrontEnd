@@ -11,6 +11,7 @@ interface ProfileCustomSheetProps {
   bgColor: string;
   onChangeBgColor: (color: string) => void;
   onPickerStateChange?: (isOpen: boolean) => void;
+  onDeselectSticker?: () => void;
 }
 
 const normalizeHex = (v: string) => {
@@ -28,6 +29,7 @@ export default function ProfileCustomSheet({
   bgColor,
   onChangeBgColor,
   onPickerStateChange,
+  onDeselectSticker,
 }: ProfileCustomSheetProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showPicker, setShowPicker] = useState(false);
@@ -47,11 +49,14 @@ export default function ProfileCustomSheet({
   };
 
   const handleToggleBgPicker = () => {
-    setShowPicker((v) => {
-      const newValue = !v;
-      onPickerStateChange?.(newValue);
-      return newValue;
-    });
+    const next = !showPicker;
+    setShowPicker(next);
+    onPickerStateChange?.(next);
+
+    // 배경색 피커를 열 때 스티커 선택 해제
+    if (next) {
+      onDeselectSticker?.();
+    }
   };
 
   const handleClosePicker = () => {
@@ -99,7 +104,7 @@ export default function ProfileCustomSheet({
             </div>
 
             {showPicker && (
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-[235px] z-50">
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-[235px] z-[60]">
                 <div className="bg-white rounded-lg p-3 shadow-lg">
                   <HexColorPicker color={safeBgColor} onChange={onChangeBgColor} />
                   <div className="mt-2 flex items-center gap-2 justify-between">

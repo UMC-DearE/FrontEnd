@@ -10,6 +10,7 @@ import type {
   PatchLetterResponse,
   RandomLetterApiResponse,
   LetterListResponse,
+  RandomLetterData,
 } from '@/types/letter';
 import { normalizeImageUrl } from './upload';
 
@@ -86,7 +87,7 @@ export const unpinLetter = async (letterId: number) => {
   return data;
 };
 
-export const getRandomLetter = async (): Promise<RandomLetterApiResponse> => {
+export const getRandomLetter = async (): Promise<RandomLetterData> => {
   const { data } = await api.get<RandomLetterApiResponse>('/letters/random');
-  return data;
+  return data.data;
 };
