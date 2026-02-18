@@ -8,12 +8,14 @@ import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import { uploadImage } from '@/api/upload';
-import { createSticker, updateSticker, deleteSticker } from '@/api/sticker';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
 import { useUpdateHomeColor } from '@/hooks/mutations/useUpdateHomeColor';
 import { useRandomLetterQuery } from '@/hooks/queries/useRandomLetterQuery';
 import { usePinLetter } from '@/hooks/mutations/usePinLetter';
 import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
+import { useCreateSticker } from '@/hooks/mutations/useCreateSticker';
+import { useUpdateSticker } from '@/hooks/mutations/useUpdateSticker';
+import { useDeleteSticker } from '@/hooks/mutations/useDeleteSticker';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -31,7 +33,6 @@ const fitToMaxSide = (w: number, h: number, maxSide: number) => {
 };
 
 const cloneStickers = (arr: StickerItem[]) => arr.map((s) => ({ ...s }));
-const isTempStickerId = (id: string) => id.startsWith('tmp-');
 
 export default function HomePage() {
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
@@ -41,6 +42,10 @@ export default function HomePage() {
   const { data: randomData, isLoading: randomLoading } = useRandomLetterQuery();
   const pinMutation = usePinLetter();
   const unpinMutation = useUnpinLetter();
+
+  const createStickerMutation = useCreateSticker();
+  const updateStickerMutation = useUpdateSticker();
+  const deleteStickerMutation = useDeleteSticker();
 
   const letter: HomeCardLetter | null = useMemo(() => {
     if (!randomData) return null;
@@ -75,57 +80,78 @@ export default function HomePage() {
   const [openSheet, setOpenSheet] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const [savedStickers, setSavedStickers] = useState<StickerItem[]>([]);
   const [draftStickers, setDraftStickers] = useState<StickerItem[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const enabled = openSheet && !pickerOpen;
-  const stickers = openSheet ? draftStickers : savedStickers;
 
-  const initialStickerIdsRef = useRef<string[]>([]);
+  const [sizeMap, setSizeMap] = useState<Map<string, { w: number; h: number }>>(new Map());
+
+  const baseStickers: StickerItem[] = useMemo(() => {
+    if (!home) return [];
+
+    return home.stickers.map((s) => {
+      const wh = sizeMap.get(s.imageUrl) ?? { w: 160, h: 160 };
+
+      return {
+        id: s.stickerId,
+        src: s.imageUrl,
+        x: s.posX,
+        y: s.posY,
+        z: s.posZ,
+        rotation: s.rotation,
+        scale: s.scale,
+        imageId: s.imageId,
+        w: wh.w,
+        h: wh.h,
+      };
+    });
+  }, [home, sizeMap]);
+
+  const stickers = openSheet ? draftStickers : baseStickers;
 
   useEffect(() => {
     if (!home) return;
-    if (openSheet) return;
-
     setHomeBgColor(home.setting.homeColor);
+  }, [home, setHomeBgColor]);
+
+  useEffect(() => {
+    if (!home) return;
 
     let alive = true;
+    const urls = Array.from(new Set(home.stickers.map((s) => s.imageUrl)));
 
-    Promise.all(
-      home.stickers.map(async (s) => {
-        const size = await loadImageSize(s.imageUrl).catch(() => ({ w: 160, h: 160 }));
+    (async () => {
+      const fetched: Array<[string, { w: number; h: number }]> = [];
+
+      for (const url of urls) {
+        const size = await loadImageSize(url).catch(() => ({ w: 160, h: 160 }));
         const fitted = fitToMaxSide(size.w, size.h, 160);
+        fetched.push([url, fitted]);
+      }
 
-        const item: StickerItem = {
-          id: String(s.stickerId),
-          src: s.imageUrl,
-          x: s.posX,
-          y: s.posY,
-          z: s.posZ,
-          rotation: s.rotation,
-          scale: s.scale,
-          imageId: s.imageId,
-          w: fitted.w,
-          h: fitted.h,
-        };
+      if (!alive) return;
 
-        return item;
-      })
-    )
-      .then((sized) => {
-        if (!alive) return;
-        setSavedStickers(sized);
-        setDraftStickers(cloneStickers(sized));
-      })
-      .catch(() => {});
+      setSizeMap((prev) => {
+        const next = new Map(prev);
+        let changed = false;
+
+        for (const [url, wh] of fetched) {
+          if (next.has(url)) continue;
+          next.set(url, wh);
+          changed = true;
+        }
+
+        return changed ? next : prev;
+      });
+    })();
 
     return () => {
       alive = false;
     };
-  }, [home, openSheet, setHomeBgColor]);
+  }, [home]);
 
   const handlePin = async (letterId: number) => {
     try {
@@ -150,8 +176,7 @@ export default function HomePage() {
   };
 
   const openEditor = () => {
-    initialStickerIdsRef.current = savedStickers.map((s) => s.id);
-    setDraftStickers(cloneStickers(savedStickers));
+    setDraftStickers(cloneStickers(baseStickers));
     setSelectedId(null);
     setOpenSheet(true);
     setPickerOpen(false);
@@ -168,21 +193,24 @@ export default function HomePage() {
     const fitted = fitToMaxSide(size.w, size.h, 160);
 
     const uploaded = await uploadImage(file, 'sticker');
+    const src = uploaded.data.url ?? localUrl;
+    const imageId = uploaded.data.imageId ?? null;
 
-    const tempId = `tmp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const tempStickerId = -Date.now();
 
+    let maxZ = 1;
     setDraftStickers((prev) => {
-      const maxZ = prev.reduce((m, s) => Math.max(m, s.z), 0);
+      maxZ = prev.reduce((m, s) => Math.max(m, s.z), 0) + 1;
 
       const next: StickerItem = {
-        id: tempId,
-        src: uploaded.data.url ?? localUrl,
+        id: tempStickerId,
+        src,
         x: cx,
         y: cy,
-        z: maxZ + 1,
+        z: maxZ,
         rotation: 0,
         scale: 1,
-        imageId: uploaded.data.imageId ?? null,
+        imageId,
         w: fitted.w,
         h: fitted.h,
       };
@@ -190,8 +218,37 @@ export default function HomePage() {
       return [...prev, next];
     });
 
-    setSelectedId(tempId);
+    setSelectedId(tempStickerId);
     setOpenSheet(true);
+
+    if (imageId === null) return;
+
+    createStickerMutation.mutate(
+      {
+        request: {
+          imageId,
+          posX: cx,
+          posY: cy,
+          posZ: maxZ,
+          rotation: 0,
+          scale: 1,
+        },
+        imageUrl: src,
+        clientStickerId: tempStickerId,
+      },
+      {
+        onSuccess: (res) => {
+          setDraftStickers((prev) =>
+            prev.map((s) => (s.id === tempStickerId ? { ...s, id: res.stickerId } : s))
+          );
+          setSelectedId((cur) => (cur === tempStickerId ? res.stickerId : cur));
+        },
+        onError: () => {
+          setDraftStickers((prev) => prev.filter((s) => s.id !== tempStickerId));
+          setSelectedId((cur) => (cur === tempStickerId ? null : cur));
+        },
+      }
+    );
   };
 
   const onChangeStickers = (next: StickerItem[]) => {
@@ -199,58 +256,32 @@ export default function HomePage() {
     setDraftStickers(next);
   };
 
-  const onDeleteSticker = async (id: string) => {
+  const onDeleteSticker = (id: number) => {
     if (!enabled) return;
+
     setDraftStickers((prev) => prev.filter((s) => s.id !== id));
     setSelectedId((cur) => (cur === id ? null : cur));
+
+    if (id > 0) deleteStickerMutation.mutate({ stickerId: id });
   };
 
-  const persistStickersOnComplete = async (draft: StickerItem[]) => {
-    const draftIds = new Set(draft.map((s) => s.id));
-    const toDelete = initialStickerIdsRef.current.filter((id) => !draftIds.has(id));
+  const onCommitSticker = (id: number) => {
+    if (!enabled) return;
+    if (id <= 0) return;
 
-    await Promise.all(toDelete.map((id) => deleteSticker(Number(id))));
+    const s = draftStickers.find((x) => x.id === id);
+    if (!s) return;
 
-    const existing = draft.filter((s) => !isTempStickerId(s.id));
-    const temps = draft.filter((s) => isTempStickerId(s.id));
-
-    await Promise.all(
-      existing.map((s) =>
-        updateSticker(s.id, {
-          posX: s.x,
-          posY: s.y,
-          posZ: s.z,
-          rotation: s.rotation,
-          scale: s.scale,
-        })
-      )
-    );
-
-    const created = await Promise.all(
-      temps.map(async (s) => {
-        if (s.imageId === null) return null;
-
-        const body = {
-          imageId: s.imageId,
-          posX: s.x,
-          posY: s.y,
-          posZ: s.z,
-          rotation: s.rotation,
-          scale: s.scale,
-        };
-
-        const res = await createSticker(body);
-
-        const next: StickerItem = {
-          ...s,
-          id: String(res.stickerId),
-        };
-
-        return next;
-      })
-    );
-
-    return [...existing, ...created.filter((x): x is StickerItem => x !== null)];
+    updateStickerMutation.mutate({
+      stickerId: id,
+      body: {
+        posX: s.x,
+        posY: s.y,
+        posZ: s.z,
+        rotation: s.rotation,
+        scale: s.scale,
+      },
+    });
   };
 
   if (homeLoading || randomLoading) return <div>로딩 중...</div>;
@@ -274,7 +305,7 @@ export default function HomePage() {
           }}
           onChange={onChangeStickers}
           onDelete={onDeleteSticker}
-          onCommit={() => {}}
+          onCommit={onCommitSticker}
         />
       </div>
 
@@ -295,31 +326,22 @@ export default function HomePage() {
           setOpenSheet(false);
           setSelectedId(null);
           setPickerOpen(false);
-          setDraftStickers(cloneStickers(savedStickers));
+          setDraftStickers(cloneStickers(baseStickers));
         }}
         onComplete={async () => {
           const snapshot = cloneStickers(draftStickers);
 
-          setSavedStickers(snapshot);
-          setDraftStickers(snapshot);
           setOpenSheet(false);
           setSelectedId(null);
           setPickerOpen(false);
 
-          const [colorRes, stickerRes] = await Promise.allSettled([
-            updateHomeColorMutation.mutateAsync(homeBgColor),
-            persistStickersOnComplete(snapshot),
-          ]);
-
-          if (colorRes.status !== 'fulfilled') console.error(colorRes.reason);
-
-          if (stickerRes.status === 'fulfilled') {
-            const persisted = cloneStickers(stickerRes.value);
-            setSavedStickers(persisted);
-            setDraftStickers(persisted);
-          } else {
-            console.error(stickerRes.reason);
+          try {
+            await updateHomeColorMutation.mutateAsync(homeBgColor);
+          } catch (e) {
+            console.error(e);
           }
+
+          setDraftStickers(snapshot);
         }}
         onPickStickerFile={async (file) => {
           try {
