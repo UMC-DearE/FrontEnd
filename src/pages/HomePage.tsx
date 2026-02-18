@@ -16,6 +16,8 @@ import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
 import { useCreateSticker } from '@/hooks/mutations/useCreateSticker';
 import { useUpdateSticker } from '@/hooks/mutations/useUpdateSticker';
 import { useDeleteSticker } from '@/hooks/mutations/useDeleteSticker';
+import { useMyMembership } from '@/hooks/queries/useMyMembership';
+import useToast from '@/hooks/useToast';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -182,7 +184,16 @@ export default function HomePage() {
     setPickerOpen(false);
   };
 
+  const { data: membership } = useMyMembership();
+  const toast = useToast();
+
   const addStickerFromFile = async (file: File) => {
+    if (!membership?.isPlus && draftStickers.length >= 3) {
+      toast.show(
+        '스티커는 최대 3개까지 추가할 수 있어요. PLUS 멤버십을 구독하면 무제한으로 사용할 수 있어요.'
+      );
+      return;
+    }
     const rect = containerRef.current?.getBoundingClientRect();
     const cx = rect ? rect.width / 2 : 196;
     const cy = rect ? rect.height / 2 : 320;
