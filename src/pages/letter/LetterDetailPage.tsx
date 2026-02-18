@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import LetterDetailSection from "@/components/letter/LetterDetailSection";
 import LetterDetailSkeleton from "@/components/skeleton/LetterDetailSkeleton";
