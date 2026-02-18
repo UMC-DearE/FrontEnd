@@ -55,6 +55,7 @@ export default function LetterBoxPage() {
 
   const [folders, setFolders] = useState<Folder[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
+  const [allLetters, setAllLetters] = useState<Letter[]>([]);
   const [totalElements, setTotalElements] = useState(0);
   const [allCount, setAllCount] = useState(0);
   const [page, setPage] = useState(0);
@@ -89,6 +90,7 @@ export default function LetterBoxPage() {
     void run();
   }, []);
 
+  // allLetters: fromId 필터 없이 폴더 기준으로만 전체 불러오기 (fromCounts 계산용)
   useEffect(() => {
     const run = async () => {
       const folderId = typeof selectedFolderId === 'number' ? selectedFolderId : undefined;
@@ -97,14 +99,16 @@ export default function LetterBoxPage() {
       try {
         const res = await getLetterLists({
           page: 0,
-          size: 1,
+          size: 9999,
           sort: 'receivedAt,desc',
           folderId,
           isLiked,
         });
 
+        setAllLetters(res.data.content ?? []);
         setAllCount(res.data.totalElements ?? 0);
       } catch (e) {
+        setAllLetters([]);
         setAllCount(0);
         console.error(e);
       }
@@ -117,6 +121,7 @@ export default function LetterBoxPage() {
     setPage(0);
   }, [selectedFolderId, selectedFromId]);
 
+  // letters: fromId 필터 포함해서 실제 표시용
   useEffect(() => {
     let alive = true;
 
@@ -220,14 +225,15 @@ export default function LetterBoxPage() {
     await updateFolderOrders(next.map((f) => f.id));
   };
 
+  // allLetters 기준으로 fromCounts 계산
   const fromCounts = useMemo(() => {
     const counts: Record<number, number> = {};
-    for (const l of letters) {
+    for (const l of allLetters) {
       const id = l.from.fromId;
       counts[id] = (counts[id] ?? 0) + 1;
     }
     return counts;
-  }, [letters]);
+  }, [allLetters]);
 
   const folderTotalCount = useMemo(() => totalElements, [totalElements]);
 
