@@ -136,7 +136,7 @@ export default function LetterBoxPage() {
         const res = await getLetterLists({
           page,
           size,
-          sort: 'receivedAt,desc',
+          sort: 'createdAt,desc',
           folderId,
           fromId,
           isLiked,
