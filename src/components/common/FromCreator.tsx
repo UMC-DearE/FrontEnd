@@ -14,9 +14,17 @@ type Props = {
   name: string;
   onNameChange: (v: string) => void;
   disabled?: boolean;
+  fromCount?: number; // 현재 From 개수 (개수에 따라 컬러피커 위치 조정용)
 };
 
-export default function CreateFrom({ onDraftCreate, onCreateImmediate, name, onNameChange, disabled }: Props) {
+export default function CreateFrom({
+  onDraftCreate,
+  onCreateImmediate,
+  name,
+  onNameChange,
+  disabled,
+  fromCount,
+}: Props) {
   const [selectedColor, setSelectedColor] = useState('#FEEFEF');
   const [showPicker, setShowPicker] = useState(false);
 
@@ -70,8 +78,12 @@ export default function CreateFrom({ onDraftCreate, onCreateImmediate, name, onN
         </button>
 
         {showPicker && (
-          <div className="absolute top-full left-6/8 -translate-x-1/2 mt-3 mb-3 z-40">
-            <div className="bg-white rounded-lg p-3 shadow-lg">
+        <div
+          className={`absolute left-6/8 -translate-x-1/2 z-40 ${
+            fromCount && fromCount >= 5 ? 'bottom-full mb-3' : 'top-full mt-3'
+          }`}
+        >
+          <div className="bg-white rounded-lg p-3 shadow-lg">
               <HexColorPicker color={selectedColor} onChange={(c) => setSelectedColor(c)} />
               <div className="mt-2 flex items-center gap-2 justify-between">
                 <input
