@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import FolderList from '@/components/letterBox/letterFolder/FolderList';
 import FolderSettingSheet from '@/components/letterBox/letterFolder/FolderSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
@@ -55,6 +55,7 @@ export default function LetterBoxPage() {
 
   const [folders, setFolders] = useState<Folder[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
+  const [allLetters, setAllLetters] = useState<Letter[]>([]);
   const [totalElements, setTotalElements] = useState(0);
   const [allCount, setAllCount] = useState(0);
   const [page, setPage] = useState(0);
@@ -63,7 +64,6 @@ export default function LetterBoxPage() {
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const searchWrapRef = useRef<HTMLDivElement | null>(null);
 
   const [allFroms, setAllFroms] = useState<From[]>([]);
 
@@ -97,14 +97,16 @@ export default function LetterBoxPage() {
       try {
         const res = await getLetterLists({
           page: 0,
-          size: 1,
+          size: 9999,
           sort: 'receivedAt,desc',
           folderId,
           isLiked,
         });
 
+        setAllLetters(res.data.content ?? []);
         setAllCount(res.data.totalElements ?? 0);
       } catch (e) {
+        setAllLetters([]);
         setAllCount(0);
         console.error(e);
       }
@@ -131,7 +133,7 @@ export default function LetterBoxPage() {
         const res = await getLetterLists({
           page,
           size,
-          sort: 'receivedAt,desc',
+          sort: 'createdAt,desc',
           folderId,
           fromId,
           isLiked,
@@ -155,25 +157,7 @@ export default function LetterBoxPage() {
 
   useEffect(() => {
     setQuery('');
-    setIsSearchOpen(false);
-  }, [selectedFolderId, selectedFromId]);
-
-  useEffect(() => {
-    if (!isSearchOpen) return;
-
-    const onPointerDown = (e: PointerEvent) => {
-      const el = searchWrapRef.current;
-      if (!el) return;
-
-      if (e.target instanceof Node && !el.contains(e.target)) {
-        setIsSearchOpen(false);
-        setQuery('');
-      }
-    };
-
-    document.addEventListener('pointerdown', onPointerDown);
-    return () => document.removeEventListener('pointerdown', onPointerDown);
-  }, [isSearchOpen]);
+  }, [selectedFolderId]);
 
   const editingFolder = useMemo(() => {
     if (editingFolderId == null) return null;
@@ -222,25 +206,54 @@ export default function LetterBoxPage() {
 
   const fromCounts = useMemo(() => {
     const counts: Record<number, number> = {};
-    for (const l of letters) {
+    for (const l of allLetters) {
       const id = l.from.fromId;
       counts[id] = (counts[id] ?? 0) + 1;
     }
     return counts;
-  }, [letters]);
+  }, [allLetters]);
 
   const folderTotalCount = useMemo(() => totalElements, [totalElements]);
 
-  const filteredLetters = useMemo(() => {
+  const searchedLetters = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return letters;
-
-    return letters.filter((l) => {
+    if (!q) return allLetters;
+    return allLetters.filter((l) => {
       const excerpt = (l.excerpt ?? '').toLowerCase();
       const fromName = (l.from?.name ?? '').toLowerCase();
       return excerpt.includes(q) || fromName.includes(q);
     });
-  }, [letters, query]);
+  }, [allLetters, query]);
+
+  const filteredLetters = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (q) {
+      let result = searchedLetters;
+      if (selectedFromId !== 'all') {
+        result = result.filter((l) => l.from.fromId === selectedFromId);
+      }
+      return result;
+    }
+    return letters;
+  }, [searchedLetters, letters, query, selectedFromId]);
+
+  const displayCount = useMemo(() => {
+    if (!query.trim()) return folderTotalCount;
+    if (selectedFromId !== 'all') return filteredLetters.length;
+    return searchedLetters.length;
+  }, [query, selectedFromId, filteredLetters, searchedLetters, folderTotalCount]);
+
+  const displayAllCount = query.trim() ? searchedLetters.length : allCount;
+
+  const displayFromCounts = useMemo(() => {
+    if (!query.trim()) return fromCounts;
+    const counts: Record<number, number> = {};
+    for (const l of searchedLetters) {
+      const id = l.from.fromId;
+      counts[id] = (counts[id] ?? 0) + 1;
+    }
+    return counts;
+  }, [query, searchedLetters, fromCounts]);
 
   const emptyMessage = useMemo(() => {
     if (query.trim()) return '검색 결과가 없어요.';
@@ -267,7 +280,7 @@ export default function LetterBoxPage() {
       </div>
 
       {isSearchOpen && (
-        <div ref={searchWrapRef} className="fixed top-[60px] left-1/2 z-50 -translate-x-1/2">
+        <div className="fixed top-[60px] left-1/2 z-50 -translate-x-1/2">
           <SearchBar
             value={query}
             onChange={setQuery}
@@ -284,18 +297,22 @@ export default function LetterBoxPage() {
           folders={folders}
           selectedId={selectedFolderId}
           onSelect={(id) => {
+            if (isSearchOpen) return;
             setSelectedFolderId(id);
             setSelectedFromId('all');
           }}
           onFolderAdd={() => {
+            if (isSearchOpen) return;
             setEditingFolderId(null);
             setIsModalOpen(true);
           }}
           onOpenFolderSetting={(id) => {
+            if (isSearchOpen) return;
             setSettingFolderId(id);
             setIsSettingOpen(true);
           }}
           onReorder={(next) => {
+            if (isSearchOpen) return;
             setFolders(next);
             void persistOrder(next);
           }}
@@ -303,10 +320,10 @@ export default function LetterBoxPage() {
 
         <div className="flex flex-col gap-[10px] mb-3">
           <ToolBar
-            folderTotalCount={folderTotalCount}
-            allCount={allCount}
+            folderTotalCount={displayCount}
+            allCount={displayAllCount}
             froms={allFroms}
-            fromCounts={fromCounts}
+            fromCounts={displayFromCounts}
             selectedFromId={selectedFromId}
             onFromSelect={setSelectedFromId}
             view={viewMode}
@@ -336,6 +353,7 @@ export default function LetterBoxPage() {
                   isLiked={letter.isLiked}
                   receivedAt={letter.receivedAt}
                   from={letter.from}
+                  searchQuery={query.trim() || undefined}
                 />
               </div>
             ))

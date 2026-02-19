@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 
 export type StickerItem = {
-  id: string;
+  id: number;
   src: string;
   x: number;
   y: number;
@@ -17,18 +17,18 @@ type Props = {
   enabled: boolean;
   containerRef: React.RefObject<HTMLDivElement | null>;
   stickers: StickerItem[];
-  selectedId: string | null;
-  onSelect: (id: string) => void;
+  selectedId: number | null;
+  onSelect: (id: number) => void;
   onDeselect: () => void;
   onChange: (next: StickerItem[]) => void;
-  onDelete: (id: string) => void;
-  onCommit?: (id: string) => void;
+  onDelete: (id: number) => void;
+  onCommit?: (id: number) => void;
 };
 
 type DragState =
   | {
       kind: 'move';
-      id: string;
+      id: number;
       pointerId: number;
       startPx: number;
       startPy: number;
@@ -37,7 +37,7 @@ type DragState =
     }
   | {
       kind: 'transform';
-      id: string;
+      id: number;
       pointerId: number;
       centerX: number;
       centerY: number;
@@ -70,12 +70,12 @@ export default function StickerLayer({
     return { x: clientX - left, y: clientY - top };
   };
 
-  const bringToFront = (id: string) => {
+  const bringToFront = (id: number) => {
     const maxZ = stickers.reduce((m, s) => Math.max(m, s.z), 0);
     onChange(stickers.map((s) => (s.id === id ? { ...s, z: maxZ + 1 } : s)));
   };
 
-  const startMove = (e: React.PointerEvent<HTMLDivElement>, id: string) => {
+  const startMove = (e: React.PointerEvent<HTMLDivElement>, id: number) => {
     if (!enabled) return;
     e.stopPropagation();
 
@@ -99,7 +99,7 @@ export default function StickerLayer({
     e.currentTarget.setPointerCapture(e.pointerId);
   };
 
-  const startTransform = (e: React.PointerEvent<HTMLButtonElement>, id: string) => {
+  const startTransform = (e: React.PointerEvent<HTMLButtonElement>, id: number) => {
     if (!enabled) return;
     e.stopPropagation();
 
@@ -182,13 +182,13 @@ export default function StickerLayer({
         if (!enabled) return;
         e.stopPropagation();
         endGesture();
-        if (selectedId) onCommit?.(selectedId);
+        if (selectedId !== null) onCommit?.(selectedId);
       }}
       onPointerCancel={(e) => {
         if (!enabled) return;
         e.stopPropagation();
         endGesture();
-        if (selectedId) onCommit?.(selectedId);
+        if (selectedId !== null) onCommit?.(selectedId);
       }}
     >
       {stickers
@@ -227,7 +227,7 @@ export default function StickerLayer({
                 <>
                   <button
                     type="button"
-                    className="absolute -top-3 -left-3 w-7 h-7 rounded-full bg-[#FF5F2F] text-white text-[14px] font-bold flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.25)] cursor-pointer"
+                    className="absolute -top-3 -left-3 w-7 h-7 rounded-full bg-[#FF5F2F] text-white text-[14px] font-bold flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.25)] cursor-pointer pointer-events-auto"
                     onPointerDown={(e) => e.stopPropagation()}
                     onClick={() => onDelete(s.id)}
                   >
@@ -236,7 +236,7 @@ export default function StickerLayer({
 
                   <button
                     type="button"
-                    className="absolute -bottom-3 -right-3 w-7 h-7 rounded-full bg-white border-2 border-[#FF5F2F] text-[#FF5F2F] text-[12px] font-bold flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.25)] cursor-pointer"
+                    className="absolute -bottom-3 -right-3 w-7 h-7 rounded-full bg-white border-2 border-[#FF5F2F] text-[#FF5F2F] text-[12px] font-bold flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.25)] cursor-pointer pointer-events-auto"
                     onPointerDown={(e) => startTransform(e, s.id)}
                   >
                     ⤡

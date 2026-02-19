@@ -5,14 +5,55 @@ import roundIcon from '@/assets/letterPage/roundIcon.svg';
 type LetterCardCompactProps = {
   content: string;
   fromName: string;
+  searchQuery?: string;
 };
 
-export default function LetterCardCompact({ content, fromName }: LetterCardCompactProps) {
+function getContextSnippet(content: string, query: string): string {
+  const lower = content.toLowerCase();
+  const idx = lower.indexOf(query.toLowerCase());
+  if (idx === -1) return content;
+  const start = Math.max(0, idx - 20);
+  return (start > 0 ? '...' : '') + content.slice(start);
+}
+
+function HighlightText({ text, query }: { text: string; query: string }) {
+  if (!query) return <>{text}</>;
+
+  const lower = text.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let idx = lower.indexOf(lowerQuery);
+
+  while (idx !== -1) {
+    if (idx > lastIndex) parts.push(text.slice(lastIndex, idx));
+    parts.push(
+      <mark key={idx} style={{ backgroundColor: '#FF5F2F1A', color: '#FF5F2F' }}>
+        {text.slice(idx, idx + query.length)}
+      </mark>
+    );
+    lastIndex = idx + query.length;
+    idx = lower.indexOf(lowerQuery, lastIndex);
+  }
+
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+  return <>{parts}</>;
+}
+
+export default function LetterCardCompact({
+  content,
+  fromName,
+  searchQuery,
+}: LetterCardCompactProps) {
+  const displayText = searchQuery ? getContextSnippet(content, searchQuery) : content;
+
   return (
     <div className="w-full h-[46px] rounded-lg bg-white px-3 py-2 flex items-center justify-between">
       <div className="flex items-center gap-[12px] flex-1 min-w-0">
         <img src={roundIcon} alt="round-icon" />
-        <p className="text-[14px] font-medium text-[#555557] truncate">{content}</p>
+        <p className="text-[14px] font-medium text-[#555557] truncate">
+          <HighlightText text={displayText} query={searchQuery ?? ''} />
+        </p>
       </div>
 
       <div className="flex h-5 w-[45px] min-w-0 items-center justify-center rounded-[6px]">

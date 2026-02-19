@@ -11,6 +11,7 @@ export type LetterCardProps = {
   receivedAt: string;
   from: From | null;
   viewMode: ViewMode;
+  searchQuery?: string;
 };
 
 export default function LetterCard({
@@ -20,9 +21,12 @@ export default function LetterCard({
   isLiked,
   receivedAt,
   from,
+  searchQuery,
 }: LetterCardProps) {
   if (viewMode === '간편 보기') {
-    return <LetterCardCompact content={excerpt} fromName={from?.name ?? ''} />;
+    return (
+      <LetterCardCompact content={excerpt} fromName={from?.name ?? ''} searchQuery={searchQuery} />
+    );
   }
 
   return (
@@ -32,6 +36,7 @@ export default function LetterCard({
       isLiked={isLiked}
       receivedAt={receivedAt}
       from={from}
+      searchQuery={searchQuery}
     />
   );
 }
