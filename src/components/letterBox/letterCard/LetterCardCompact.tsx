@@ -1,10 +1,9 @@
 // 편지함 편지 카드 간편 보기
 
-import roundIcon from '@/assets/letterPage/roundIcon.svg';
-
 type LetterCardCompactProps = {
   content: string;
   fromName: string;
+  bgColor?: string;
   searchQuery?: string;
 };
 
@@ -43,6 +42,7 @@ function HighlightText({ text, query }: { text: string; query: string }) {
 export default function LetterCardCompact({
   content,
   fromName,
+  bgColor,
   searchQuery,
 }: LetterCardCompactProps) {
   const displayText = searchQuery ? getContextSnippet(content, searchQuery) : content;
@@ -50,7 +50,10 @@ export default function LetterCardCompact({
   return (
     <div className="w-full h-[46px] rounded-lg bg-white px-3 py-2 flex items-center justify-between">
       <div className="flex items-center gap-[12px] flex-1 min-w-0">
-        <img src={roundIcon} alt="round-icon" />
+        <div
+          className="w-[14px] h-[14px] rounded-full flex-shrink-0"
+          style={{ backgroundColor: bgColor }}
+        />
         <p className="text-[14px] font-medium text-[#555557] truncate">
           <HighlightText text={displayText} query={searchQuery ?? ''} />
         </p>
