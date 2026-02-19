@@ -48,11 +48,12 @@ export default function FromPage() {
           저장된 목록이 없어요
         </div>
       ) : (
-        fromList.map((from) => (
+        fromList.map((from, index) => (
           <div key={from.fromId}>
             {editingFromId === from.fromId ? (
               <FromEditPanel
                 from={from}
+                fromIndex={index}
                 onCancel={() => setEditingFromId(null)}
                 onSave={async (updated) => {
                   try {
