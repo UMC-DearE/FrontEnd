@@ -7,14 +7,15 @@ interface FromBadgeProps {
   size?: 'sm' | 'md';
 }
 
-export function FromBadge({
-  name,
-  bgColor,
-  fontColor,
-  size = 'md',
-}: FromBadgeProps) {
-  const outerClass = size === 'sm' ? 'inline-flex h-[20px] px-[8px] rounded-[6px]' : 'inline-flex h-[24px] px-[11px] rounded-[6px]';
-  const textClass = size === 'sm' ? 'flex items-center text-[12px] font-medium' : 'flex items-center text-[14px] font-medium';
+export function FromBadge({ name, bgColor, fontColor, size = 'md' }: FromBadgeProps) {
+  const outerClass =
+    size === 'sm'
+      ? 'inline-flex h-[20px] px-[8px] rounded-[6px]'
+      : 'inline-flex h-[24px] px-[11px] rounded-[6px]';
+  const textClass =
+    size === 'sm'
+      ? 'flex items-center text-[12px] font-medium'
+      : 'flex items-center text-[14px] font-medium';
 
   return (
     <span data-from-badge className={outerClass} style={{ backgroundColor: bgColor }}>

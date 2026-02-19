@@ -1,17 +1,23 @@
+import { useMemo, useRef, useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import type { AppLayoutContext } from '@/layouts/AppLayout';
 import ProfileCard from '@/components/home/ProfileCard';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import LetterCard, { type HomeCardLetter } from '@/components/home/LetterCard';
 import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
-import type { AppLayoutContext } from '@/layouts/AppLayout';
-import { updateLetterPinned, getRandomLetter } from '@/api/letter';
 import { uploadImage } from '@/api/upload';
-import { createSticker, updateSticker, deleteSticker } from '@/api/sticker';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
 import { useUpdateHomeColor } from '@/hooks/mutations/useUpdateHomeColor';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useRandomLetterQuery } from '@/hooks/queries/useRandomLetterQuery';
+import { usePinLetter } from '@/hooks/mutations/usePinLetter';
+import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
+import { useCreateSticker } from '@/hooks/mutations/useCreateSticker';
+import { useUpdateSticker } from '@/hooks/mutations/useUpdateSticker';
+import { useDeleteSticker } from '@/hooks/mutations/useDeleteSticker';
+import { useMyMembership } from '@/hooks/queries/useMyMembership';
+import useToast from '@/hooks/useToast';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -29,132 +35,131 @@ const fitToMaxSide = (w: number, h: number, maxSide: number) => {
 };
 
 const cloneStickers = (arr: StickerItem[]) => arr.map((s) => ({ ...s }));
-const isTempStickerId = (id: string) => id.startsWith('tmp-');
 
 export default function HomePage() {
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
   const { data: home, isLoading: homeLoading, isError: homeError } = useHomeQuery();
   const updateHomeColorMutation = useUpdateHomeColor();
 
-  const [letter, setLetter] = useState<HomeCardLetter | null>(null);
-  const [pinnedLetterId, setPinnedLetterId] = useState<number | null>(null);
+  const { data: randomData, isLoading: randomLoading } = useRandomLetterQuery();
+  const pinMutation = usePinLetter();
+  const unpinMutation = useUnpinLetter();
+
+  const createStickerMutation = useCreateSticker();
+  const updateStickerMutation = useUpdateSticker();
+  const deleteStickerMutation = useDeleteSticker();
+
+  const letter: HomeCardLetter | null = useMemo(() => {
+    if (!randomData) return null;
+
+    if (!randomData.hasLetter) {
+      return {
+        id: 0,
+        excerpt: '',
+        month: randomData.date.month,
+        day: randomData.date.day,
+        dayOfWeek: randomData.date.dayOfWeek,
+      };
+    }
+
+    return {
+      id: randomData.letterId,
+      excerpt: randomData.randomPhrase,
+      month: randomData.date.month,
+      day: randomData.date.day,
+      dayOfWeek: randomData.date.dayOfWeek,
+    };
+  }, [randomData]);
+
+  const pinnedLetterId = useMemo(() => {
+    if (!randomData) return null;
+    if (!randomData.hasLetter) return null;
+    return randomData.isPinned ? randomData.letterId : null;
+  }, [randomData]);
+
   const [pendingUnpinId, setPendingUnpinId] = useState<number | null>(null);
 
   const [openSheet, setOpenSheet] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const [savedStickers, setSavedStickers] = useState<StickerItem[]>([]);
   const [draftStickers, setDraftStickers] = useState<StickerItem[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  const enabled = openSheet;
-  const stickers = openSheet ? draftStickers : savedStickers;
+  const enabled = openSheet && !pickerOpen;
 
-  const initialStickerIdsRef = useRef<string[]>([]);
+  const [sizeMap, setSizeMap] = useState<Map<string, { w: number; h: number }>>(new Map());
 
-  const applyRandomLetterToState = useCallback(
-    (data: {
-      hasLetter: boolean;
-      date: { month: string; day: number; dayOfWeek: string };
-      letterId: number;
-      randomPhrase: string;
-      isPinned: boolean;
-    }) => {
-      if (!data.hasLetter) {
-        setLetter({
-          id: 0,
-          excerpt: '',
-          month: data.date.month,
-          day: data.date.day,
-          dayOfWeek: data.date.dayOfWeek,
-        });
-        setPinnedLetterId(null);
-        return;
-      }
+  const baseStickers: StickerItem[] = useMemo(() => {
+    if (!home) return [];
 
-      const next: HomeCardLetter = {
-        id: data.letterId,
-        excerpt: data.randomPhrase,
-        month: data.date.month,
-        day: data.date.day,
-        dayOfWeek: data.date.dayOfWeek,
+    return home.stickers.map((s) => {
+      const wh = sizeMap.get(s.imageUrl) ?? { w: 160, h: 160 };
+
+      return {
+        id: s.stickerId,
+        src: s.imageUrl,
+        x: s.posX,
+        y: s.posY,
+        z: s.posZ,
+        rotation: s.rotation,
+        scale: s.scale,
+        imageId: s.imageId,
+        w: wh.w,
+        h: wh.h,
       };
+    });
+  }, [home, sizeMap]);
 
-      setLetter(next);
-      setPinnedLetterId(data.isPinned ? data.letterId : null);
-    },
-    []
-  );
-
-  const refetchRandomLetter = useCallback(async () => {
-    const response = await getRandomLetter();
-    applyRandomLetterToState(response.data);
-  }, [applyRandomLetterToState]);
+  const stickers = openSheet ? draftStickers : baseStickers;
 
   useEffect(() => {
-    let mounted = true;
-
-    getRandomLetter()
-      .then((response) => {
-        if (!mounted) return;
-        applyRandomLetterToState(response.data);
-      })
-      .catch(() => {});
-
-    return () => {
-      mounted = false;
-    };
-  }, [applyRandomLetterToState]);
+    if (!home) return;
+    setHomeBgColor(home.setting.homeColor);
+  }, [home, setHomeBgColor]);
 
   useEffect(() => {
     if (!home) return;
 
-    setHomeBgColor(home.setting.homeColor);
-
-    if (openSheet) return;
-
     let alive = true;
+    const urls = Array.from(new Set(home.stickers.map((s) => s.imageUrl)));
 
-    Promise.all(
-      home.stickers.map(async (s) => {
-        const size = await loadImageSize(s.imageUrl).catch(() => ({ w: 160, h: 160 }));
+    (async () => {
+      const fetched: Array<[string, { w: number; h: number }]> = [];
+
+      for (const url of urls) {
+        const size = await loadImageSize(url).catch(() => ({ w: 160, h: 160 }));
         const fitted = fitToMaxSide(size.w, size.h, 160);
+        fetched.push([url, fitted]);
+      }
 
-        const item: StickerItem = {
-          id: String(s.stickerId),
-          src: s.imageUrl,
-          x: s.posX,
-          y: s.posY,
-          z: s.posZ,
-          rotation: s.rotation,
-          scale: s.scale,
-          imageId: s.imageId,
-          w: fitted.w,
-          h: fitted.h,
-        };
+      if (!alive) return;
 
-        return item;
-      })
-    )
-      .then((sized) => {
-        if (!alive) return;
-        setSavedStickers(sized);
-        setDraftStickers(cloneStickers(sized));
-      })
-      .catch(() => {});
+      setSizeMap((prev) => {
+        const next = new Map(prev);
+        let changed = false;
+
+        for (const [url, wh] of fetched) {
+          if (next.has(url)) continue;
+          next.set(url, wh);
+          changed = true;
+        }
+
+        return changed ? next : prev;
+      });
+    })();
 
     return () => {
       alive = false;
     };
-  }, [home, openSheet, setHomeBgColor]);
+  }, [home]);
 
   const handlePin = async (letterId: number) => {
     try {
-      await updateLetterPinned(letterId, true);
-      setPinnedLetterId(letterId);
-    } catch (error) {
-      console.error(error);
+      await pinMutation.mutateAsync(letterId);
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -165,22 +170,30 @@ export default function HomePage() {
     if (pendingUnpinId === null) return;
 
     try {
-      await updateLetterPinned(pendingUnpinId, false);
+      await unpinMutation.mutateAsync(pendingUnpinId);
       setPendingUnpinId(null);
-      await refetchRandomLetter();
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error(e);
     }
   };
 
   const openEditor = () => {
-    initialStickerIdsRef.current = savedStickers.map((s) => s.id);
-    setDraftStickers(cloneStickers(savedStickers));
+    setDraftStickers(cloneStickers(baseStickers));
     setSelectedId(null);
     setOpenSheet(true);
+    setPickerOpen(false);
   };
 
+  const { data: membership } = useMyMembership();
+  const toast = useToast();
+
   const addStickerFromFile = async (file: File) => {
+    if (!membership?.isPlus && draftStickers.length >= 3) {
+      toast.show(
+        '스티커는 최대 3개까지 추가할 수 있어요. PLUS 멤버십을 구독하면 무제한으로 사용할 수 있어요.'
+      );
+      return;
+    }
     const rect = containerRef.current?.getBoundingClientRect();
     const cx = rect ? rect.width / 2 : 196;
     const cy = rect ? rect.height / 2 : 320;
@@ -191,21 +204,22 @@ export default function HomePage() {
     const fitted = fitToMaxSide(size.w, size.h, 160);
 
     const uploaded = await uploadImage(file, 'sticker');
+    const src = uploaded.data.url ?? localUrl;
+    const imageId = uploaded.data.imageId ?? null;
 
-    const tempId = `tmp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const tempStickerId = -Date.now();
+    const maxZ = draftStickers.reduce((m, s) => Math.max(m, s.z), 0) + 1;
 
     setDraftStickers((prev) => {
-      const maxZ = prev.reduce((m, s) => Math.max(m, s.z), 0);
-
       const next: StickerItem = {
-        id: tempId,
-        src: uploaded.data.url ?? localUrl,
+        id: tempStickerId,
+        src,
         x: cx,
         y: cy,
-        z: maxZ + 1,
+        z: maxZ,
         rotation: 0,
         scale: 1,
-        imageId: uploaded.data.imageId ?? null,
+        imageId,
         w: fitted.w,
         h: fitted.h,
       };
@@ -213,100 +227,94 @@ export default function HomePage() {
       return [...prev, next];
     });
 
-    setSelectedId(tempId);
+    setSelectedId(tempStickerId);
     setOpenSheet(true);
+
+    if (imageId === null) return;
+
+    createStickerMutation.mutate(
+      {
+        request: {
+          imageId,
+          posX: cx,
+          posY: cy,
+          posZ: maxZ,
+          rotation: 0,
+          scale: 1,
+        },
+        imageUrl: src,
+        clientStickerId: tempStickerId,
+      },
+      {
+        onSuccess: (res) => {
+          setDraftStickers((prev) =>
+            prev.map((s) => (s.id === tempStickerId ? { ...s, id: res.stickerId } : s))
+          );
+          setSelectedId((cur) => (cur === tempStickerId ? res.stickerId : cur));
+        },
+        onError: () => {
+          setDraftStickers((prev) => prev.filter((s) => s.id !== tempStickerId));
+          setSelectedId((cur) => (cur === tempStickerId ? null : cur));
+        },
+      }
+    );
   };
 
   const onChangeStickers = (next: StickerItem[]) => {
-    if (!openSheet) return;
+    if (!enabled) return;
     setDraftStickers(next);
   };
 
-  const onDeleteSticker = async (id: string) => {
-    if (!openSheet) return;
+  const onDeleteSticker = (id: number) => {
+    if (!enabled) return;
+
     setDraftStickers((prev) => prev.filter((s) => s.id !== id));
     setSelectedId((cur) => (cur === id ? null : cur));
+
+    if (id > 0) deleteStickerMutation.mutate({ stickerId: id });
   };
 
-  const commitSticker = async (id: string) => {
-    if (!openSheet) return;
-    if (isTempStickerId(id)) return;
+  const onCommitSticker = (id: number) => {
+    if (!enabled) return;
+    if (id <= 0) return;
+
+    const s = draftStickers.find((x) => x.id === id);
+    if (!s) return;
+
+    updateStickerMutation.mutate({
+      stickerId: id,
+      body: {
+        posX: s.x,
+        posY: s.y,
+        posZ: s.z,
+        rotation: s.rotation,
+        scale: s.scale,
+      },
+    });
   };
 
-  const persistStickersOnComplete = async (draft: StickerItem[]) => {
-    const draftIds = new Set(draft.map((s) => s.id));
-    const toDelete = initialStickerIdsRef.current.filter((id) => !draftIds.has(id));
-
-    await Promise.all(toDelete.map((id) => deleteSticker(Number(id))));
-
-    const existing = draft.filter((s) => !isTempStickerId(s.id));
-    const temps = draft.filter((s) => isTempStickerId(s.id));
-
-    await Promise.all(
-      existing.map((s) =>
-        updateSticker(s.id, {
-          posX: s.x,
-          posY: s.y,
-          posZ: s.z,
-          rotation: s.rotation,
-          scale: s.scale,
-        })
-      )
-    );
-
-    const created = await Promise.all(
-      temps.map(async (s) => {
-        if (s.imageId === null) return null;
-
-        const body = {
-          imageId: s.imageId,
-          posX: s.x,
-          posY: s.y,
-          posZ: s.z,
-          rotation: s.rotation,
-          scale: s.scale,
-        };
-
-        const res = await createSticker(body);
-
-        const next: StickerItem = {
-          ...s,
-          id: String(res.stickerId),
-        };
-
-        return next;
-      })
-    );
-
-    const merged = [...existing, ...created.filter((x): x is StickerItem => x !== null)];
-
-    return merged;
-  };
-
-  if (homeLoading) return <div>로딩 중...</div>;
+  if (homeLoading || randomLoading) return <div>로딩 중...</div>;
   if (homeError || !home) return <div>에러</div>;
 
   return (
     <div ref={containerRef} style={{ backgroundColor: homeBgColor }}>
-      <div className={openSheet ? 'relative z-100' : 'relative z-40'}>
+      <div className={openSheet ? 'relative' : 'relative z-40'}>
         <StickerLayer
           enabled={enabled}
           containerRef={containerRef}
           stickers={stickers}
           selectedId={selectedId}
           onSelect={(id) => {
-            if (!openSheet) return;
+            if (!enabled) return;
             setSelectedId(id);
           }}
           onDeselect={() => {
-            if (!openSheet) return;
+            if (!enabled) return;
             setSelectedId(null);
           }}
           onChange={onChangeStickers}
           onDelete={onDeleteSticker}
-          onCommit={(id) => {
-            commitSticker(id);
-          }}
+          onCommit={onCommitSticker}
         />
       </div>
 
@@ -321,33 +329,28 @@ export default function HomePage() {
         open={openSheet}
         bgColor={homeBgColor}
         onChangeBgColor={setHomeBgColor}
+        onPickerStateChange={setPickerOpen}
+        onDeselectSticker={() => setSelectedId(null)}
         onClose={() => {
           setOpenSheet(false);
           setSelectedId(null);
-          setDraftStickers(cloneStickers(savedStickers));
+          setPickerOpen(false);
+          setDraftStickers(cloneStickers(baseStickers));
         }}
         onComplete={async () => {
           const snapshot = cloneStickers(draftStickers);
 
-          setSavedStickers(snapshot);
-          setDraftStickers(snapshot);
           setOpenSheet(false);
           setSelectedId(null);
+          setPickerOpen(false);
 
-          const [colorRes, stickerRes] = await Promise.allSettled([
-            updateHomeColorMutation.mutateAsync(homeBgColor),
-            persistStickersOnComplete(snapshot),
-          ]);
-
-          if (colorRes.status !== 'fulfilled') console.error(colorRes.reason);
-
-          if (stickerRes.status === 'fulfilled') {
-            const persisted = cloneStickers(stickerRes.value);
-            setSavedStickers(persisted);
-            setDraftStickers(persisted);
-          } else {
-            console.error(stickerRes.reason);
+          try {
+            await updateHomeColorMutation.mutateAsync(homeBgColor);
+          } catch (e) {
+            console.error(e);
           }
+
+          setDraftStickers(snapshot);
         }}
         onPickStickerFile={async (file) => {
           try {

@@ -4,8 +4,9 @@ import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomButton } from "@/components/common/BottomButton";
 import ProfilePlaceholderIcon from "@/components/icons/ProfilePlaceholderIcon";
-import { getMe, updateMe } from "@/api/http";
 import { uploadImage } from "@/api/upload";
+import { useMeQuery } from "@/hooks/queries/useMeQuery";
+import { useUpdateMe } from "@/hooks/mutations/useUpdateMe";
 
 const MAX_INTRO = 20;
 const NICKNAME_REGEX = /^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]+$/;
@@ -27,31 +28,25 @@ export default function ProfilePage() {
   const [initialNickname, setInitialNickname] = useState<string>("");
   const [initialIntro, setInitialIntro] = useState<string>("");
 
-  const [saving, setSaving] = useState(false);
+  const { data: me, isError } = useMeQuery();
+  const { mutateAsync: updateMeMutate, isPending: isUpdating } = useUpdateMe();
 
   useEffect(() => {
-    let mounted = true;
+    if (!me) return;
 
-    (async () => {
-      try {
-        const me = await getMe();
-        if (!mounted) return;
+    setNickname(me.nickname);
+    setIntro(me.intro ?? "");
+    setProfileImageUrl(me.profileImageUrl);
 
-        setNickname(me.nickname);
-        setIntro(me.intro ?? "");
-        setProfileImageUrl(me.profileImageUrl);
+    setInitialNickname(me.nickname);
+    setInitialIntro(me.intro ?? "");
+  }, [me]);
 
-        setInitialNickname(me.nickname);
-        setInitialIntro(me.intro ?? "");
-      } catch {
-        navigate("/login", { replace: true });
-      }
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, [navigate]);
+  useEffect(() => {
+    if (isError) {
+      navigate("/login", { replace: true });
+    }
+  }, [isError, navigate]);
 
   useEffect(() => {
     return () => {
@@ -94,8 +89,8 @@ export default function ProfilePage() {
   const canSave = useMemo(() => {
     const nicknameOk = nickname.length > 0 && !errorMessage;
     const introOk = !introError;
-    return nicknameOk && introOk && isChanged && !saving && !uploading;
-  }, [nickname, errorMessage, introError, isChanged, saving, uploading]);
+    return nicknameOk && introOk && isChanged && !isUpdating && !uploading;
+  }, [nickname, errorMessage, introError, isChanged, isUpdating, uploading]);
 
   const onPickImage = () => fileRef.current?.click();
 
@@ -121,19 +116,13 @@ export default function ProfilePage() {
   const onSubmit = async () => {
     if (!canSave) return;
 
-    try {
-      setSaving(true);
+    await updateMeMutate({
+      nickname: nickname.trim(),
+      intro: intro.trim() === "" ? undefined : intro.trim(),
+      ...(uploadedImageId ? { imageId: uploadedImageId } : {}),
+    });
 
-      await updateMe({
-        nickname: nickname.trim(),
-        intro: intro.trim() === "" ? undefined : intro.trim(),
-        ...(uploadedImageId ? { imageId: uploadedImageId } : {}),
-      });
-
-      navigate(-1);
-    } finally {
-      setSaving(false);
-    }
+    navigate(-1);
   };
 
   const shownImage = previewUrl ?? profileImageUrl;

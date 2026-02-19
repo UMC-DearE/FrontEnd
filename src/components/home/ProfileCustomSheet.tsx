@@ -10,6 +10,8 @@ interface ProfileCustomSheetProps {
   onPickStickerFile?: (file: File) => void;
   bgColor: string;
   onChangeBgColor: (color: string) => void;
+  onPickerStateChange?: (isOpen: boolean) => void;
+  onDeselectSticker?: () => void;
 }
 
 const normalizeHex = (v: string) => {
@@ -26,6 +28,8 @@ export default function ProfileCustomSheet({
   onPickStickerFile,
   bgColor,
   onChangeBgColor,
+  onPickerStateChange,
+  onDeselectSticker,
 }: ProfileCustomSheetProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showPicker, setShowPicker] = useState(false);
@@ -34,16 +38,30 @@ export default function ProfileCustomSheet({
 
   const handleComplete = () => {
     setShowPicker(false);
+    onPickerStateChange?.(false);
     onComplete?.();
   };
 
   const handleClickSticker = () => {
     setShowPicker(false);
+    onPickerStateChange?.(false);
     fileInputRef.current?.click();
   };
 
   const handleToggleBgPicker = () => {
-    setShowPicker((v) => !v);
+    const next = !showPicker;
+    setShowPicker(next);
+    onPickerStateChange?.(next);
+
+    // 배경색 피커를 열 때 스티커 선택 해제
+    if (next) {
+      onDeselectSticker?.();
+    }
+  };
+
+  const handleClosePicker = () => {
+    setShowPicker(false);
+    onPickerStateChange?.(false);
   };
 
   if (!open) return null;
@@ -86,7 +104,7 @@ export default function ProfileCustomSheet({
             </div>
 
             {showPicker && (
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-[235px] z-50">
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-[235px] z-[60]">
                 <div className="bg-white rounded-lg p-3 shadow-lg">
                   <HexColorPicker color={safeBgColor} onChange={onChangeBgColor} />
                   <div className="mt-2 flex items-center gap-2 justify-between">
@@ -96,7 +114,7 @@ export default function ProfileCustomSheet({
                       className="w-28 rounded border px-2 py-1 text-sm"
                     />
                     <button
-                      onClick={() => setShowPicker(false)}
+                      onClick={handleClosePicker}
                       className="px-3 py-1 rounded bg-gray-100 text-sm"
                       type="button"
                     >
@@ -118,6 +136,7 @@ export default function ProfileCustomSheet({
             const file = e.target.files?.[0];
             if (!file) return;
             setShowPicker(false);
+            onPickerStateChange?.(false);
             onPickStickerFile?.(file);
             e.currentTarget.value = '';
           }}

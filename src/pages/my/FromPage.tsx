@@ -42,7 +42,7 @@ export default function FromPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4 mt-1">
+    <div className="flex flex-col gap-4 mt-1 mb-4">
       {fromList.length === 0 ? (
         <div className="w-full text-center text-sm text-[#9D9D9F] py-6">
           저장된 목록이 없어요

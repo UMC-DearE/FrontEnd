@@ -14,6 +14,7 @@ type FromBottomSheetProps = {
 export default function FromBottomSheet({
   froms,
   allCount,
+  fromCounts,
   selectedId,
   onSelect,
   onClose,
@@ -69,7 +70,7 @@ export default function FromBottomSheet({
                       <p
                         className={`text-[16px] ${isSelected ? 'text-[#FF5F2F] font-bold' : 'text-[#45454599]'}`}
                       >
-                        {from.letterCount ?? 0}
+                        {fromCounts[from.fromId] ?? 0}
                       </p>
                     </button>
                   );

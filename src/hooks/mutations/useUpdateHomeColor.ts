@@ -8,6 +8,7 @@ export function useUpdateHomeColor() {
 
   return useMutation({
     mutationFn: updateHomeColor,
+
     onMutate: async (newColor: string) => {
       await queryClient.cancelQueries({ queryKey: homeQueryKey });
 
@@ -20,15 +21,14 @@ export function useUpdateHomeColor() {
         });
       }
 
-      return { previous } as { previous: HomeDataDto | undefined };
+      return { previous };
     },
-    onError: (_error, _newColor, context) => {
+
+    onError: (_err, _newColor, context) => {
       if (context?.previous) {
-        queryClient.setQueryData<HomeDataDto>(homeQueryKey, context.previous);
+        queryClient.setQueryData(homeQueryKey, context.previous);
       }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: homeQueryKey });
     },
   });
 }
+

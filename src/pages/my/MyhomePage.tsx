@@ -16,9 +16,10 @@ import { useMembershipStore } from '@/stores/membershipStores';
 import { useAuthStore } from '@/stores/authStore';
 
 import { FONT_LABEL } from '@/utils/fontLabelMap';
-import { logout, getMe } from '@/api/http';
+import { logout } from '@/api/http';
 import { getMyMembership, payMyMembershipTemp } from "@/api/membership";
 import { getMyTheme, serverFontToClient } from '@/api/theme';
+import { useMeQuery } from "@/hooks/queries/useMeQuery";
 
 export function MyProfileSection({
   nickname,
@@ -79,9 +80,6 @@ export default function MyhomePage() {
   const [isPlusModalOpen, setIsPlusModalOpen] = useState(false);
   const [openLogoutModal, setOpenLogoutModal] = useState(false);
 
-  const [nickname, setNickname] = useState('');
-  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
-
   const font = useStyleStore((s) => s.font);
   const setFont = useStyleStore((s) => s.setFont);
 
@@ -92,17 +90,13 @@ export default function MyhomePage() {
 
   const navigate = useNavigate();
 
+  const { data: me, isError: isMeError } = useMeQuery();
+
   useEffect(() => {
     let mounted = true;
 
     (async () => {
       try {
-        const me = await getMe();
-        if (!mounted) return;
-
-        setNickname(me.nickname);
-        setProfileImageUrl(me.profileImageUrl);
-
         const membership = await getMyMembership();
         if (!mounted) return;
         
@@ -122,6 +116,13 @@ export default function MyhomePage() {
     };
   }, [navigate, setAuthStatus, setIsPlus, setFont]);
 
+  useEffect(() => {
+    if (isMeError) {
+      setAuthStatus("unauthenticated");
+      navigate("/login", { replace: true });
+    }
+  }, [isMeError, navigate, setAuthStatus]);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -135,8 +136,8 @@ export default function MyhomePage() {
     <>
       <main className="bg-white -mt-[20px]">
         <MyProfileSection
-        nickname={nickname || '사용자'}
-        profileImageUrl={profileImageUrl}
+        nickname={me?.nickname || '사용자'}
+        profileImageUrl={me?.profileImageUrl ?? null}
         isPlus={isPlus} 
         />
 
@@ -225,7 +226,7 @@ export default function MyhomePage() {
         open={openLogoutModal}
         title="로그아웃 할까요?"
         cancelText="취소"
-        confirmText="해제"
+        confirmText="확인"
         onCancel={() => setOpenLogoutModal(false)}
         onConfirm={handleLogout}
       />
