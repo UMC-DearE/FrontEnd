@@ -8,7 +8,7 @@ export function useFolderList() {
   return useQuery<Folder[]>({
     queryKey: ['folders'],
     queryFn: getFolderList,
-    staleTime: Infinity,
+    staleTime: 0,
     refetchOnWindowFocus: false,
   });
 }
