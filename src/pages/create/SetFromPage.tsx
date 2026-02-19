@@ -125,6 +125,7 @@ export default function SetFromPage() {
         onDraftCreate={goBackWithDraft}
         name={input}
         onNameChange={setInput}
+        fromCount={fromList.length}
       />
     </div>
   );

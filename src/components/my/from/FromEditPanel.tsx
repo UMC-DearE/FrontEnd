@@ -18,9 +18,10 @@ type Props = {
   onCancel: () => void;
   onSave: (updated: FromItem) => void;
   onDelete?: (fromId: number) => void;
+  fromIndex?: number;
 };
+export default function FromEditPanel({ from, onCancel, onSave, onDelete, fromIndex }: Props) {
 
-export default function FromEditPanel({ from, onCancel, onSave, onDelete }: Props) {
   const [name, setName] = useState(from.name);
   const [selectedColor, setSelectedColor] = useState(from.bgColor);
   const [showPicker, setShowPicker] = useState(false);
@@ -84,7 +85,11 @@ export default function FromEditPanel({ from, onCancel, onSave, onDelete }: Prop
         </button>
 
         {showPicker && (
-          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 mb-3 z-40">
+        <div
+          className={`absolute left-1/2 -translate-x-1/2 z-40 ${
+            fromIndex !== undefined && fromIndex >= 3 ? 'bottom-full mb-3' : 'top-full mt-3'
+          }`}
+        >
             <div className="bg-white rounded-lg p-3 shadow-lg">
               <HexColorPicker color={selectedColor} onChange={(c) => setSelectedColor(c)} />
               <div className="mt-2 flex items-center gap-2 justify-between">
