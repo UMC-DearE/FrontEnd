@@ -226,7 +226,7 @@ export default function MyhomePage() {
         open={openLogoutModal}
         title="로그아웃 할까요?"
         cancelText="취소"
-        confirmText="해제"
+        confirmText="확인"
         onCancel={() => setOpenLogoutModal(false)}
         onConfirm={handleLogout}
       />

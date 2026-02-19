@@ -208,13 +208,13 @@ export default function LetterDetailSection({
     try {
       const list = folderData;
       if (!list || list.length === 0) {
-        toast.show("생성된 폴더가 없습니다", 1200);
+        toast.show("생성된 폴더가 없습니다.", 1200);
         return;
       }
       setFolders(list);
       setOpenFolderSelect(true);
     } catch {
-      toast.show("폴더 목록을 불러오지 못했어요.");
+      toast.show("폴더 목록을 불러오지 못했어요.", 1200);
     }
   };
 
@@ -275,7 +275,7 @@ export default function LetterDetailSection({
                   await toggleLikeMutation.mutateAsync(next);
                 } catch {
                   setLiked(!next);
-                  toast.show("좋아요 처리에 실패했습니다.");
+                  toast.show("좋아요 처리에 실패했습니다.", 1200);
                 } finally {
                   setLikeLoading(false);
                 }

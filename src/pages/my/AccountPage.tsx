@@ -49,7 +49,7 @@ export default function AccountPage() {
           "계정 내의 삭제된 편지들은 복구되지 않습니다. \n정말로 삭제하시겠습니까?"
         }
         cancelText="취소"
-        confirmText="해제"
+        confirmText="확인"
         onCancel={() => setOpenDeleteModal(false)}
         onConfirm={onConfirmDelete}
         titleClassName="text-[#FF1D0D]"
