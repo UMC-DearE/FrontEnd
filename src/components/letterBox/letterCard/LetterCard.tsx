@@ -25,7 +25,12 @@ export default function LetterCard({
 }: LetterCardProps) {
   if (viewMode === '간편 보기') {
     return (
-      <LetterCardCompact content={excerpt} fromName={from?.name ?? ''} searchQuery={searchQuery} />
+      <LetterCardCompact
+        content={excerpt}
+        fromName={from?.name ?? ''}
+        searchQuery={searchQuery}
+        bgColor={from?.bgColor}
+      />
     );
   }
 

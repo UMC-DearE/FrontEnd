@@ -1,8 +1,8 @@
 // 마이페이지 - 프롬 관리 페이지 헤더
 
-import TopSection from "@/components/header/TopSection";
-import BackButton from "../common/header/BackButton";
-import { useNavigate } from "react-router-dom";
+import TopSection from '@/components/header/TopSection';
+import BackButton from '../common/header/BackButton';
+import { useNavigate } from 'react-router-dom';
 
 export default function MyFromHeader() {
   const navigate = useNavigate();
