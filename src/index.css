@@ -186,3 +186,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* 프로필 이미지 크롭 시 원형 선택 영역 */
+.profile-cropper .reactEasyCrop_CropArea {
+  border-radius: 9999px !important;
+}
