@@ -15,6 +15,7 @@ export function useLetterFolder(letterId: number) {
         return;
       }
       queryClient.invalidateQueries({ queryKey: ["letter", letterId] });
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
     },
     onError: () => {
       toast.show("폴더에 추가하지 못했어요.");
@@ -29,6 +30,7 @@ export function useLetterFolder(letterId: number) {
         return;
       }
       queryClient.invalidateQueries({ queryKey: ["letter", letterId] });
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
     },
     onError: () => {
       toast.show("폴더에서 삭제하지 못했어요.");
