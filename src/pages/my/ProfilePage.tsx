@@ -1,12 +1,19 @@
 // 프로필 수정 페이지
 
-import React, { useMemo, useRef, useState, useEffect } from "react";
+import React, {
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomButton } from "@/components/common/BottomButton";
 import ProfilePlaceholderIcon from "@/components/icons/ProfilePlaceholderIcon";
 import { uploadImage } from "@/api/upload";
 import { useMeQuery } from "@/hooks/queries/useMeQuery";
 import { useUpdateMe } from "@/hooks/mutations/useUpdateMe";
+import Cropper, { type Area } from "react-easy-crop";
 
 const MAX_INTRO = 20;
 const NICKNAME_REGEX = /^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]+$/;
@@ -27,6 +34,14 @@ export default function ProfilePage() {
 
   const [initialNickname, setInitialNickname] = useState<string>("");
   const [initialIntro, setInitialIntro] = useState<string>("");
+
+  const [isCropping, setIsCropping] = useState(false);
+  const [cropImageUrl, setCropImageUrl] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(
+    null,
+  );
 
   const { data: me, isError } = useMeQuery();
   const { mutateAsync: updateMeMutate, isPending: isUpdating } = useUpdateMe();
@@ -51,8 +66,50 @@ export default function ProfilePage() {
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
+      if (cropImageUrl) URL.revokeObjectURL(cropImageUrl);
     };
-  }, [previewUrl]);
+  }, [previewUrl, cropImageUrl]);
+
+  const createImage = (url: string): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      img.addEventListener("load", () => resolve(img));
+      img.addEventListener("error", (e) => reject(e));
+      img.src = url;
+    });
+
+  const getCroppedImage = useCallback(
+    async (imageSrc: string, cropArea: Area): Promise<Blob> => {
+      const image = await createImage(imageSrc);
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Canvas not supported");
+
+      canvas.width = cropArea.width;
+      canvas.height = cropArea.height;
+
+      ctx.drawImage(
+        image,
+        cropArea.x,
+        cropArea.y,
+        cropArea.width,
+        cropArea.height,
+        0,
+        0,
+        cropArea.width,
+        cropArea.height,
+      );
+
+      return new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error("이미지를 자를 수 없어요."));
+        }, "image/jpeg", 0.9);
+      });
+    },
+    [],
+  );
 
   const errorMessage = useMemo(() => {
     if (!touched) return "";
@@ -94,23 +151,62 @@ export default function ProfilePage() {
 
   const onPickImage = () => fileRef.current?.click();
 
-  const onChangeFile: React.ChangeEventHandler<HTMLInputElement> = async(e) => {
+  const onChangeFile: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
+
+    if (cropImageUrl) {
+      URL.revokeObjectURL(cropImageUrl);
+    }
+
+    setCropImageUrl(url);
+    setIsCropping(true);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
+
+    e.target.value = "";
+  };
+
+  const handleCropCancel = () => {
+    if (cropImageUrl) {
+      URL.revokeObjectURL(cropImageUrl);
+    }
+    setCropImageUrl(null);
+    setIsCropping(false);
+    setCroppedAreaPixels(null);
+  };
+
+  const handleCropConfirm = async () => {
+    if (!cropImageUrl || !croppedAreaPixels) {
+      setIsCropping(false);
+      return;
+    }
 
     try {
       setUploading(true);
 
+      const blob = await getCroppedImage(cropImageUrl, croppedAreaPixels);
+
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      const croppedUrl = URL.createObjectURL(blob);
+      setPreviewUrl(croppedUrl);
+
+      const file = new File([blob], "profile.jpg", { type: "image/jpeg" });
       const uploaded = await uploadImage(file, "profile");
       setUploadedImageId(uploaded.data.imageId);
     } finally {
       setUploading(false);
+      if (cropImageUrl) {
+        URL.revokeObjectURL(cropImageUrl);
+      }
+      setCropImageUrl(null);
+      setIsCropping(false);
     }
-
-    e.target.value = "";
   };
 
   const onSubmit = async () => {
@@ -129,6 +225,43 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {isCropping && cropImageUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="relative w-[393px] max-w-full h-full bg-black flex flex-col">
+            <div className="flex-1 flex items-center justify-center">
+				  <div className="profile-cropper relative w-full h-full bg-black">
+                <Cropper
+                  image={cropImageUrl}
+                  crop={crop}
+                  zoom={zoom}
+                  aspect={1}
+                  objectFit="contain"
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onCropComplete={(_, area) => setCroppedAreaPixels(area)}
+                />
+              </div>
+            </div>
+            <div className="bg-black p-4 flex gap-3 justify-between">
+              <button
+                type="button"
+                onClick={handleCropCancel}
+                className="flex-1 h-[44px] rounded-[12px] border border-[#FFFFFF] text-[14px] font-medium text-[#FFFFFF]"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleCropConfirm}
+                disabled={!croppedAreaPixels || uploading}
+                className="flex-1 h-[44px] rounded-[12px] bg-[#555557] text-white text-[14px] font-medium disabled:opacity-50"
+              >
+                완료
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div>
         <div className="flex flex-col items-center">
           <div className="h-[80px] w-[80px] rounded-full bg-[#F2F3F5] flex items-center justify-center overflow-hidden">

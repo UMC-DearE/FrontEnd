@@ -12,16 +12,16 @@ export default function LetterDetailHeader() {
         left={<BackButton to="/letter" />}
         center={<div className="text-lg font-semibold">편지 상세</div>}
         right={
-            <div className="flex items-center justify-center mr-2">
+            <div className="relative flex items-center justify-center mr-2">
               <button
                 type="button"
-                className="text-base font-medium text-primary"
+                aria-label="더보기"
+                className="absolute inset-[-8px]"
                 onClick={() => {
-                  window.dispatchEvent(new CustomEvent('open-letter-more'));
+                  window.dispatchEvent(new CustomEvent("open-letter-more"));
                 }}
-              >
-                <img src={morebar} alt="more" />
-              </button>
+              />
+              <img src={morebar} alt="more" className="pointer-events-none" />
             </div>
         }
       />
