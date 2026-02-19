@@ -39,9 +39,8 @@ export default function ProfilePage() {
   const [cropImageUrl, setCropImageUrl] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(
-    null,
-  );
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [minZoom, setMinZoom] = useState(1);
 
   const { data: me, isError } = useMeQuery();
   const { mutateAsync: updateMeMutate, isPending: isUpdating } = useUpdateMe();
@@ -161,10 +160,17 @@ export default function ProfilePage() {
       URL.revokeObjectURL(cropImageUrl);
     }
 
+    // 이미지 크기 측정 후 minZoom 계산
+    const img = new window.Image();
+    img.onload = () => {
+      setMinZoom(1);
+      setZoom(1);
+    };
+    img.src = url;
+
     setCropImageUrl(url);
     setIsCropping(true);
     setCrop({ x: 0, y: 0 });
-    setZoom(1);
     setCroppedAreaPixels(null);
 
     e.target.value = "";
@@ -227,26 +233,15 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-white">
       {isCropping && cropImageUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="relative w-[393px] max-w-full h-full bg-black flex flex-col">
-            <div className="flex-1 flex items-center justify-center">
-				  <div className="profile-cropper relative w-full h-full bg-black">
-                <Cropper
-                  image={cropImageUrl}
-                  crop={crop}
-                  zoom={zoom}
-                  aspect={1}
-                  objectFit="contain"
-                  onCropChange={setCrop}
-                  onZoomChange={setZoom}
-                  onCropComplete={(_, area) => setCroppedAreaPixels(area)}
-                />
-              </div>
-            </div>
-            <div className="bg-black p-4 flex gap-3 justify-between">
+          <div className="relative w-[393px] max-w-full h-full bg-black flex flex-col">
+            <div
+              className="flex items-center justify-between px-4 mb-2 text-white text-base font-normal"
+              style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)' }}
+            >
               <button
                 type="button"
                 onClick={handleCropCancel}
-                className="flex-1 h-[44px] rounded-[12px] border border-[#FFFFFF] text-[14px] font-medium text-[#FFFFFF]"
+                className="py-1 px-2 -ml-2"
               >
                 취소
               </button>
@@ -254,10 +249,28 @@ export default function ProfilePage() {
                 type="button"
                 onClick={handleCropConfirm}
                 disabled={!croppedAreaPixels || uploading}
-                className="flex-1 h-[44px] rounded-[12px] bg-[#555557] text-white text-[14px] font-medium disabled:opacity-50"
+                className="py-1 px-2 -mr-2 disabled:opacity-50"
               >
-                완료
+                적용
               </button>
+            </div>
+
+            {/* 이미지 영역 */}
+            <div className="flex-1 flex items-center justify-center mb-15">
+              <div className="profile-cropper relative w-full h-full bg-black">
+                <Cropper
+                  image={cropImageUrl}
+                  crop={crop}
+                  zoom={zoom}
+                  minZoom={minZoom}
+                  aspect={1}
+                  objectFit="horizontal-cover"
+                  restrictPosition={true}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onCropComplete={(_, area) => setCroppedAreaPixels(area)}
+                />
+              </div>
             </div>
           </div>
         </div>
