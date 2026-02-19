@@ -285,9 +285,9 @@ export default function LetterDetailSection({
               disabled={likeLoading || toggleLikeMutation.isPending}
             >
               {liked ? (
-                <HeartFilledIcon className="w-[14px] h-[15px]" />
+                <HeartFilledIcon className="w-[15px] h-[16px]" />
               ) : (
-                <HeartOutlineIcon className="w-[14px] h-[15px]" />
+                <HeartOutlineIcon className="w-[15px] h-[16px]" />
               )}
             </button>
         </div>
