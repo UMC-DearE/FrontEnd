@@ -71,7 +71,7 @@ export default function LetterCreatePage() {
         },
       });
     } catch (e) {
-      toast.show("이미지 업로드/OCR/AI 분석 중 오류가 발생했습니다.");
+      toast.show("편지 분석에 실패했어요. 다시 시도해주세요.");
     } finally {
       setIsLoading(false);
     }
