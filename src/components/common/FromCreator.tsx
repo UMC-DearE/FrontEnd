@@ -80,7 +80,7 @@ export default function CreateFrom({
         {showPicker && (
         <div
           className={`absolute left-6/8 -translate-x-1/2 z-40 ${
-            fromCount && fromCount >= 5 ? 'bottom-full mb-3' : 'top-full mt-3'
+            fromCount && fromCount >= 4 ? 'bottom-full mb-3' : 'top-full mt-3'
           }`}
         >
           <div className="bg-white rounded-lg p-3 shadow-lg">
