@@ -99,19 +99,25 @@ export default function LetterCreatePage() {
             )}
           </div>
 
-          <div className="fixed bottom-0 left-1/2 w-full max-w-[393px] -translate-x-1/2 bg-white px-4 pb-[52px] pt-1">
-            {mode === "TEXT" && (
-              <p className="text-sm text-[#9D9D9F] text-center mb-5 font-medium">
-                편지는 한 번에 하나만 등록할 수 있어요
-              </p>
-            )}
+          <div className="fixed bottom-0 inset-x-0 flex justify-center">
+            <div className="w-full max-w-[440px] bg-white px-4 pt-2 pb-[calc(52px+env(safe-area-inset-bottom))]">
+              
+              {mode === "TEXT" && (
+                <p className="text-sm text-[#9D9D9F] text-center mb-5 font-medium">
+                  편지는 한 번에 하나만 등록할 수 있어요
+                </p>
+              )}
 
-            <BottomButton
-              disabled={!isValid}
-              onClick={handleSubmit}
-            >
-              완료
-            </BottomButton>
+              <div className="flex justify-center">
+                <BottomButton
+                  disabled={!isValid}
+                  onClick={handleSubmit}
+                >
+                  완료
+                </BottomButton>
+              </div>
+
+            </div>
           </div>
         </>
       )}

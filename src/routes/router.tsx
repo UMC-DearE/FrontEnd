@@ -44,6 +44,13 @@ const router = createBrowserRouter([
           { path: "login", element: <LoginPage /> },
           { path: "auth/oauth2/:provider/callback", element: <OAuthCallbackPage /> },
 
+          // 인증 없이 접근 가능한 페이지 추가
+          { path: "create", element: <LetterCreatePage /> },
+          { path: "letter", element: <LetterBoxPage /> },
+                        { path: "report", element: <ReportPage /> },
+                        { path: "my", element: <MyHomePage /> },
+                        
+
           {
             path: "auth",
             children: [
@@ -64,7 +71,7 @@ const router = createBrowserRouter([
               {
                 path: "create",
                 children: [
-                  { index: true, element: <LetterCreatePage /> },
+
                   { path: "detail", element: <CreateDetailPage /> },
                   { path: "from", element: <SetFromPage /> },
                 ],
@@ -73,18 +80,15 @@ const router = createBrowserRouter([
               {
                 path: "letter",
                 children: [
-                  { index: true, element: <LetterBoxPage /> },
                   { path: ":id", element: <LetterDetailPage /> },
                   { path: ":id/edit", element: <EditLetterPage /> },
                 ],
               },
 
-              { path: "report", element: <ReportPage /> },
 
               {
                 path: "my",
                 children: [
-                  { index: true, element: <MyHomePage /> },
                   { path: "profile", element: <ProfilePage /> },
                   { path: "account", element: <AccountPage /> },
                   {
