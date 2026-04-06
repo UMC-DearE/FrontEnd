@@ -47,8 +47,7 @@ function NavItem({ to, label, Icon }: NavItemProps) {
 
 export default function BottomNav() {
   return (
-    <nav className="fixed bottom-0 inset-x-0 flex justify-center">
-      <div className="w-full max-w-[393px] h-[95px] bg-white">
+      <div className="w-full h-[95px] bg-white">
         <div className="flex h-full items-start pt-4 px-5 justify-between">
           <NavItem to="/" label="홈" Icon={HomeIcon} />
           <NavItem to="/letter" label="편지함" Icon={LetterIcon} />
@@ -56,6 +55,5 @@ export default function BottomNav() {
           <NavItem to="/my" label="MY" Icon={MyIcon} />
         </div>
       </div>
-    </nav>
   );
 }

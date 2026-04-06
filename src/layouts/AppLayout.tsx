@@ -60,12 +60,11 @@ export function AppLayout() {
   const HEADER_HEIGHT = 105;
   const BOTTOM_NAV_HEIGHT = 95;
   const FIXED_ACTION_HEIGHT = 52 + 20 + 16;
-
   const bottomInset = fixedAction ? FIXED_ACTION_HEIGHT : hideBottomNav ? 0 : BOTTOM_NAV_HEIGHT;
 
   return (
     <div
-      className={`min-h-screen flex flex-col ${bgClass}`}
+      className={`min-h-[max(700px,100dvh)] flex flex-col ${bgClass}`}
       style={{
         ...(useHomeBg ? { backgroundColor: homeBgColor } : {}),
         paddingBottom: `calc(${bottomInset}px + env(safe-area-inset-bottom, 0px))`,
@@ -74,7 +73,7 @@ export function AppLayout() {
       {shouldShowHeader && (
         <Suspense fallback={null}>
           <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
-            <div className="w-full max-w-[393px]">
+            <div className="w-full max-w-[440px]">
               <Header title={matched?.title} />
             </div>
           </div>
@@ -82,18 +81,20 @@ export function AppLayout() {
       )}
 
       <main
-        className={[noMainPadding ? '' : 'px-4'].join(' ')}
+        className="min-w-0 flex-1 flex flex-col"
         style={{
           paddingTop: shouldShowHeader ? `calc(${HEADER_HEIGHT}px + 20px)` : noMainPadding ? 0 : 20,
         }}
       >
-        <Outlet context={{ homeBgColor, setHomeBgColor, setFixedAction }} />
+        <div  className={`${noMainPadding ? '' : 'px-4'} w-full min-w-0 flex-1 flex flex-col`}>
+          <Outlet context={{ homeBgColor, setHomeBgColor, setFixedAction }} />
+        </div>
       </main>
 
       {fixedAction && (
-        <div className="fixed bottom-0 inset-x-0 z-40 flex justify-center pointer-events-none">
+        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-40 flex justify-center pointer-events-none">
           <div
-            className="w-full max-w-[393px] pt-3 pointer-events-auto"
+            className="w-full max-w-[440px] pt-3 pointer-events-auto"
             style={{
               background: fixedAction.bgColor ?? '#F8F8F8',
               paddingBottom: '52px',
@@ -105,10 +106,8 @@ export function AppLayout() {
       )}
 
       {!hideBottomNav && !fixedAction && (
-        <nav className="fixed bottom-0 inset-x-0 z-40 flex justify-center bg-white pb-safe-bottom">
-          <div className="w-full max-w-[393px]">
-            <BottomNav />
-          </div>
+        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-40 bg-white pb-safe-bottom">
+          <BottomNav />
         </nav>
       )}
     </div>

@@ -73,14 +73,14 @@ export default function LoginPage() {
       <div className="pt-4 pb-[59px] flex flex-col">
         <div
           style={{ touchAction: "pan-y" }}
-          className="relative mt-10 overflow-hidden touch-pan-y"
+          className="relative mt-10 overflow-hidden touch-pan-y min-w-0"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
           <div
-            className="flex transition-transform duration-500 ease-out"
+            className="flex transition-transform duration-500 ease-out min-w-0"
             style={{ transform: `translateX(-${pageIdx * 100}%)` }}
           >
             {pages.map((p) => (
@@ -102,7 +102,7 @@ export default function LoginPage() {
           ))}
         </div>
 
-        <div className="shrink-0 space-y-4">
+        <div className="shrink-0 space-y-4 flex flex-col items-center">
           <SocialLoginButton
             provider="kakao"
             onClick={onKakaoLogin}

@@ -25,7 +25,7 @@ export function SocialLoginButton({
       disabled={disabled}
       aria-label={isKakao ? "카카오로 계속하기" : "구글로 계속하기"}
       className={`
-        w-[361px] h-[50px]
+        w-full max-w-[361px] h-[50px]
         rounded-[12px]
         flex items-center px-4 gap-[83px]
         text-[16px] font-medium
