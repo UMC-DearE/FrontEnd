@@ -378,7 +378,7 @@ export default function HomePage() {
         onConfirm={handleConfirmUnpin}
       />
 
-      <div className="absolute bottom-32 left-[282px]">
+      <div className="absolute bottom-[127px] right-4">
         <AddLetterButton />
       </div>
     </div>
