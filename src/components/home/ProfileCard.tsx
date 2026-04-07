@@ -12,7 +12,7 @@ interface ProfileCardProps {
 
 export default function ProfileCard({ nickname, bio, imgUrl, onClickSettings }: ProfileCardProps) {
   return (
-    <div className="relative flex min-h-[202px] w-full min-w-[320px] max-w-[440px] flex-col items-center rounded-[10px] bg-white shadow-[0_0_4px_0.5px_rgba(0,0,0,0.15)]">
+    <div className="relative flex min-h-[202px] w-full min-w-[320px] max-w-[440px] flex-col items-center rounded-[10px] bg-white shadow-[0_0_4px_0_rgba(0,0,0,0.12)]">
       <button
         type="button"
         onClick={onClickSettings}
