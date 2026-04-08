@@ -60,7 +60,7 @@ export default function FolderList({
   };
 
   return (
-    <div className="flex gap-[10px] p-[28px] overflow-x-auto no-scrollbar">
+    <div className="flex gap-[10px] p-[28px] pt-0 overflow-x-auto no-scrollbar">
       <div className="flex flex-col items-center gap-2 shrink-0" onClick={() => onSelect('all')}>
         <button
           type="button"
