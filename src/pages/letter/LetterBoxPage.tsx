@@ -278,9 +278,9 @@ export default function LetterBoxPage() {
           />
         </div>
       </div>
-
+      {/* top값 나중에 다시 수정 */}
       {isSearchOpen && (
-        <div className="fixed left-0 right-0 top-[60px] z-50 flex justify-center">
+        <div className="fixed left-0 right-0 top-[34px] z-50 flex justify-center">
           <div className="w-full max-w-[440px] px-4">
             <SearchBar
               value={query}
