@@ -86,7 +86,7 @@ export function AppLayout() {
           paddingTop: shouldShowHeader ? `calc(${HEADER_HEIGHT}px + 20px)` : noMainPadding ? 0 : 20,
         }}
       >
-        <div  className={`${noMainPadding ? '' : 'px-4'} w-full min-w-0 flex-1 flex flex-col`}>
+        <div className={`${noMainPadding ? '' : 'px-4'} w-full min-w-0 flex-1 flex flex-col`}>
           <Outlet context={{ homeBgColor, setHomeBgColor, setFixedAction }} />
         </div>
       </main>
