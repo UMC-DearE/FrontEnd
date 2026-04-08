@@ -280,15 +280,17 @@ export default function LetterBoxPage() {
       </div>
 
       {isSearchOpen && (
-        <div className="fixed top-[60px] left-1/2 z-50 -translate-x-1/2">
-          <SearchBar
-            value={query}
-            onChange={setQuery}
-            onClose={() => {
-              setQuery('');
-              setIsSearchOpen(false);
-            }}
-          />
+        <div className="fixed left-0 right-0 top-[60px] z-50 flex justify-center">
+          <div className="w-full max-w-[440px] px-4">
+            <SearchBar
+              value={query}
+              onChange={setQuery}
+              onClose={() => {
+                setQuery('');
+                setIsSearchOpen(false);
+              }}
+            />
+          </div>
         </div>
       )}
 
