@@ -23,14 +23,12 @@ export default function ConfirmModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="relative flex w-[393px] min-h-screen items-center justify-center bg-black/40">
+      <div className="relative flex w-full max-w-[440px] min-h-screen items-center justify-center bg-black/40">
         <div className="w-[294px] rounded-[17px] bg-white px-[18px] pt-[26px] pb-[20px]">
           <div className="flex flex-col gap-[20px]">
             <div className="flex flex-col items-center gap-2">
               <p
-                className={`text-center text-base font-semibold ${
-                  titleClassName ?? 'text-black'
-                }`}
+                className={`text-center text-base font-semibold ${titleClassName ?? 'text-black'}`}
               >
                 {title}
               </p>
@@ -40,7 +38,7 @@ export default function ConfirmModal({
                     .split(/\r?\n/)
                     .map((line) => line.trim())
                     .map((line, idx) => (
-                      <p key={idx} className={idx === 0 ? "" : "mt-1"}>
+                      <p key={idx} className={idx === 0 ? '' : 'mt-1'}>
                         {line}
                       </p>
                     ))}
