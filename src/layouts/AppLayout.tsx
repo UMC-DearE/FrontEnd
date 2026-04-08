@@ -57,7 +57,7 @@ export function AppLayout() {
     NO_MAIN_PADDING_PATHS.includes(pathname) ||
     (pathname.startsWith('/letter/') && pathname.endsWith('/edit'));
 
-  const HEADER_HEIGHT = 105;
+  const HEADER_HEIGHT = 78;
   const BOTTOM_NAV_HEIGHT = 95;
   const FIXED_ACTION_HEIGHT = 52 + 20 + 16;
   const bottomInset = fixedAction ? FIXED_ACTION_HEIGHT : hideBottomNav ? 0 : BOTTOM_NAV_HEIGHT;
