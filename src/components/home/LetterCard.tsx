@@ -32,7 +32,7 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
   };
 
   return (
-    <div className="relative mt-5 flex w-full min-w-[320px] max-w-[440px] min-h-[97px] items-center rounded-[10px] bg-white shadow-[0_0_4px_0_rgba(0,0,0,0.12)]">
+    <div className="relative mt-5 flex w-full max-w-[440px] min-h-[97px] items-center rounded-[10px] bg-white shadow-[0_0_4px_0_rgba(0,0,0,0.12)]">
       {/* 날짜 뱃지 */}
       <div className="mx-3 flex h-[57px] w-[47px] shrink-0 flex-col items-center justify-center rounded-[10px] bg-[#FF4F181A]">
         <p className="text-[10px] font-medium text-[#FF5F2F]">{letter?.month ?? ''}</p>
