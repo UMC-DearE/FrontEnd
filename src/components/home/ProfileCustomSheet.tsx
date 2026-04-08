@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import stickerIcon from '@/assets/homePage/stickerIcon.svg';
 import bgIcon from '@/assets/homePage/bgIcon.svg';
@@ -35,6 +35,12 @@ export default function ProfileCustomSheet({
   const [showPicker, setShowPicker] = useState(false);
 
   const safeBgColor = useMemo(() => normalizeHex(bgColor), [bgColor]);
+
+  const [hexDraft, setHexDraft] = useState(safeBgColor);
+
+  useEffect(() => {
+    setHexDraft(safeBgColor);
+  }, [safeBgColor]);
 
   const handleComplete = () => {
     setShowPicker(false);
@@ -114,12 +120,15 @@ export default function ProfileCustomSheet({
               <HexColorPicker color={safeBgColor} onChange={onChangeBgColor} />
               <div className="mt-2 flex items-center justify-between gap-2">
                 <input
-                  value={safeBgColor}
-                  onChange={(e) => onChangeBgColor(normalizeHex(e.target.value))}
+                  value={hexDraft}
+                  onChange={(e) => setHexDraft(e.target.value)}
                   className="w-28 rounded border px-2 py-1 text-sm"
                 />
                 <button
-                  onClick={handleClosePicker}
+                  onClick={() => {
+                    onChangeBgColor(normalizeHex(hexDraft));
+                    handleClosePicker();
+                  }}
                   className="rounded bg-gray-100 px-3 py-1 text-sm"
                   type="button"
                 >
