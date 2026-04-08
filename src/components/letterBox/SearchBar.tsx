@@ -34,7 +34,7 @@ export default function SearchBar({
           onChange('');
           onClose();
         }}
-        className="absolute right-3 top-1/2 -translate-y-1/2 -translate-y-1/2 cursor-pointer text-[14px] font-medium text-[#BEBEBE]"
+        className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[14px] font-medium text-[#BEBEBE]"
       >
         취소
       </button>
