@@ -233,7 +233,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-white">
       {isCropping && cropImageUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="relative w-[393px] max-w-full h-full bg-black flex flex-col">
+          <div className="relative w-full max-w-[440px] h-full bg-black flex flex-col">
             <div
               className="flex items-center justify-between px-4 mb-2 text-white text-base font-normal"
               style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)' }}
