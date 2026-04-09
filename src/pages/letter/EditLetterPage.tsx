@@ -143,7 +143,7 @@ export default function EditLetterPage() {
   return (
     <>
       <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
-        <div className="w-full max-w-[393px]">
+        <div className="w-full max-w-[440px]">
           <EditLetterHeader images={headerImages} />
         </div>
       </div>

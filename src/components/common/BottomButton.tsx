@@ -17,7 +17,7 @@ export function BottomButton({
       disabled={disabled}
       onClick={onClick}
       className={`
-        w-full max-w-[361px] h-[50px] rounded-xl font-bold text-base text-white
+        w-full max-w-[440px] h-[50px] rounded-xl font-bold text-base text-white
         transition-all
         ${
           disabled
