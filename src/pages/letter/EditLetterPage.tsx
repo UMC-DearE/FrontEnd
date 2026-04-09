@@ -148,7 +148,7 @@ export default function EditLetterPage() {
         </div>
       </div>
 
-      <div className="mt-[125px] flex-1 px-4">
+      <div className="mt-[98px] flex-1 px-4">
         {showSubmittingLoading ? (
           <LoadingSection
             className="pt-25"
