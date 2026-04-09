@@ -19,7 +19,7 @@ export default function AddLetterButton({ onClick }: AddLetterButtonProps) {
     <button
       type="button"
       onClick={handleClick}
-      className="flex h-[38px] w-[103px] items-start rounded-full bg-black shadow-[0_0_4px_0.5px_rgba(0,0,0,0.15)] cursor-pointer"
+      className="flex h-[38px] w-[103px] items-start rounded-full bg-black shadow-[0_3px_6px_0_rgba(0,0,0,0.12)] cursor-pointer"
     >
       <div className="ml-[13px] mt-[7px] flex h-6 w-[84px] items-center gap-2">
         <p className="text-[14px] font-semibold leading-none text-white whitespace-nowrap">
