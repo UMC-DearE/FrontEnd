@@ -1,7 +1,6 @@
 export default function EditLetterSkeleton() {
   return (
     <>
-      {/* 헤더 스켈레톤 */}
       <div className="px-4 pt-15 pb-2 animate-pulse">
         <div className="h-[56px] flex items-center justify-between">
           <div className="h-4 w-8 rounded bg-[#E0E0E0]" />

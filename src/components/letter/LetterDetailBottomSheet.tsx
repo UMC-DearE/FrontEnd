@@ -30,7 +30,7 @@ export default function LetterDetailBottomSheet({
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center">
-      <div className="relative w-[393px] min-h-screen">
+      <div className="relative w-full max-w-[440px] min-h-screen">
         <button
           onClick={onClose}
           className="absolute inset-0 bg-black/40"

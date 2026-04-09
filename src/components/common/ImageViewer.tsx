@@ -114,7 +114,7 @@ const getDistance = (t1: TouchPoint, t2: TouchPoint) => {
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className="relative w-[393px] h-full bg-black flex items-center justify-center"
+        className="relative w-full max-w-[440px] h-full bg-black flex items-center justify-center"
         onClick={onClose}
       >
         <div
