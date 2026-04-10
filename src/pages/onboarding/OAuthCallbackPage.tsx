@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
-import { useNavigate, useSearchParams, useParams } from "react-router-dom";
-import { useAuthStore } from "@/stores/authStore";
-import { api } from "@/api/http";
+import { useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
+import { useAuthStore } from '@/stores/authStore';
+import { api } from '@/api/http';
 
-type ResultType = "SIGNUP_REQUIRED" | "REGISTERED";
+type ResultType = 'SIGNUP_REQUIRED' | 'REGISTERED';
 
 export default function OAuthCallbackPage() {
   const navigate = useNavigate();
@@ -11,7 +11,6 @@ export default function OAuthCallbackPage() {
   const { provider } = useParams();
 
   const setAuthStatus = useAuthStore.getState().setAuthStatus;
-
   const ran = useRef(false);
 
   useEffect(() => {
@@ -19,47 +18,40 @@ export default function OAuthCallbackPage() {
     ran.current = true;
 
     const run = async () => {
-      const code = params.get("code");  
-      const state = params.get("state");
-
-      // console.log("[OAuthCallback] code/state/provider =", { code, state, provider });
+      const code = params.get('code');
+      const state = params.get('state');
 
       if (!code || !provider) {
-        navigate("/login", { replace: true });
+        setAuthStatus('unauthenticated');
+        navigate('/login', { replace: true });
         return;
       }
 
-      const base = import.meta.env.VITE_API_BASE_URL;
-
-      const res = await api.get(
-        `${base}/auth/oauth2/${provider}/callback`,
-        {
-          params: { code, state },
-          withCredentials: true,
-          headers: { accept: "*/*" },
-        }
-      );
-
-      // console.log("[OAuthCallback] response =", res.data);
+      const res = await api.get(`/auth/oauth2/${provider}/callback`, {
+        params: { code, state },
+      });
 
       const resultType = res.data?.data?.resultType as ResultType | undefined;
 
-      if (resultType === "SIGNUP_REQUIRED") {
-        setAuthStatus("signup_required");
-        navigate("/auth/terms", { replace: true });
-      } else if (resultType === "REGISTERED") {
-        setAuthStatus("authenticated");
-        navigate("/", { replace: true });
-      } else {
-        setAuthStatus("unauthenticated");
-        navigate("/login", { replace: true });
+      if (resultType === 'SIGNUP_REQUIRED') {
+        setAuthStatus('signup_required');
+        navigate('/auth/terms', { replace: true });
+        return;
       }
+
+      if (resultType === 'REGISTERED') {
+        setAuthStatus('authenticated');
+        navigate('/', { replace: true });
+        return;
+      }
+
+      setAuthStatus('unauthenticated');
+      navigate('/login', { replace: true });
     };
 
-    run().catch((e) => {
-      console.error("[OAuthCallback] failed:", e);
-      setAuthStatus("unauthenticated");
-      navigate("/login", { replace: true });
+    run().catch(() => {
+      setAuthStatus('unauthenticated');
+      navigate('/login', { replace: true });
     });
   }, [navigate, params, provider, setAuthStatus]);
 
