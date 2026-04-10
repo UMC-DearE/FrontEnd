@@ -62,6 +62,8 @@ export function AppLayout() {
   const FIXED_ACTION_HEIGHT = 52 + 20 + 16;
   const bottomInset = fixedAction ? FIXED_ACTION_HEIGHT : hideBottomNav ? 0 : BOTTOM_NAV_HEIGHT;
 
+  const SAFE_TOP = 'env(safe-area-inset-top, 0px)';
+
   return (
     <div
       className={`min-h-[max(700px,100dvh)] flex flex-col ${bgClass}`}
@@ -73,7 +75,12 @@ export function AppLayout() {
       {shouldShowHeader && (
         <Suspense fallback={null}>
           <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
-            <div className="w-full max-w-[440px]">
+            <div
+              className="w-full max-w-[440px]"
+              style={{
+                paddingTop: SAFE_TOP,
+              }}
+            >
               <Header title={matched?.title} />
             </div>
           </div>
