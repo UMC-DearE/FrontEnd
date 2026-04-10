@@ -258,13 +258,13 @@ export default function LetterBoxPage() {
   const emptyMessage = useMemo(() => {
     if (query.trim()) return '검색 결과가 없어요.';
     if (selectedFromId !== 'all') return '필터링 결과가 없어요.';
-    return '추가된 편지가 없어요.';
+    return '추가된 편지가 없어요';
   }, [query, selectedFromId]);
 
   return (
     <>
       <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
-        <div className="w-full max-w-[393px]">
+        <div className="w-full max-w-[440px]">
           <LetterBoxHeader
             title="편지함"
             left={
@@ -278,17 +278,19 @@ export default function LetterBoxPage() {
           />
         </div>
       </div>
-
+      {/* top값 나중에 다시 수정 */}
       {isSearchOpen && (
-        <div className="fixed top-[60px] left-1/2 z-50 -translate-x-1/2">
-          <SearchBar
-            value={query}
-            onChange={setQuery}
-            onClose={() => {
-              setQuery('');
-              setIsSearchOpen(false);
-            }}
-          />
+        <div className="fixed left-0 right-0 top-[34px] z-50 flex justify-center">
+          <div className="w-full max-w-[440px] px-4">
+            <SearchBar
+              value={query}
+              onChange={setQuery}
+              onClose={() => {
+                setQuery('');
+                setIsSearchOpen(false);
+              }}
+            />
+          </div>
         </div>
       )}
 
@@ -337,7 +339,15 @@ export default function LetterBoxPage() {
               ))}
             </div>
           ) : filteredLetters.length === 0 ? (
-            <div className="py-12 text-center text-[#9D9D9F] text-[15px]">{emptyMessage}</div>
+            <div className="flex flex-col py-[147px] text-center text-[#A1A4AA] text-[15px] justify-center items-center gap-4">
+              {emptyMessage}
+              <button
+                onClick={() => navigate('/create')}
+                className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
+              >
+                편지 추가
+              </button>
+            </div>
           ) : (
             filteredLetters.map((letter) => (
               <div

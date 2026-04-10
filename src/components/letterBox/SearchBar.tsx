@@ -1,7 +1,5 @@
 // 검색창
 
-import type { ChangeEvent } from 'react';
-
 export default function SearchBar({
   value,
   onChange,
@@ -12,7 +10,7 @@ export default function SearchBar({
   onClose: () => void;
 }) {
   return (
-    <div className="relative flex h-[50px] w-[361px] bg-white items-center rounded-xl border-[1.2px] border-[#C2C4C7] shadow-[0px_0px_12px_0px_#0000001A] focus-within:border-black">
+    <div className="relative h-[50px] w-full max-w-[440px] rounded-xl border-[1.2px] border-[#C2C4C7] bg-white shadow-[0px_0px_12px_0px_#0000001A] focus-within:border-black">
       <p
         className={`pointer-events-none absolute left-[22px] top-1/2 -translate-y-1/2 text-[16px] font-medium text-[#C2C4C7] transition-opacity ${
           value ? 'opacity-0' : 'opacity-100'
@@ -23,7 +21,7 @@ export default function SearchBar({
 
       <input
         value={value}
-        onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         spellCheck={false}
         autoCorrect="off"
         autoCapitalize="off"
@@ -36,7 +34,7 @@ export default function SearchBar({
           onChange('');
           onClose();
         }}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-[14px] font-medium text-[#BEBEBE] cursor-pointer"
+        className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[14px] font-medium text-[#BEBEBE]"
       >
         취소
       </button>

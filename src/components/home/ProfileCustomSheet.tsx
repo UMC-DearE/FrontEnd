@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import stickerIcon from '@/assets/homePage/stickerIcon.svg';
 import bgIcon from '@/assets/homePage/bgIcon.svg';
@@ -36,6 +36,12 @@ export default function ProfileCustomSheet({
 
   const safeBgColor = useMemo(() => normalizeHex(bgColor), [bgColor]);
 
+  const [hexDraft, setHexDraft] = useState(safeBgColor);
+
+  useEffect(() => {
+    setHexDraft(safeBgColor);
+  }, [safeBgColor]);
+
   const handleComplete = () => {
     setShowPicker(false);
     onPickerStateChange?.(false);
@@ -53,7 +59,6 @@ export default function ProfileCustomSheet({
     setShowPicker(next);
     onPickerStateChange?.(next);
 
-    // 배경색 피커를 열 때 스티커 선택 해제
     if (next) {
       onDeselectSticker?.();
     }
@@ -68,64 +73,71 @@ export default function ProfileCustomSheet({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-      <div className="relative w-[393px] min-h-screen bg-black/40 overflow-hidden pointer-events-none">
+      <div className="relative w-full max-w-[440px] min-h-screen bg-black/40 overflow-hidden pointer-events-none">
         <button
           type="button"
           onClick={handleComplete}
-          className="absolute top-[79px] left-[309px] flex items-center justify-center w-[57px] h-[29px] bg-[#FF5F2F] rounded-[18px] px-[16px] py-[6px] gap-[10px] cursor-pointer pointer-events-auto"
+          className="absolute right-[16px] top-[41px] flex h-[29px] w-[57px] items-center justify-center rounded-[18px] bg-[#FF5F2F] px-[16px] py-[6px] cursor-pointer pointer-events-auto"
         >
-          <p className="absolute w-[25px] h-[17px] text-white font-semibold text-[14px]">완료</p>
+          <p className="text-white font-semibold text-[14px] leading-none">완료</p>
         </button>
 
-        <div className="pointer-events-auto fixed bottom-0 left-1/2 h-[225px] w-[393px] -translate-x-1/2 rounded-t-[17px] bg-white">
-          <div className="flex h-full flex-col">
-            <div className="flex items-center justify-center mt-[54px] gap-[54px]">
-              <button
-                type="button"
-                onClick={handleClickSticker}
-                className="flex h-[56px] w-[56px] items-center justify-center rounded-[6px] border border-[#E6E7E9] bg-[#F4F5F6] cursor-pointer"
-              >
-                <img src={stickerIcon} alt="sticker-icon" />
-              </button>
-              <p className="absolute top-[126px] left-[122px] text-[#555557] font-medium text-[14px] leading-[100%] w-[37px] h-[17px] text-center">
-                스티커
-              </p>
-
-              <button
-                type="button"
-                onClick={handleToggleBgPicker}
-                className="flex h-[56px] w-[56px] items-center justify-center rounded-[6px] border border-[#E6E7E9] bg-[#F4F5F6] cursor-pointer"
-              >
-                <img src={bgIcon} alt="bg-icon" />
-              </button>
-              <p className="absolute top-[126px] left-[233px] text-[#555557] font-medium text-[14px] leading-[100%] w-[37px] h-[17px] text-center">
-                배경색
-              </p>
-            </div>
-
-            {showPicker && (
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-[235px] z-[60]">
-                <div className="bg-white rounded-lg p-3 shadow-lg">
-                  <HexColorPicker color={safeBgColor} onChange={onChangeBgColor} />
-                  <div className="mt-2 flex items-center gap-2 justify-between">
-                    <input
-                      value={safeBgColor}
-                      onChange={(e) => onChangeBgColor(normalizeHex(e.target.value))}
-                      className="w-28 rounded border px-2 py-1 text-sm"
-                    />
-                    <button
-                      onClick={handleClosePicker}
-                      className="px-3 py-1 rounded bg-gray-100 text-sm"
-                      type="button"
-                    >
-                      선택
-                    </button>
-                  </div>
-                </div>
+        <div className="pointer-events-auto fixed bottom-0 left-1/2 h-[225px] w-full max-w-[440px] -translate-x-1/2 rounded-t-[17px] bg-white">
+          <div className="flex h-full flex-col items-center">
+            <div className="mt-[54px] flex items-start justify-center gap-[54px]">
+              <div className="flex flex-col items-center gap-[14px]">
+                <button
+                  type="button"
+                  onClick={handleClickSticker}
+                  className="flex h-[56px] w-[56px] items-center justify-center rounded-[6px] border border-[#E6E7E9] bg-[#F4F5F6] cursor-pointer"
+                >
+                  <img src={stickerIcon} alt="sticker-icon" />
+                </button>
+                <p className="w-[37px] text-center text-[14px] font-medium leading-[100%] text-[#555557]">
+                  스티커
+                </p>
               </div>
-            )}
+
+              <div className="flex flex-col items-center gap-[14px]">
+                <button
+                  type="button"
+                  onClick={handleToggleBgPicker}
+                  className="flex h-[56px] w-[56px] items-center justify-center rounded-[6px] border border-[#E6E7E9] bg-[#F4F5F6] cursor-pointer"
+                >
+                  <img src={bgIcon} alt="bg-icon" />
+                </button>
+                <p className="w-[48px] text-center text-[14px] font-medium leading-[100%] text-[#555557]">
+                  배경색
+                </p>
+              </div>
+            </div>
           </div>
         </div>
+
+        {showPicker && (
+          <div className="absolute left-1/2 bottom-[235px] z-[60] -translate-x-1/2 pointer-events-auto">
+            <div className="rounded-lg bg-white p-3 shadow-lg">
+              <HexColorPicker color={safeBgColor} onChange={onChangeBgColor} />
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <input
+                  value={hexDraft}
+                  onChange={(e) => setHexDraft(e.target.value)}
+                  className="w-28 rounded border px-2 py-1 text-sm"
+                />
+                <button
+                  onClick={() => {
+                    onChangeBgColor(normalizeHex(hexDraft));
+                    handleClosePicker();
+                  }}
+                  className="rounded bg-gray-100 px-3 py-1 text-sm"
+                  type="button"
+                >
+                  선택
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <input
           ref={fileInputRef}

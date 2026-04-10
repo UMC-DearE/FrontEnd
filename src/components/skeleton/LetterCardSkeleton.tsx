@@ -6,7 +6,7 @@ type Props = {
 
 function DefaultSkeleton() {
   return (
-    <div className="w-full shadow-[0_0_4px_0_rgba(217,217,217,0.5)] rounded-lg animate-pulse">
+    <div className="w-full max-w-[440px] shadow-[0_0_4px_0_rgba(217,217,217,0.5)] rounded-lg animate-pulse">
       <div className="rounded-lg bg-white px-3 py-3 h-[121px] flex flex-col">
         <div className="flex justify-between">
           <div className="h-[12px] w-[60px] rounded bg-gray-200" />
@@ -30,7 +30,7 @@ function DefaultSkeleton() {
 
 function LetterCardCompactSkeleton() {
   return (
-    <div className="w-full h-[46px] rounded-lg bg-white px-3 py-2 flex items-center justify-between animate-pulse">
+    <div className="w-full max-w-[440px] h-[46px] rounded-lg bg-white px-3 py-2 flex items-center justify-between animate-pulse">
       <div className="flex items-center gap-[12px] flex-1 min-w-0">
         <div className="relative h-6 w-6 flex items-center justify-center">
           <div className="absolute inset-0 m-auto w-[14px] h-[14px] rounded-full bg-gray-200" />

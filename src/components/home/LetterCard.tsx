@@ -24,47 +24,43 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
 
   const handlePinClick = () => {
     if (letterId == null || isEmpty) return;
-
     if (isPinned) {
       onRequestUnpin(letterId);
       return;
     }
-
     onPin(letterId);
   };
 
   return (
-    <div className="relative mt-5 flex h-[97px] w-[361px] items-center rounded-[10px] bg-white shadow-[0_0_4px_0_rgba(217,217,217,0.5)]">
-      <div className="mx-[12px] flex h-[57px] w-[47px] flex-col items-center justify-center rounded-[10px] bg-[#FF4F181A]">
-        <span className="text-[10px] font-medium text-[#FF5F2F]">{letter?.month ?? ''}</span>
-        <span className="text-[15px] font-bold text-[#FF5F2F]">{letter?.day ?? ''}</span>
-        <span className="text-[11px] font-medium text-[#FF5F2F]">{letter?.dayOfWeek ?? ''}</span>
+    <div className="relative mt-5 flex w-full max-w-[440px] min-h-[97px] items-center rounded-[10px] bg-white shadow-[0_0_4px_0_rgba(0,0,0,0.12)]">
+      {/* 날짜 뱃지 */}
+      <div className="mx-3 flex h-[57px] w-[47px] shrink-0 flex-col items-center justify-center rounded-[10px] bg-[#FF4F181A]">
+        <p className="text-[10px] font-medium text-[#FF5F2F]">{letter?.month ?? ''}</p>
+        <p className="text-[15px] font-bold text-[#FF5F2F]">{letter?.day ?? ''}</p>
+        <p className="text-[11px] font-medium text-[#FF5F2F]">{letter?.dayOfWeek ?? ''}</p>
       </div>
 
-      <div className="absolute left-[67px] top-[31px] w-[273px] text-[12.3px] leading-[20px]">
+      {/* 편지 내용 */}
+      <div className="flex-1 pr-8 py-4 text-[12.3px] leading-[20px]">
         {isEmpty ? (
-          <p className="break-keep text-[#9D9D9F]">
+          <p className="break-keep text-[#A1A4AA]">
             아직 추가한 편지가 없어요.
             <br />
-            하단 <span className="font-bold text-[#FF5F2F]">편지 추가</span> 버튼을 눌러 첫 번째
-            편지를 추가해 보세요
+            하단 편지 추가 버튼을 눌러 편지를 추가해 보세요!
           </p>
         ) : (
           <p className="line-clamp-2 break-all font-medium text-[#555557]">{letter.excerpt}</p>
         )}
       </div>
 
+      {/* 핀 버튼 */}
       <button
         type="button"
         onClick={handlePinClick}
         disabled={letterId == null || isEmpty}
-        className="absolute top-2 left-[339px] cursor-pointer"
+        className="absolute top-2 right-3 cursor-pointer"
       >
-        <img
-          src={isPinned ? pinOnIcon : pinOffIcon}
-          alt="pin"
-          className="h-[12.41px] w-[12.41px]"
-        />
+        <img src={isPinned ? pinOnIcon : pinOffIcon} alt="pin" className="h-[14px] w-[14px]" />
       </button>
     </div>
   );

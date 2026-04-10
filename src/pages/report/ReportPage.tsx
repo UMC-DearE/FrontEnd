@@ -83,8 +83,8 @@ export default function ReportPage() {
   return (
     <div className="flex flex-col">
       <div className="flex-1 pb-1 space-y-7">
-        <button className="cursor-pointer">
-          <img src={report} alt="report-recap" className="w-full h-32" />
+        <button className="cursor-pointer w-full max-w-[440px]">
+          <img src={report} alt="report-recap" className="w-full max-w-[440px]" />
         </button>
 
         {/* TOP3 영역 */}
