@@ -69,22 +69,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div>
-      <div className="pt-4 pb-[59px] flex flex-col">
+    <div className="w-full max-w-[440px] mx-auto flex flex-col min-w-0">
+      <div className="flex flex-1 flex-col px-4 pt-4 pb-[59px] min-w-0">
         <div
           style={{ touchAction: "pan-y" }}
-          className="relative mt-10 overflow-hidden touch-pan-y min-w-0"
+          className="relative mt-10 w-full overflow-hidden min-w-0"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
           <div
-            className="flex transition-transform duration-500 ease-out min-w-0"
+            className="flex w-full transition-transform duration-500 ease-out min-w-0"
             style={{ transform: `translateX(-${pageIdx * 100}%)` }}
           >
             {pages.map((p) => (
-              <div key={p.id} className="w-full shrink-0">
+              <div key={p.id} className="w-full shrink-0 min-w-0">
                 {p.node}
               </div>
             ))}
@@ -102,16 +102,19 @@ export default function LoginPage() {
           ))}
         </div>
 
-        <div className="shrink-0 space-y-4 flex flex-col items-center">
-          <SocialLoginButton
-            provider="kakao"
-            onClick={onKakaoLogin}
-          />
-
-          <SocialLoginButton
-            provider="google"
-            onClick={onGoogleLogin}
-          />
+        <div className="shrink-0 space-y-4 flex flex-col items-center min-w-0">
+          <div className="w-full aspect-[408/50] min-w-0">
+            <SocialLoginButton
+              provider="kakao"
+              onClick={onKakaoLogin}
+            />
+          </div>
+          <div className="w-full aspect-[408/50] min-w-0">
+            <SocialLoginButton
+              provider="google"
+              onClick={onGoogleLogin}
+            />
+          </div>
         </div>
       </div>
     </div>

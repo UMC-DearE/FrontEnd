@@ -58,7 +58,7 @@ export default function AutoCarousel({
   if (!hasItems) return null;
 
   return (
-    <div className="overflow-hidden w-full">
+    <div className="overflow-hidden w-full min-w-0">
       <div
         className={`flex ${
           renderTransition
