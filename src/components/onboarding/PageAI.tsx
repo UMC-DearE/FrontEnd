@@ -12,8 +12,8 @@ export default function PageAI({ active }: { active: boolean }) {
   );
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="text-center">
+    <div className="flex flex-col w-full items-center min-w-0">
+      <div className="w-full text-center">
         <div className="text-[14px] text-[#9D9D9F] font-medium">
           그날의 감정, 진심 등을
         </div>
@@ -22,15 +22,20 @@ export default function PageAI({ active }: { active: boolean }) {
         </div>
       </div>
 
-      <div className="mt-8">
-        <img src={onboardingAssets.RobotIcon} alt="robot" draggable={false} />
+      <div className="mt-8 flex w-full justify-center min-w-0">
+        <img
+          src={onboardingAssets.RobotIcon}
+          alt="robot"
+          draggable={false}
+          className="h-auto w-full max-w-[140px] object-contain"
+        />
       </div>
 
-      <div className="mt-[13px] w-full flex justify-center">
-        <div className="w-[308px] h-[69px]">
+      <div className="mt-[13px] w-full flex justify-center min-w-0">
+        <div className="w-full max-w-[308px] min-w-0">
           <AutoCarousel
             items={aiCards.map((card, i) => (
-              <div key={i}>
+              <div key={i} className="w-full min-w-0">
                 {card}
               </div>
             ))}

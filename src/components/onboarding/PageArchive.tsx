@@ -6,14 +6,20 @@ export default function PageArchive({ active }: { active: boolean }) {
   const archiveSlides = useMemo(
     () =>
       onboardingAssets.archive.map((src, idx) => (
-        <img key={idx} src={src} className="w-[176px]" alt={`archive-${idx + 1}`} draggable={false} />
+        <img
+          key={idx}
+          src={src}
+          className="w-full h-auto"
+          alt={`archive-${idx + 1}`}
+          draggable={false}
+        />
       )),
     []
   );
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="text-center">
+    <div className="flex flex-col items-center w-full min-w-0">
+      <div className="text-center w-full">
         <div className="text-[14px] text-[#9D9D9F] font-medium">
           사진 스티커를 붙이거나 배경을 바꿔
         </div>
@@ -22,8 +28,14 @@ export default function PageArchive({ active }: { active: boolean }) {
         </div>
       </div>
 
-      <div className="mt-[42px] w-[176px] flex justify-center">
-        <AutoCarousel items={archiveSlides} autoplayMs={1800} enabled={active} />
+      <div className="mt-[42px] flex w-full justify-center min-w-0">
+        <div className="w-full max-w-[176px] min-w-0">
+          <AutoCarousel
+            items={archiveSlides}
+            autoplayMs={1800}
+            enabled={active}
+          />
+        </div>
       </div>
     </div>
   );
