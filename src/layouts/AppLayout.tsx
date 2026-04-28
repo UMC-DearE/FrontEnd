@@ -26,7 +26,6 @@ export function AppLayout() {
     document.documentElement.style.setProperty('--app-font', fontFamily);
   }, [font]);
 
-  // 페이지 전환 시 항상 스크롤을 맨 위로 이동
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [pathname]);
@@ -58,6 +57,9 @@ export function AppLayout() {
     (pathname.startsWith('/letter/') && pathname.endsWith('/edit'));
 
   const HEADER_HEIGHT = 78;
+  const HEADER_SAFE_AREA = 'min(env(safe-area-inset-top, 0px), 32px)';
+  const HEADER_CONTENT_GAP = 20;
+
   const BOTTOM_NAV_HEIGHT = 95;
   const FIXED_ACTION_HEIGHT = 52 + 20 + 16;
   const bottomInset = fixedAction ? FIXED_ACTION_HEIGHT : hideBottomNav ? 0 : BOTTOM_NAV_HEIGHT;
@@ -83,7 +85,11 @@ export function AppLayout() {
       <main
         className="min-w-0 flex-1 flex flex-col"
         style={{
-          paddingTop: shouldShowHeader ? `calc(${HEADER_HEIGHT}px + 20px)` : noMainPadding ? 0 : 20,
+          paddingTop: shouldShowHeader
+            ? `calc(${HEADER_SAFE_AREA} + ${HEADER_HEIGHT}px + ${HEADER_CONTENT_GAP}px)`
+            : noMainPadding
+              ? 0
+              : HEADER_CONTENT_GAP,
         }}
       >
         <div className={`${noMainPadding ? '' : 'px-4'} w-full min-w-0 flex-1 flex flex-col`}>
