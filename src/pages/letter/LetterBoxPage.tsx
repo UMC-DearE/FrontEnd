@@ -32,6 +32,11 @@ const VIEW_MODE_KEY = 'letterbox:viewMode';
 const isViewMode = (v: unknown): v is ViewMode => v === '기본 보기' || v === '간편 보기';
 
 export default function LetterBoxPage() {
+  const HEADER_SAFE_AREA = 'min(env(safe-area-inset-top, 0px), 32px)';
+  const HEADER_HEIGHT = 78;
+  const SEARCH_BAR_TOP = 34;
+  const CONTENT_GAP = 20;
+
   const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>('all');
   const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
   const navigate = useNavigate();
@@ -278,9 +283,14 @@ export default function LetterBoxPage() {
           />
         </div>
       </div>
-      {/* top값 나중에 다시 수정 */}
+
       {isSearchOpen && (
-        <div className="fixed left-0 right-0 top-[34px] z-50 flex justify-center">
+        <div
+          className="fixed left-0 right-0 z-50 flex justify-center"
+          style={{
+            top: `calc(${HEADER_SAFE_AREA} + ${SEARCH_BAR_TOP}px)`,
+          }}
+        >
           <div className="w-full max-w-[440px] px-4">
             <SearchBar
               value={query}
@@ -294,7 +304,11 @@ export default function LetterBoxPage() {
         </div>
       )}
 
-      <div className="mt-[105px]">
+      <div
+        style={{
+          marginTop: `calc(${HEADER_SAFE_AREA} + ${HEADER_HEIGHT}px + ${CONTENT_GAP}px)`,
+        }}
+      >
         <FolderList
           folders={folders}
           selectedId={selectedFolderId}
