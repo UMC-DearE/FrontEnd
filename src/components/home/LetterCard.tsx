@@ -37,11 +37,11 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
       <div className="mx-3 flex h-[57px] w-[47px] shrink-0 flex-col items-center justify-center rounded-[10px] bg-[#FF4F181A]">
         <p className="text-[10px] font-medium text-[#FF5F2F]">{letter?.month ?? ''}</p>
         <p className="text-[15px] font-bold text-[#FF5F2F]">{letter?.day ?? ''}</p>
-        <p className="text-[11px] font-medium text-[#FF5F2F]">{letter?.dayOfWeek ?? ''}</p>
+        <p className="text-[12px] font-medium text-[#FF5F2F]">{letter?.dayOfWeek ?? ''}</p>
       </div>
 
       {/* 편지 내용 */}
-      <div className="flex-1 pr-8 py-4 text-[12.3px] leading-[20px]">
+      <div className="flex-1 pr-8 py-4 w-[226px] text-[13px] leading-[20px]">
         {isEmpty ? (
           <p className="break-keep text-[#A1A4AA]">
             아직 추가한 편지가 없어요.
@@ -58,7 +58,7 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
         type="button"
         onClick={handlePinClick}
         disabled={letterId == null || isEmpty}
-        className="absolute top-2 right-3 cursor-pointer"
+        className="absolute top-[10px] right-[10px] cursor-pointer"
       >
         <img src={isPinned ? pinOnIcon : pinOffIcon} alt="pin" className="h-[14px] w-[14px]" />
       </button>
