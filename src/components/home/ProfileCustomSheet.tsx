@@ -3,7 +3,6 @@ import { HexColorPicker } from 'react-colorful';
 import stickerIcon from '@/assets/homePage/stickerIcon.svg';
 import bgIcon from '@/assets/homePage/bgIcon.svg';
 import resetIcon from '@/assets/homePage/resetIcon.svg';
-import CustomResetSheet from './CustomResetSheet';
 
 interface ProfileCustomSheetProps {
   open: boolean;
@@ -14,6 +13,7 @@ interface ProfileCustomSheetProps {
   onChangeBgColor: (color: string) => void;
   onPickerStateChange?: (isOpen: boolean) => void;
   onDeselectSticker?: () => void;
+  onClickReset?: () => void;
 }
 
 const normalizeHex = (v: string) => {
@@ -26,16 +26,15 @@ const normalizeHex = (v: string) => {
 
 export default function ProfileCustomSheet({
   open,
-  onComplete,
   onPickStickerFile,
   bgColor,
   onChangeBgColor,
   onPickerStateChange,
   onDeselectSticker,
+  onClickReset,
 }: ProfileCustomSheetProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showPicker, setShowPicker] = useState(false);
-  const [showResetSheet, setShowResetSheet] = useState(false);
 
   const safeBgColor = useMemo(() => normalizeHex(bgColor), [bgColor]);
 
@@ -44,12 +43,6 @@ export default function ProfileCustomSheet({
   useEffect(() => {
     setHexDraft(safeBgColor);
   }, [safeBgColor]);
-
-  const handleComplete = () => {
-    setShowPicker(false);
-    onPickerStateChange?.(false);
-    onComplete?.();
-  };
 
   const handleClickSticker = () => {
     setShowPicker(false);
@@ -60,7 +53,7 @@ export default function ProfileCustomSheet({
   const handleClickReset = () => {
     setShowPicker(false);
     onPickerStateChange?.(false);
-    setShowResetSheet(true);
+    onClickReset?.();
   };
 
   const handleToggleBgPicker = () => {
@@ -86,14 +79,6 @@ export default function ProfileCustomSheet({
         className="relative w-full max-w-[440px] min-h-screen 
       overflow-hidden pointer-events-none"
       >
-        <button
-          type="button"
-          onClick={handleComplete}
-          className="absolute right-[16px] top-[41px] flex h-[29px] w-[57px] items-center justify-center rounded-[18px] bg-[#FF5F2F] px-[16px] py-[6px] cursor-pointer pointer-events-auto"
-        >
-          <p className="text-white font-semibold text-[14px] leading-none">완료</p>
-        </button>
-
         <div className="pointer-events-auto fixed bottom-0 left-1/2 h-[126px] w-full max-w-[440px] -translate-x-1/2 bg-white">
           <div className="flex h-full flex-col items-center">
             <div className="mt-[20px] flex items-start justify-center gap-[54px]">
@@ -178,8 +163,6 @@ export default function ProfileCustomSheet({
             e.currentTarget.value = '';
           }}
         />
-
-        {showResetSheet && <CustomResetSheet />}
       </div>
     </div>
   );

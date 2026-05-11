@@ -6,6 +6,7 @@ import ConfirmModal from '@/components/common/ConfirmModal';
 import LetterCard, { type HomeCardLetter } from '@/components/home/LetterCard';
 import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
+import CustomResetSheet from '@/components/home/CustomResetSheet';
 import CustomizingHeader from '@/components/header/CustomizingHeader';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import { uploadImage } from '@/api/upload';
@@ -84,6 +85,7 @@ export default function HomePage() {
   const [openSheet, setOpenSheet] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
+  const [showResetSheet, setShowResetSheet] = useState(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -345,9 +347,10 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={handleCompleteCustomizing}
+                  disabled={showResetSheet}
                   className="flex h-[29px] w-[49px] items-center justify-center rounded-[6px] bg-[#FF5F2F] px-[12px] py-[6px] cursor-pointer"
                 >
-                  <p className="text-white font-semibold text-[14px] leading-none">완료</p>
+                  <p className="text-white font-semibold text-[14px] leading-none">저장</p>
                 </button>
               }
             />
@@ -388,6 +391,7 @@ export default function HomePage() {
         onChangeBgColor={setHomeBgColor}
         onPickerStateChange={setPickerOpen}
         onDeselectSticker={() => setSelectedId(null)}
+        onClickReset={() => setShowResetSheet(true)}
         onClose={() => {
           setOpenSheet(false);
           setSelectedId(null);
@@ -402,6 +406,8 @@ export default function HomePage() {
           }
         }}
       />
+
+      {showResetSheet && <CustomResetSheet onClose={() => setShowResetSheet(false)} />}
 
       <LetterCard
         letter={letter}
@@ -426,8 +432,8 @@ export default function HomePage() {
         description="변경한 내용이 저장되지 않아요"
         cancelText="나가기"
         confirmText="계속 편집"
-        onCancel={handleCancelClose}
-        onConfirm={handleConfirmClose}
+        onCancel={handleConfirmClose}
+        onConfirm={handleCancelClose}
       />
 
       {!openSheet && (
