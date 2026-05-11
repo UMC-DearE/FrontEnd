@@ -6,6 +6,7 @@ import ConfirmModal from '@/components/common/ConfirmModal';
 import LetterCard, { type HomeCardLetter } from '@/components/home/LetterCard';
 import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
+import CustomizingHeader from '@/components/header/CustomizingHeader';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import { uploadImage } from '@/api/upload';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
@@ -18,6 +19,7 @@ import { useUpdateSticker } from '@/hooks/mutations/useUpdateSticker';
 import { useDeleteSticker } from '@/hooks/mutations/useDeleteSticker';
 import { useMyMembership } from '@/hooks/queries/useMyMembership';
 import useToast from '@/hooks/useToast';
+import closeIcon from '@/assets/homePage/closeIcon.svg';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -81,6 +83,7 @@ export default function HomePage() {
 
   const [openSheet, setOpenSheet] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -182,6 +185,32 @@ export default function HomePage() {
     setSelectedId(null);
     setOpenSheet(true);
     setPickerOpen(false);
+  };
+
+  const handleRequestClose = () => setConfirmCloseOpen(true);
+  const handleCancelClose = () => setConfirmCloseOpen(false);
+  const handleConfirmClose = () => {
+    setConfirmCloseOpen(false);
+    setOpenSheet(false);
+    setSelectedId(null);
+    setPickerOpen(false);
+    setDraftStickers(cloneStickers(baseStickers));
+  };
+
+  const handleCompleteCustomizing = async () => {
+    const snapshot = cloneStickers(draftStickers);
+
+    setOpenSheet(false);
+    setSelectedId(null);
+    setPickerOpen(false);
+
+    try {
+      await updateHomeColorMutation.mutateAsync(homeBgColor);
+    } catch (e) {
+      console.error(e);
+    }
+
+    setDraftStickers(snapshot);
   };
 
   const { data: membership } = useMyMembership();
@@ -298,6 +327,34 @@ export default function HomePage() {
 
   return (
     <div ref={containerRef} style={{ backgroundColor: homeBgColor }}>
+      {openSheet && (
+        <div className="fixed top-0 left-0 right-0 z-[55] flex justify-center">
+          <div className="w-full max-w-[440px]">
+            <CustomizingHeader
+              title="홈 편집"
+              left={
+                <button
+                  type="button"
+                  onClick={handleRequestClose}
+                  className="flex items-center justify-center cursor-pointer"
+                >
+                  <img src={closeIcon} alt="닫기" className="h-6 w-6" />
+                </button>
+              }
+              right={
+                <button
+                  type="button"
+                  onClick={handleCompleteCustomizing}
+                  className="flex h-[29px] w-[49px] items-center justify-center rounded-[6px] bg-[#FF5F2F] px-[12px] py-[6px] cursor-pointer"
+                >
+                  <p className="text-white font-semibold text-[14px] leading-none">완료</p>
+                </button>
+              }
+            />
+          </div>
+        </div>
+      )}
+
       <div className={openSheet ? 'relative' : 'relative z-40'}>
         <StickerLayer
           enabled={enabled}
@@ -337,21 +394,6 @@ export default function HomePage() {
           setPickerOpen(false);
           setDraftStickers(cloneStickers(baseStickers));
         }}
-        onComplete={async () => {
-          const snapshot = cloneStickers(draftStickers);
-
-          setOpenSheet(false);
-          setSelectedId(null);
-          setPickerOpen(false);
-
-          try {
-            await updateHomeColorMutation.mutateAsync(homeBgColor);
-          } catch (e) {
-            console.error(e);
-          }
-
-          setDraftStickers(snapshot);
-        }}
         onPickStickerFile={async (file) => {
           try {
             await addStickerFromFile(file);
@@ -378,9 +420,21 @@ export default function HomePage() {
         onConfirm={handleConfirmUnpin}
       />
 
-      <div className="absolute bottom-[127px] right-4">
-        <AddLetterButton />
-      </div>
+      <ConfirmModal
+        open={confirmCloseOpen}
+        title="저장하지 않고 나갈까요?"
+        description="변경한 내용이 저장되지 않아요"
+        cancelText="나가기"
+        confirmText="계속 편집"
+        onCancel={handleConfirmClose}
+        onConfirm={handleCancelClose}
+      />
+
+      {!openSheet && (
+        <div className="absolute bottom-[127px] right-4">
+          <AddLetterButton />
+        </div>
+      )}
     </div>
   );
 }
