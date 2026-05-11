@@ -3,6 +3,7 @@ import { HexColorPicker } from 'react-colorful';
 import stickerIcon from '@/assets/homePage/stickerIcon.svg';
 import bgIcon from '@/assets/homePage/bgIcon.svg';
 import resetIcon from '@/assets/homePage/resetIcon.svg';
+import CustomResetSheet from './CustomResetSheet';
 
 interface ProfileCustomSheetProps {
   open: boolean;
@@ -34,6 +35,7 @@ export default function ProfileCustomSheet({
 }: ProfileCustomSheetProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showPicker, setShowPicker] = useState(false);
+  const [showResetSheet, setShowResetSheet] = useState(false);
 
   const safeBgColor = useMemo(() => normalizeHex(bgColor), [bgColor]);
 
@@ -53,6 +55,12 @@ export default function ProfileCustomSheet({
     setShowPicker(false);
     onPickerStateChange?.(false);
     fileInputRef.current?.click();
+  };
+
+  const handleClickReset = () => {
+    setShowPicker(false);
+    onPickerStateChange?.(false);
+    setShowResetSheet(true);
   };
 
   const handleToggleBgPicker = () => {
@@ -92,7 +100,7 @@ export default function ProfileCustomSheet({
               <div className="flex flex-col items-center gap-[14px]">
                 <button
                   type="button"
-                  onClick={handleToggleBgPicker}
+                  onClick={handleClickReset}
                   className="flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-[#E6E7E9] bg-[#F4F5F6] cursor-pointer"
                 >
                   <img className="w-[25px] h-[25px]" src={resetIcon} alt="bg-icon" />
@@ -170,6 +178,8 @@ export default function ProfileCustomSheet({
             e.currentTarget.value = '';
           }}
         />
+
+        {showResetSheet && <CustomResetSheet />}
       </div>
     </div>
   );

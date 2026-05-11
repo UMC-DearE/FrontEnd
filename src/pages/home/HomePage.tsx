@@ -426,8 +426,8 @@ export default function HomePage() {
         description="변경한 내용이 저장되지 않아요"
         cancelText="나가기"
         confirmText="계속 편집"
-        onCancel={handleConfirmClose}
-        onConfirm={handleCancelClose}
+        onCancel={handleCancelClose}
+        onConfirm={handleConfirmClose}
       />
 
       {!openSheet && (
