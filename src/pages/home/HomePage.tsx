@@ -91,6 +91,9 @@ export default function HomePage() {
 
   const [draftStickers, setDraftStickers] = useState<StickerItem[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [bgColorBackup, setBgColorBackup] = useState<string | null>(null);
+
+  const DEFAULT_BG_COLOR = '#F7F8F9';
 
   const enabled = openSheet && !pickerOpen;
 
@@ -184,6 +187,7 @@ export default function HomePage() {
 
   const openEditor = () => {
     setDraftStickers(cloneStickers(baseStickers));
+    setBgColorBackup(homeBgColor);
     setSelectedId(null);
     setOpenSheet(true);
     setPickerOpen(false);
@@ -196,23 +200,79 @@ export default function HomePage() {
     setOpenSheet(false);
     setSelectedId(null);
     setPickerOpen(false);
+    setShowResetSheet(false);
     setDraftStickers(cloneStickers(baseStickers));
+    if (bgColorBackup !== null) {
+      setHomeBgColor(bgColorBackup);
+    }
+    setBgColorBackup(null);
   };
 
   const handleCompleteCustomizing = async () => {
-    const snapshot = cloneStickers(draftStickers);
+    const draftIds = new Set(draftStickers.map((s) => s.id));
+    const baseById = new Map(baseStickers.map((s) => [s.id, s]));
+
+    const deleted = baseStickers.filter((s) => s.id > 0 && !draftIds.has(s.id));
+
+    const added = draftStickers.filter(
+      (s) => !baseById.has(s.id) && s.imageId !== null && s.imageId !== undefined
+    );
+
+    const updated = draftStickers.filter((d) => {
+      if (d.id <= 0) return false;
+      const b = baseById.get(d.id);
+      if (!b) return false;
+      return (
+        b.x !== d.x ||
+        b.y !== d.y ||
+        b.z !== d.z ||
+        b.rotation !== d.rotation ||
+        b.scale !== d.scale
+      );
+    });
+
+    const bgChanged = bgColorBackup !== null && homeBgColor !== bgColorBackup;
 
     setOpenSheet(false);
     setSelectedId(null);
     setPickerOpen(false);
+    setShowResetSheet(false);
+    setBgColorBackup(null);
 
     try {
-      await updateHomeColorMutation.mutateAsync(homeBgColor);
+      await Promise.all([
+        ...deleted.map((s) => deleteStickerMutation.mutateAsync({ stickerId: s.id })),
+        ...added.map((s) =>
+          createStickerMutation.mutateAsync({
+            request: {
+              imageId: s.imageId as number,
+              posX: s.x,
+              posY: s.y,
+              posZ: s.z,
+              rotation: s.rotation,
+              scale: s.scale,
+            },
+            imageUrl: s.src,
+            clientStickerId: s.id,
+          })
+        ),
+        ...updated.map((s) =>
+          updateStickerMutation.mutateAsync({
+            stickerId: s.id,
+            body: {
+              posX: s.x,
+              posY: s.y,
+              posZ: s.z,
+              rotation: s.rotation,
+              scale: s.scale,
+            },
+          })
+        ),
+        bgChanged ? updateHomeColorMutation.mutateAsync(homeBgColor) : Promise.resolve(),
+      ]);
     } catch (e) {
       console.error(e);
     }
-
-    setDraftStickers(snapshot);
   };
 
   const { data: membership } = useMyMembership();
@@ -260,35 +320,6 @@ export default function HomePage() {
 
     setSelectedId(tempStickerId);
     setOpenSheet(true);
-
-    if (imageId === null) return;
-
-    createStickerMutation.mutate(
-      {
-        request: {
-          imageId,
-          posX: cx,
-          posY: cy,
-          posZ: maxZ,
-          rotation: 0,
-          scale: 1,
-        },
-        imageUrl: src,
-        clientStickerId: tempStickerId,
-      },
-      {
-        onSuccess: (res) => {
-          setDraftStickers((prev) =>
-            prev.map((s) => (s.id === tempStickerId ? { ...s, id: res.stickerId } : s))
-          );
-          setSelectedId((cur) => (cur === tempStickerId ? res.stickerId : cur));
-        },
-        onError: () => {
-          setDraftStickers((prev) => prev.filter((s) => s.id !== tempStickerId));
-          setSelectedId((cur) => (cur === tempStickerId ? null : cur));
-        },
-      }
-    );
   };
 
   const onChangeStickers = (next: StickerItem[]) => {
@@ -301,27 +332,28 @@ export default function HomePage() {
 
     setDraftStickers((prev) => prev.filter((s) => s.id !== id));
     setSelectedId((cur) => (cur === id ? null : cur));
-
-    if (id > 0) deleteStickerMutation.mutate({ stickerId: id });
   };
 
-  const onCommitSticker = (id: number) => {
-    if (!enabled) return;
-    if (id <= 0) return;
+  const handleResetStickers = () => {
+    setDraftStickers([]);
+    setSelectedId(null);
+    setShowResetSheet(false);
+  };
 
-    const s = draftStickers.find((x) => x.id === id);
-    if (!s) return;
+  const handleResetBgColor = () => {
+    setHomeBgColor(DEFAULT_BG_COLOR);
+    setShowResetSheet(false);
+  };
 
-    updateStickerMutation.mutate({
-      stickerId: id,
-      body: {
-        posX: s.x,
-        posY: s.y,
-        posZ: s.z,
-        rotation: s.rotation,
-        scale: s.scale,
-      },
-    });
+  const handleResetAll = () => {
+    setDraftStickers([]);
+    setHomeBgColor(DEFAULT_BG_COLOR);
+    setSelectedId(null);
+    setShowResetSheet(false);
+  };
+
+  const onCommitSticker = (_id: number) => {
+    // 저장 버튼을 누를 때까지 서버에 반영하지 않음
   };
 
   if (homeLoading || randomLoading) return <div>로딩 중...</div>;
@@ -392,12 +424,7 @@ export default function HomePage() {
         onPickerStateChange={setPickerOpen}
         onDeselectSticker={() => setSelectedId(null)}
         onClickReset={() => setShowResetSheet(true)}
-        onClose={() => {
-          setOpenSheet(false);
-          setSelectedId(null);
-          setPickerOpen(false);
-          setDraftStickers(cloneStickers(baseStickers));
-        }}
+        onClose={handleConfirmClose}
         onPickStickerFile={async (file) => {
           try {
             await addStickerFromFile(file);
@@ -407,7 +434,14 @@ export default function HomePage() {
         }}
       />
 
-      {showResetSheet && <CustomResetSheet onClose={() => setShowResetSheet(false)} />}
+      {showResetSheet && (
+        <CustomResetSheet
+          onClose={() => setShowResetSheet(false)}
+          onResetStickers={handleResetStickers}
+          onResetBgColor={handleResetBgColor}
+          onResetAll={handleResetAll}
+        />
+      )}
 
       <LetterCard
         letter={letter}

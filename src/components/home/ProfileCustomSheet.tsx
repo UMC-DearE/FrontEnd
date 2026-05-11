@@ -18,10 +18,10 @@ interface ProfileCustomSheetProps {
 
 const normalizeHex = (v: string) => {
   const t = v.trim();
-  if (!t) return '#000000';
+  if (!t) return '#F7F8F9';
   const withHash = t.startsWith('#') ? t : `#${t}`;
   const ok = /^#[0-9A-Fa-f]{6}$/.test(withHash);
-  return ok ? withHash : '#000000';
+  return ok ? withHash : '#F7F8F9';
 };
 
 export default function ProfileCustomSheet({
