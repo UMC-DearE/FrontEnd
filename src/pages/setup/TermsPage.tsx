@@ -20,7 +20,6 @@ export default function TermsPage() {
   const [terms, setTerms] = useState<TermsState>({
     service: false,
     privacy: false,
-    marketing: false,
   });
 
   const navigate = useNavigate();
@@ -67,7 +66,7 @@ export default function TermsPage() {
   }, [navigate]);
 
   const items = useMemo(() => {
-    const order: TermsKey[] = ["service", "privacy", "marketing"];
+    const order: TermsKey[] = ["service", "privacy"];
     return order
       .map((key) => {
         const m = metaMap[key];
