@@ -15,7 +15,7 @@ export default function PlusModal({ open, onPay, onClose }: PlusModalProps) {
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex justify-center">
-      <div className="relative w-[393px] min-h-screen">
+      <div className="relative w-full min-h-screen">
         <button
           type="button"
           onClick={onClose}
