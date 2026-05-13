@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
 import LetterCardSkeleton from '@/components/skeleton/LetterCardSkeleton';
 import { getFromList } from '@/api/from';
 import { getLetterLists } from '@/api/letter';
+import { addLetterToFolder } from '@/api/folder';
 import type { From } from '@/types/from';
 import type { Letter } from '@/types/letter';
 
@@ -12,8 +13,13 @@ type LayoutContext = {
   setFixedAction: (payload: { node: React.ReactNode; bgColor?: string } | null) => void;
 };
 
+type LocationState = { folderId?: number; folderName?: string } | null;
+
 export default function LetterSelectPage() {
   const { setFixedAction } = useOutletContext<LayoutContext>();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const folderId = (location.state as LocationState)?.folderId;
 
   const [froms, setFroms] = useState<From[]>([]);
   const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
@@ -22,6 +28,7 @@ export default function LetterSelectPage() {
   const [allCount, setAllCount] = useState(0);
   const [isLettersLoading, setIsLettersLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggleSelected = (id: number) => {
     setSelectedIds((prev) => {
@@ -93,6 +100,21 @@ export default function LetterSelectPage() {
     return allLetters.filter((l) => l.from.fromId === selectedFromId);
   }, [allLetters, selectedFromId]);
 
+  const handleSubmit = async () => {
+    if (folderId == null || selectedIds.size === 0 || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      await Promise.all(
+        Array.from(selectedIds).map((letterId) => addLetterToFolder(folderId, letterId))
+      );
+      navigate('/letter', { state: { selectedFolderId: folderId } });
+    } catch (e) {
+      console.error('addLetterToFolder failed', e);
+      setIsSubmitting(false);
+    }
+  };
+
   useEffect(() => {
     if (!setFixedAction) return;
 
@@ -100,7 +122,8 @@ export default function LetterSelectPage() {
       node: (
         <button
           type="button"
-          disabled={selectedIds.size === 0}
+          disabled={selectedIds.size === 0 || isSubmitting || folderId == null}
+          onClick={handleSubmit}
           className="flex justify-center items-center w-full h-[50px] bg-[#FF5F2F] text-white rounded-xl font-bold text-[16px] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           추가하기 ({selectedIds.size})
@@ -109,7 +132,7 @@ export default function LetterSelectPage() {
     });
 
     return () => setFixedAction(null);
-  }, [setFixedAction, selectedIds]);
+  }, [setFixedAction, selectedIds, isSubmitting, folderId]);
 
   return (
     <div className="flex flex-col gap-[10px] mb-3">

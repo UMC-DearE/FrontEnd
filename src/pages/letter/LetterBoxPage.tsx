@@ -7,7 +7,7 @@ import type { Folder } from '@/types/folder';
 import type { Letter } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   getFolderList,
   deleteFolder,
@@ -27,6 +27,8 @@ import LetterCardSkeleton from '@/components/skeleton/LetterCardSkeleton';
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
 
+type LocationState = { selectedFolderId?: FolderSelectId } | null;
+
 const VIEW_MODE_KEY = 'letterbox:viewMode';
 
 const isViewMode = (v: unknown): v is ViewMode => v === '기본 보기' || v === '간편 보기';
@@ -37,9 +39,20 @@ export default function LetterBoxPage() {
   const SEARCH_BAR_TOP = 34;
   const CONTENT_GAP = 20;
 
-  const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>('all');
-  const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
   const navigate = useNavigate();
+  const location = useLocation();
+  const initialFolderId = (location.state as LocationState)?.selectedFolderId ?? 'all';
+
+  const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>(initialFolderId);
+  const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
+
+  useEffect(() => {
+    const next = (location.state as LocationState)?.selectedFolderId;
+    if (next != null) {
+      setSelectedFolderId(next);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
 
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const saved = localStorage.getItem(VIEW_MODE_KEY);
@@ -392,7 +405,10 @@ export default function LetterBoxPage() {
                   <button
                     onClick={() =>
                       navigate('/letter/select', {
-                        state: { folderName: selectedFolderName },
+                        state: {
+                          folderId: selectedFolderId,
+                          folderName: selectedFolderName,
+                        },
                       })
                     }
                     type="button"
