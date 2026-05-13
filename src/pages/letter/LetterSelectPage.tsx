@@ -14,6 +14,16 @@ export default function LetterSelectPage() {
   const [allLetters, setAllLetters] = useState<Letter[]>([]);
   const [allCount, setAllCount] = useState(0);
   const [isLettersLoading, setIsLettersLoading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+
+  const toggleSelected = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   useEffect(() => {
     const run = async () => {
@@ -104,6 +114,9 @@ export default function LetterSelectPage() {
               isLiked={letter.isLiked}
               receivedAt={letter.receivedAt}
               from={letter.from}
+              mode="select"
+              selected={selectedIds.has(letter.id)}
+              onSelectToggle={() => toggleSelected(letter.id)}
             />
           </div>
         ))
