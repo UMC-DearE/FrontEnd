@@ -4,8 +4,8 @@ import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useToggleLetterLike } from '@/hooks/mutations/useToggleLetterLike';
 import { FromBadge } from '@/components/common/FromBadge';
 import type { From } from '@/types/from';
-import HeartFilledIcon from '@/components/icons/HeartFilledIcon';
-import HeartOutlineIcon from '@/components/icons/HeartOutlineIcon';
+import heartOuline from '@/assets/letterPage/heart-outline.svg';
+import heartFill from '@/assets/letterPage/heart-filled.svg';
 import selectOutline from '@/assets/letter/select-outline.svg';
 import selectFilled from '@/assets/letter/select-filled.svg';
 
@@ -136,12 +136,12 @@ export default function LetterCardDefault({
                 onClickLike();
               }}
               disabled={toggleLike.isPending}
-              className="w-[13px] h-4 cursor-pointer disabled:opacity-50"
+              className="cursor-pointer disabled:opacity-50"
             >
               {liked ? (
-                <HeartFilledIcon className="w-[16px] h-[14px]" />
+                <img src={heartOuline} className="w-4 h-[14px]" />
               ) : (
-                <HeartOutlineIcon className="w-[16px] h-[14px]" />
+                <img src={heartFill} className="w-4 h-[14px]" />
               )}
             </button>
           )}

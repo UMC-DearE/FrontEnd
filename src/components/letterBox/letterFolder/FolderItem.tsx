@@ -30,7 +30,7 @@ export default function FolderItem({
       <button
         type="button"
         onClick={() => onSelect(folder.id)}
-        className={`relative flex items-center justify-center w-[50px] h-[50px] rounded-[10px] cursor-pointer ${
+        className={`relative flex items-center justify-center w-[54px] h-[54px] rounded-[10px] cursor-pointer ${
           hasFolderImage
             ? isSelected
               ? 'shadow-[0px_3px_4px_0px_rgba(0,0,0,0.15)]'
@@ -66,13 +66,9 @@ export default function FolderItem({
                 onOpenFolderSetting(folder.id);
               }
             }}
-            className="absolute w-[14px] h-[14px] rounded-[40px] left-[40px] bottom-[39px] bg-[#555557] flex items-center justify-center cursor-pointer"
+            className="absolute left-[42px] bottom-[41px] cursor-pointer w-[18px] h-[18px]"
           >
-            <img
-              src={folderSetIcon}
-              alt="folder-setting-icon"
-              className="w-2 h-2 pointer-events-none"
-            />
+            <img src={folderSetIcon} alt="folder-setting-icon" className="pointer-events-none" />
           </div>
         )}
       </button>

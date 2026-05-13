@@ -60,11 +60,11 @@ export default function FolderList({
   };
 
   return (
-    <div className="flex gap-[10px] p-[28px] pt-0 overflow-x-auto no-scrollbar">
+    <div className="flex gap-[10px] p-[28px] pt-2 overflow-x-auto no-scrollbar">
       <div className="flex flex-col items-center gap-2 shrink-0" onClick={() => onSelect('all')}>
         <button
           type="button"
-          className={`flex items-center justify-center w-[50px] h-[50px] rounded-[10px] cursor-pointer ${
+          className={`flex items-center justify-center w-[54px] h-[54px] rounded-[10px] cursor-pointer ${
             selectedId === 'all' ? 'bg-black' : 'bg-white border-[#E6E7E9] border-[1.2px]'
           }`}
         >
@@ -84,7 +84,7 @@ export default function FolderList({
       <div className="flex flex-col items-center gap-2 shrink-0" onClick={() => onSelect('like')}>
         <button
           type="button"
-          className={`flex items-center justify-center w-[50px] h-[50px] rounded-[10px] cursor-pointer ${
+          className={`flex items-center justify-center w-[54px] h-[54px] rounded-[10px] cursor-pointer ${
             selectedId === 'like' ? 'bg-black' : 'bg-white border-[#E6E7E9] border-[1.2px]'
           }`}
         >
@@ -120,7 +120,7 @@ export default function FolderList({
         <div className="flex flex-col items-center gap-2 shrink-0" onClick={onFolderAdd}>
           <button
             type="button"
-            className="flex items-center justify-center w-[50px] h-[50px] bg-white border-[#E6E7E9] border-[1.2px] rounded-[10px] cursor-pointer"
+            className="flex items-center justify-center w-[54px] h-[54px] bg-white border-[#E6E7E9] border-[1.2px] rounded-[10px] cursor-pointer"
           >
             <img src={plusIcon} alt="plus-icon" />
           </button>
