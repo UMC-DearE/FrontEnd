@@ -260,11 +260,19 @@ export default function LetterBoxPage() {
     return counts;
   }, [query, searchedLetters, fromCounts]);
 
+  const isDefaultFolder = selectedFolderId === 'all' || selectedFolderId === 'like';
+
+  const selectedFolderName = useMemo(() => {
+    if (typeof selectedFolderId !== 'number') return '';
+    return folders.find((f) => f.id === selectedFolderId)?.name ?? '';
+  }, [folders, selectedFolderId]);
+
   const emptyMessage = useMemo(() => {
     if (query.trim()) return '검색 결과가 없어요.';
     if (selectedFromId !== 'all') return '필터링 결과가 없어요.';
-    return '추가된 편지가 없어요';
-  }, [query, selectedFromId]);
+    if (isDefaultFolder) return '추가된 편지가 없어요';
+    return '저장된 편지가 없어요';
+  }, [query, selectedFromId, isDefaultFolder]);
 
   return (
     <>
@@ -355,12 +363,29 @@ export default function LetterBoxPage() {
           ) : filteredLetters.length === 0 ? (
             <div className="flex flex-col py-[147px] text-center text-[#A1A4AA] text-[15px] justify-center items-center gap-4">
               {emptyMessage}
-              <button
-                onClick={() => navigate('/create')}
-                className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
-              >
-                편지 추가
-              </button>
+              {isDefaultFolder ? (
+                <button
+                  onClick={() => navigate('/create')}
+                  className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
+                >
+                  편지 추가
+                </button>
+              ) : (
+                !query.trim() &&
+                selectedFromId === 'all' && (
+                  <button
+                    onClick={() =>
+                      navigate('/letter/select', {
+                        state: { folderName: selectedFolderName },
+                      })
+                    }
+                    type="button"
+                    className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
+                  >
+                    폴더에 추가
+                  </button>
+                )
+              )}
             </div>
           ) : (
             filteredLetters.map((letter) => (

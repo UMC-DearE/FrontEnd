@@ -9,7 +9,8 @@ export type HeaderPresetKey =
   | 'MY_FROM'
   | 'MY_STYLE'
   | 'LETTER_DETAIL'
-  | 'EDIT_LETTER';
+  | 'EDIT_LETTER'
+  | 'LETTER_SELECT';
 
 export const ROUTE_META: Array<{
   match: (pathname: string) => boolean;
@@ -83,6 +84,13 @@ export const ROUTE_META: Array<{
     header: 'EDIT_LETTER',
     bg: 'white',
     hideHeader: true,
+  },
+
+  // 편지함 - 폴더에 편지 추가 선택
+  {
+    match: (pathname) => pathname === '/letter/select',
+    header: 'LETTER_SELECT',
+    bg: 'gray',
   },
 
   // 편지 상세

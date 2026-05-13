@@ -32,6 +32,9 @@ const LetterDetailHeader = lazy(
 const EditLetterHeader = lazy(
   () => import("@/components/header/EditLetterHeader")
 );
+const LetterSelectHeader = lazy(
+  () => import("@/components/header/LetterSelectHeader")
+);
 
 export type HeaderRenderContext = {
   title?: string;
@@ -58,7 +61,8 @@ export const HEADER_REGISTRY: Record<
   MY_STYLE: () => <MyStyleHeader />,
   LETTER_DETAIL: () => <LetterDetailHeader />,
   EDIT_LETTER: () => <EditLetterHeader />,
-  
+  LETTER_SELECT: () => <LetterSelectHeader />,
+
   NONE: null,
 };
 
