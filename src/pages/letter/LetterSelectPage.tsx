@@ -124,7 +124,7 @@ export default function LetterSelectPage() {
           type="button"
           disabled={selectedIds.size === 0 || isSubmitting || folderId == null}
           onClick={handleSubmit}
-          className="flex justify-center items-center w-full h-[50px] bg-[#FF5F2F] text-white rounded-xl font-bold text-[16px] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex justify-center items-center w-full h-[50px] bg-[#FF5F2F] text-white rounded-xl font-bold text-[16px] disabled:bg-[#E7E8EB] disabled:cursor-not-allowed"
         >
           추가하기 ({selectedIds.size})
         </button>
@@ -169,7 +169,6 @@ export default function LetterSelectPage() {
           </div>
         ))
       )}
-
     </div>
   );
 }
