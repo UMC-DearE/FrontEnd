@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
 import LetterCardSkeleton from '@/components/skeleton/LetterCardSkeleton';
@@ -7,7 +8,13 @@ import { getLetterLists } from '@/api/letter';
 import type { From } from '@/types/from';
 import type { Letter } from '@/types/letter';
 
+type LayoutContext = {
+  setFixedAction: (payload: { node: React.ReactNode; bgColor?: string } | null) => void;
+};
+
 export default function LetterSelectPage() {
+  const { setFixedAction } = useOutletContext<LayoutContext>();
+
   const [froms, setFroms] = useState<From[]>([]);
   const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
 
@@ -86,6 +93,24 @@ export default function LetterSelectPage() {
     return allLetters.filter((l) => l.from.fromId === selectedFromId);
   }, [allLetters, selectedFromId]);
 
+  useEffect(() => {
+    if (!setFixedAction) return;
+
+    setFixedAction({
+      node: (
+        <button
+          type="button"
+          disabled={selectedIds.size === 0}
+          className="flex justify-center items-center w-full h-[50px] bg-[#FF5F2F] text-white rounded-xl font-bold text-[16px] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          추가하기 ({selectedIds.size})
+        </button>
+      ),
+    });
+
+    return () => setFixedAction(null);
+  }, [setFixedAction, selectedIds]);
+
   return (
     <div className="flex flex-col gap-[10px] mb-3">
       <ToolBar
@@ -121,6 +146,7 @@ export default function LetterSelectPage() {
           </div>
         ))
       )}
+
     </div>
   );
 }

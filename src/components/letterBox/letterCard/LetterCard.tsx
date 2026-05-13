@@ -15,6 +15,7 @@ export type LetterCardProps = {
   mode?: LetterCardMode;
   selected?: boolean;
   onSelectToggle?: () => void;
+  onLikeToggle?: (nextLiked: boolean) => void;
 };
 
 export default function LetterCard({
@@ -28,6 +29,7 @@ export default function LetterCard({
   mode,
   selected,
   onSelectToggle,
+  onLikeToggle,
 }: LetterCardProps) {
   if (viewMode === '간편 보기') {
     return (
@@ -51,6 +53,7 @@ export default function LetterCard({
       mode={mode}
       selected={selected}
       onSelectToggle={onSelectToggle}
+      onLikeToggle={onLikeToggle}
     />
   );
 }

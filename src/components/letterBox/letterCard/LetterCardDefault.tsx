@@ -21,6 +21,7 @@ type LetterCardDefaultProps = {
   mode?: LetterCardMode;
   selected?: boolean;
   onSelectToggle?: () => void;
+  onLikeToggle?: (nextLiked: boolean) => void;
 };
 
 const safeColor = (v?: string, fallback = '#EDEDED') => {
@@ -72,6 +73,7 @@ export default function LetterCardDefault({
   mode = 'view',
   selected = false,
   onSelectToggle,
+  onLikeToggle,
 }: LetterCardDefaultProps) {
   const [liked, setLiked] = useState(isLiked);
   const [isTwoLine, setIsTwoLine] = useState(false);
@@ -94,8 +96,12 @@ export default function LetterCardDefault({
   const onClickLike = () => {
     const next = !liked;
     setLiked(next);
+    onLikeToggle?.(next);
     toggleLike.mutate(next, {
-      onError: () => setLiked((cur) => !cur),
+      onError: () => {
+        setLiked((cur) => !cur);
+        onLikeToggle?.(!next);
+      },
     });
   };
 
@@ -139,9 +145,9 @@ export default function LetterCardDefault({
               className="cursor-pointer disabled:opacity-50"
             >
               {liked ? (
-                <img src={heartOuline} className="w-4 h-[14px]" />
-              ) : (
                 <img src={heartFill} className="w-4 h-[14px]" />
+              ) : (
+                <img src={heartOuline} className="w-4 h-[14px]" />
               )}
             </button>
           )}

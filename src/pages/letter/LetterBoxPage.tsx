@@ -267,6 +267,22 @@ export default function LetterBoxPage() {
     return folders.find((f) => f.id === selectedFolderId)?.name ?? '';
   }, [folders, selectedFolderId]);
 
+  const handleLikeToggle = (letterId: number, nextLiked: boolean) => {
+    setAllLetters((prev) =>
+      prev.map((l) => (l.id === letterId ? { ...l, isLiked: nextLiked } : l))
+    );
+    setLetters((prev) => {
+      if (selectedFolderId === 'like' && !nextLiked) {
+        return prev.filter((l) => l.id !== letterId);
+      }
+      return prev.map((l) => (l.id === letterId ? { ...l, isLiked: nextLiked } : l));
+    });
+    if (selectedFolderId === 'like') {
+      setTotalElements((prev) => (nextLiked ? prev : Math.max(0, prev - 1)));
+      setAllCount((prev) => (nextLiked ? prev : Math.max(0, prev - 1)));
+    }
+  };
+
   const emptyMessage = useMemo(() => {
     if (query.trim()) return '검색 결과가 없어요.';
     if (selectedFromId !== 'all') return '필터링 결과가 없어요.';
@@ -403,6 +419,7 @@ export default function LetterBoxPage() {
                   receivedAt={letter.receivedAt}
                   from={letter.from}
                   searchQuery={query.trim() || undefined}
+                  onLikeToggle={(next) => handleLikeToggle(letter.id, next)}
                 />
               </div>
             ))
