@@ -118,6 +118,8 @@ export default function LetterSelectPage() {
   useEffect(() => {
     if (!setFixedAction) return;
 
+    const hasNoLetters = allLetters.length === 0;
+
     setFixedAction({
       node: (
         <button
@@ -126,13 +128,13 @@ export default function LetterSelectPage() {
           onClick={handleSubmit}
           className="flex justify-center items-center w-full h-[50px] bg-[#FF5F2F] text-white rounded-xl font-bold text-[16px] disabled:bg-[#E7E8EB] disabled:cursor-not-allowed"
         >
-          추가하기 ({selectedIds.size})
+          {hasNoLetters ? '추가하기' : `추가하기 (${selectedIds.size})`}
         </button>
       ),
     });
 
     return () => setFixedAction(null);
-  }, [setFixedAction, selectedIds, isSubmitting, folderId]);
+  }, [setFixedAction, selectedIds, isSubmitting, folderId, allLetters.length]);
 
   return (
     <div className="flex flex-col gap-[10px] mb-3">
@@ -151,6 +153,18 @@ export default function LetterSelectPage() {
           {Array.from({ length: 10 }).map((_, i) => (
             <LetterCardSkeleton key={i} viewMode="기본 보기" />
           ))}
+        </div>
+      ) : filteredLetters.length === 0 ? (
+        <div className="flex flex-col py-[147px] text-center text-[#A1A4AA] text-[15px] justify-center items-center gap-4">
+          추가할 편지가 없어요
+          {selectedFromId === 'all' && (
+            <button
+              onClick={() => navigate('/create')}
+              className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
+            >
+              편지 추가
+            </button>
+          )}
         </div>
       ) : (
         filteredLetters.map((letter) => (
