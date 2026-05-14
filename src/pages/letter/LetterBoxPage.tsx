@@ -371,7 +371,7 @@ export default function LetterBoxPage() {
           }}
         />
 
-        <div className="flex flex-col gap-[10px] mb-3">
+        <div className="flex flex-col gap-3 mb-3">
           <ToolBar
             folderTotalCount={displayCount}
             allCount={displayAllCount}
@@ -384,7 +384,7 @@ export default function LetterBoxPage() {
           />
 
           {isLettersLoading ? (
-            <div className="flex flex-col gap-[10px]">
+            <div className="flex flex-col gap-3">
               {Array.from({ length: 10 }).map((_, i) => (
                 <LetterCardSkeleton key={i} viewMode={viewMode} />
               ))}
