@@ -85,7 +85,7 @@ export default function LetterCreatePage() {
         <>
           <AddTypeTabs mode={mode} onChange={setMode} />
 
-          <div className="flex-1 mt-5">
+          <div className="flex-1 mt-[24px]">
             {mode === "IMAGE" ? (
               <ImageAddSection
                 images={images}

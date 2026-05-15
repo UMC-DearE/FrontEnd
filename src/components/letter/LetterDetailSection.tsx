@@ -69,7 +69,7 @@ function roundCanvas(source: HTMLCanvasElement, radius = 16) {
   ctx.closePath();
   ctx.clip();
 
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = "#FAFAFA";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(source, 0, 0);
 
@@ -136,7 +136,7 @@ export default function LetterDetailSection({
     const captureScale = Math.min(3, devicePixelRatio);
 
     const originalCanvas = await html2canvas(el, {
-      backgroundColor: "#ffffff",
+      backgroundColor: "#FAFAFA",
       scale: captureScale,
       useCORS: true,
       onclone: (doc) => {
@@ -176,8 +176,8 @@ export default function LetterDetailSection({
           try {
             if (ch.closest("[data-from-badge]")) continue;
 
-            ch.style.background = "#ffffff";
-            ch.style.backgroundColor = "#ffffff";
+            ch.style.background = "#FAFAFA";
+            ch.style.backgroundColor = "#FAFAFA";
             ch.style.backgroundImage = "none";
             ch.style.boxShadow = "none";
             (ch.style as any).webkitBoxShadow = "none";

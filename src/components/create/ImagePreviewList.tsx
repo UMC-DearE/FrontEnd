@@ -118,11 +118,11 @@ export default function ImagePreviewList({ images, setImages }: Props) {
           items={images.map((_, i) => i.toString())}
           strategy={horizontalListSortingStrategy}
         >
-          <div className="flex gap-2 mt-5 overflow-x-auto thin-scrollbar pb-1">
+          <div className="flex gap-2 mt-[24px] overflow-x-auto thin-scrollbar pb-1">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="w-[70px] h-[70px] border rounded-sm border-[#E6E7E9]
+              className="w-[76px] h-[76px] border-[2px] rounded-sm border-[#E7E8EB]
                          flex flex-col items-center justify-center
                          text-[#6C6C6C] shrink-0"
             >

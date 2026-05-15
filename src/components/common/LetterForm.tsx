@@ -33,22 +33,23 @@ export default function LetterForm({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { setFixedAction } = useOutletContext<LayoutContext>();
 
-  // 초기 OCR 텍스트 높이 자동 조절 및 내용 변경 시 높이 재조절(+ 최대 높이 초과 시 스크롤 생김)
-  const MAX_HEIGHT = 176;
+  const LINE_HEIGHT = 18;
+  const MAX_LINES = 15;
+  const PADDING_Y = 32;
+
+  const MAX_HEIGHT = LINE_HEIGHT * MAX_LINES + PADDING_Y;
 
   useLayoutEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
 
-    el.style.height = "auto";
+    el.style.height = 'auto';
 
-    if (el.scrollHeight > MAX_HEIGHT) {
-      el.style.height = `${MAX_HEIGHT}px`;
-      el.style.overflowY = "auto";
-    } else {
-      el.style.height = `${el.scrollHeight}px`;
-      el.style.overflowY = "hidden";
-    }
+    const nextHeight = Math.min(el.scrollHeight, MAX_HEIGHT);
+
+    el.style.height = `${nextHeight}px`;
+    el.style.overflowY =
+      el.scrollHeight > MAX_HEIGHT ? 'auto' : 'hidden';
   }, [content]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -82,7 +83,7 @@ export default function LetterForm({
           {mode === "edit" ? "수정 완료" : "편지 추가하기"}
         </BottomButton>
       ),
-      bgColor: '#FFFFFF',
+      bgColor: '#FAFAFA',
     });
 
     return () => {
@@ -102,25 +103,26 @@ export default function LetterForm({
             box-border
             border border-[#E6E7E9]
             rounded-xl
-            px-4 py-[14px]
+            px-4 py-4
             text-sm text-[#555557]
-            leading-relaxed
-            mb-6
+            leading-[18px]
+            mb-[24px]
             resize-none
-            overflow-y-hidden
+            overflow-y-auto
+            max-h-[320px]
             focus:ring-0
             focus:outline-none
             thin-scrollbar
           "
         />
       ) : (
-        <div className="border border-[#E6E7E9] rounded-xl px-4 py-[14px] text-sm leading-relaxed text-[#555557] mb-6 max-h-[176px] overflow-y-auto thin-scrollbar">
+        <div className="border border-[#E6E7E9] rounded-xl px-4 py-4 text-sm leading-[18px] text-[#555557] mb-6 max-h-[320px] overflow-y-auto thin-scrollbar">
           {content}
         </div>
       )}
 
-      <div className="mb-6">
-        <p className="text-base font-semibold text-primary mb-2">
+      <div className="mb-[24px]">
+        <p className="text-base font-semibold text-primary mb-[12px]">
           누구에게 받은 편지인가요?
         </p>
 
@@ -144,8 +146,8 @@ export default function LetterForm({
         </div>
       </div>
 
-      <div className="mb-6">
-        <p className="text-base font-semibold text-primary mb-2">
+      <div className="mb-[24px]">
+        <p className="text-base font-semibold text-primary mb-[12px]">
           언제 받은 편지인가요?
         </p>
 
@@ -189,19 +191,19 @@ export default function LetterForm({
         </div>
       </div>
 
-      <div className="mb-6">
-        <p className="text-base font-semibold text-primary mb-2">
-          AI 한 줄 요약
+      <div className="mb-[24px]">
+        <p className="text-base font-semibold text-primary mb-[12px]">
+          한 줄 요약
         </p>
-        <div className="flex items-center gap-2 bg-[#F7F7F7] rounded-xl p-4 text-sm text-[#555557] leading-relaxed">
+        <div className="flex items-center gap-3 bg-[#F7F8F9] rounded-xl px-[14px] py-[12px] text-sm text-[#585A5F] leading-relaxed">
           <img src={aiSummary} alt="" className="w-[19px] h-[19px]" />
           <p>{aiResult.summary}</p>
         </div>
       </div>
 
-      <div className="mb-8">
-        <p className="text-base font-semibold text-primary mb-2">
-          태그된 감정
+      <div className="mb-[40px]">
+        <p className="text-base font-semibold text-primary mb-[12px]">
+          수집된 감정
         </p>
         <div className="flex gap-2 flex-wrap">
           {aiResult.emotions.map((emotion) => (

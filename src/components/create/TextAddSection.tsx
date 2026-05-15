@@ -47,8 +47,8 @@ useEffect(() => {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="
-          w-full
-          border border-[#E6E7E9]
+          w-full h-[254px]
+          border-[2px] border-[#E6E7E9]
           rounded-xl
           p-4
           text-sm

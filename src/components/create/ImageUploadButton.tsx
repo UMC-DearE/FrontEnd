@@ -58,7 +58,7 @@ export default function ImageUploadButton({ setImages }: Props) {
     <>
       <button
         onClick={() => inputRef.current?.click()}
-        className="w-[120px] h-[32px] px-[7px] py-[5px] bg-[#555557] text-white rounded-lg text-xs font-medium"
+        className="w-[125px] h-[38px] px-[7px] py-[5px] text-[#585A5F] border-[1.2px] border-[#E7E8EB] rounded-lg text-sm font-medium"
       >
         이미지 업로드
       </button>
