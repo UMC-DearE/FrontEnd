@@ -14,7 +14,7 @@ export default function Dropdown({ value, onSelect }: DropdownProps) {
   useEffect(() => {}, [value]);
 
   return (
-    <div className="w-[126px] h-[91px] rounded-xl bg-white flex items-center justify-center shadow-[0_0_12px_0_#0000001A]">
+    <div className="w-[126px] h-[91px] rounded-xl bg-white flex items-center justify-center shadow-[0_0_4px_0_rgba(0,0,0,0.12)]">
       <div className="flex flex-col items-center gap-2">
         {options.map((option) => {
           const isSelected = value === option;

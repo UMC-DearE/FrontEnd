@@ -1,4 +1,4 @@
-import LetterCardDefault from './LetterCardDefault';
+import LetterCardDefault, { type LetterCardMode } from './LetterCardDefault';
 import LetterCardCompact from './LetterCardCompact';
 import type { From } from '@/types/from';
 
@@ -12,6 +12,10 @@ export type LetterCardProps = {
   from: From | null;
   viewMode: ViewMode;
   searchQuery?: string;
+  mode?: LetterCardMode;
+  selected?: boolean;
+  onSelectToggle?: () => void;
+  onLikeToggle?: (nextLiked: boolean) => void;
 };
 
 export default function LetterCard({
@@ -22,6 +26,10 @@ export default function LetterCard({
   receivedAt,
   from,
   searchQuery,
+  mode,
+  selected,
+  onSelectToggle,
+  onLikeToggle,
 }: LetterCardProps) {
   if (viewMode === '간편 보기') {
     return (
@@ -42,6 +50,10 @@ export default function LetterCard({
       receivedAt={receivedAt}
       from={from}
       searchQuery={searchQuery}
+      mode={mode}
+      selected={selected}
+      onSelectToggle={onSelectToggle}
+      onLikeToggle={onLikeToggle}
     />
   );
 }

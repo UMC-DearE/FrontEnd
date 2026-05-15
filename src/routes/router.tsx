@@ -32,6 +32,7 @@ import MyTermsPage from '@/pages/my/TermsPage';
 import PrivacyPage from '@/pages/my/PrivacyPage';
 import EditLetterPage from '@/pages/letter/EditLetterPage';
 import AuthGuard from '@/routes/AuthGuard';
+import LetterSelectPage from '@/pages/letter/LetterSelectPage';
 
 const router = createBrowserRouter([
   {
@@ -77,6 +78,7 @@ const router = createBrowserRouter([
                   { index: true, element: <LetterBoxPage /> },
                   { path: ':id', element: <LetterDetailPage /> },
                   { path: ':id/edit', element: <EditLetterPage /> },
+                  { path: 'select', element: <LetterSelectPage /> },
                 ],
               },
 

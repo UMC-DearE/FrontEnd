@@ -4,8 +4,12 @@ import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { useToggleLetterLike } from '@/hooks/mutations/useToggleLetterLike';
 import { FromBadge } from '@/components/common/FromBadge';
 import type { From } from '@/types/from';
-import HeartFilledIcon from '@/components/icons/HeartFilledIcon';
-import HeartOutlineIcon from '@/components/icons/HeartOutlineIcon';
+import heartOuline from '@/assets/letterPage/heart-outline.svg';
+import heartFill from '@/assets/letterPage/heart-filled.svg';
+import selectOutline from '@/assets/letter/select-outline.svg';
+import selectFilled from '@/assets/letter/select-filled.svg';
+
+export type LetterCardMode = 'view' | 'select';
 
 type LetterCardDefaultProps = {
   letterId: number;
@@ -14,6 +18,10 @@ type LetterCardDefaultProps = {
   receivedAt: string;
   from: From | null;
   searchQuery?: string;
+  mode?: LetterCardMode;
+  selected?: boolean;
+  onSelectToggle?: () => void;
+  onLikeToggle?: (nextLiked: boolean) => void;
 };
 
 const safeColor = (v?: string, fallback = '#EDEDED') => {
@@ -62,6 +70,10 @@ export default function LetterCardDefault({
   receivedAt,
   from,
   searchQuery,
+  mode = 'view',
+  selected = false,
+  onSelectToggle,
+  onLikeToggle,
 }: LetterCardDefaultProps) {
   const [liked, setLiked] = useState(isLiked);
   const [isTwoLine, setIsTwoLine] = useState(false);
@@ -84,8 +96,12 @@ export default function LetterCardDefault({
   const onClickLike = () => {
     const next = !liked;
     setLiked(next);
+    onLikeToggle?.(next);
     toggleLike.mutate(next, {
-      onError: () => setLiked((cur) => !cur),
+      onError: () => {
+        setLiked((cur) => !cur);
+        onLikeToggle?.(!next);
+      },
     });
   };
 
@@ -97,25 +113,44 @@ export default function LetterCardDefault({
   return (
     <div className="w-full shadow-[0_0_4px_0_rgba(217,217,217,0.5)] rounded-lg">
       <div
-        className={`rounded-lg bg-white px-3 py-3 ${isTwoLine ? 'h-[121px]' : 'h-[100px]'} flex flex-col`}
+        className={`rounded-lg bg-white px-4 py-[10px] ${isTwoLine ? 'h-[121px]' : 'h-[100px]'} flex flex-col`}
       >
         <div className="flex justify-between">
-          <div className="text-[#C2C4C7] font-medium text-[12px]">{displayDate}</div>
-          <button
-            type="button"
-            onClick={(e: MouseEvent<HTMLButtonElement>) => {
-              e.stopPropagation();
-              onClickLike();
-            }}
-            disabled={toggleLike.isPending}
-            className="w-[13px] h-4 cursor-pointer disabled:opacity-50"
-          >
-            {liked ? (
-              <HeartFilledIcon className="w-[14px] h-[15px]" />
-            ) : (
-              <HeartOutlineIcon className="w-[14px] h-[15px]" />
-            )}
-          </button>
+          <div className="mt-1 flex justify-start">
+            <FromBadge name={fromName} bgColor={bgColor} fontColor={fontColor} size="md" />
+          </div>
+          {mode === 'select' ? (
+            <button
+              type="button"
+              onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation();
+                onSelectToggle?.();
+              }}
+              className="w-[20px] h-[20px] cursor-pointer"
+            >
+              <img
+                src={selected ? selectFilled : selectOutline}
+                alt={selected ? 'selected' : 'unselected'}
+                className="w-[20px] h-[20px]"
+              />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation();
+                onClickLike();
+              }}
+              disabled={toggleLike.isPending}
+              className="cursor-pointer disabled:opacity-50"
+            >
+              {liked ? (
+                <img src={heartFill} className="w-4 h-[14px]" />
+              ) : (
+                <img src={heartOuline} className="w-4 h-[14px]" />
+              )}
+            </button>
+          )}
         </div>
 
         <div className="flex-1 flex items-center">
@@ -126,10 +161,7 @@ export default function LetterCardDefault({
             <HighlightText text={displayContent} query={searchQuery ?? ''} />
           </p>
         </div>
-
-        <div className="mt-1 flex justify-start">
-          <FromBadge name={fromName} bgColor={bgColor} fontColor={fontColor} size="md" />
-        </div>
+        <div className="text-[#C2C4C7] font-medium text-[12px]">{displayDate}</div>
       </div>
     </div>
   );
