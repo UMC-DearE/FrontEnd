@@ -37,6 +37,18 @@ export const ROUTE_META: Array<{
     title: '회원 가입',
     bg: 'white',
   },
+  {
+    match: (pathname) => pathname === '/auth/terms/service',
+    header: 'BACK_TITLE',
+    title: '서비스 이용 약관',
+    bg: 'white',
+  },
+  {
+    match: (pathname) => pathname === '/auth/terms/privacy',
+    header: 'BACK_TITLE',
+    title: '개인정보처리방침',
+    bg: 'white',
+  },
 
   // 홈
   {

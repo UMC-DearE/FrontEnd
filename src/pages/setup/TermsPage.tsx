@@ -141,7 +141,13 @@ export default function TermsPage() {
             onToggle={() => toggleOne(item.key)}
             title={item.title}
             required={item.required}
-            onView={() => {}}
+            onView={() =>
+            navigate(`/auth/terms/${item.key}`, {
+              state: {
+                title: metaMap[item.key]?.title,
+                content: metaMap[item.key]?.content,
+              },
+            })}
           />
         ))}
       </div>

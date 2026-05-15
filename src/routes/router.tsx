@@ -8,6 +8,8 @@ import LoginPage from '@/pages/onboarding/LoginPage';
 import OAuthCallbackPage from '@/pages/onboarding/OAuthCallbackPage';
 
 import TermsPage from '@/pages/setup/TermsPage';
+import ServicePage from '@/pages/setup/ServicePage';
+import PrivacyPage from '@/pages/setup/PrivacyPage';
 import SetNickamePage from '@/pages/setup/SetNicknamePage';
 
 import HomePage from '@/pages/home/HomePage';
@@ -28,8 +30,7 @@ import FromPage from '@/pages/my/FromPage';
 import FromCreatePage from '@/pages/my/FromCreatePage';
 import StylePage from '@/pages/my/StylePage';
 import ThemePage from '@/pages/my/ThemePage';
-import MyTermsPage from '@/pages/my/TermsPage';
-import PrivacyPage from '@/pages/my/PrivacyPage';
+// import PrivacyPage from '@/pages/my/PrivacyPage';
 import EditLetterPage from '@/pages/letter/EditLetterPage';
 import AuthGuard from '@/routes/AuthGuard';
 
@@ -49,6 +50,8 @@ const router = createBrowserRouter([
             path: 'auth',
             children: [
               { path: 'terms', element: <TermsPage /> },
+              { path: 'terms/service', element: <ServicePage /> },
+              { path: 'terms/privacy', element: <PrivacyPage /> },
               { path: 'signup', element: <SetNickamePage /> },
             ],
           },
@@ -97,8 +100,8 @@ const router = createBrowserRouter([
                   },
                   { path: 'style', element: <StylePage /> },
                   { path: 'theme', element: <ThemePage /> },
-                  { path: 'terms', element: <MyTermsPage /> },
-                  { path: 'privacy', element: <PrivacyPage /> },
+                  // { path: 'terms', element: <MyTermsPage /> },
+                  // { path: 'privacy', element: <PrivacyPage /> },
                 ],
               },
             ],
