@@ -6,8 +6,6 @@ export function termTypeToKey(type: string): TermsKey | null {
       return "service";
     case "PRIVACY":
       return "privacy";
-    case "MARKETING":
-      return "marketing";
     default:
       return null;
   }
