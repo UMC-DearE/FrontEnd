@@ -65,7 +65,7 @@ export function MyProfileSection({
             {isPlus && <PremiumBadge label="Plus" />}
           </div>
 
-          <p className="font-medium text-[12px] text-[#9D9D9F] mt-2">
+          <p className="font-medium text-[12px] text-[#A1A4AA] mt-2">
             프로필 수정
           </p>
         </div>
@@ -141,7 +141,7 @@ export default function MyhomePage() {
         isPlus={isPlus} 
         />
 
-        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#9D9D9F]">
+        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#A1A4AA]">
           설정
         </div>
 
@@ -155,7 +155,7 @@ export default function MyhomePage() {
 
           {isPlus ? (
             <div className="flex items-center gap-[9px]">
-              <span className="text-[12px] text-[#9D9D9F]">이용 중</span>
+              <span className="text-[12px] text-[#A1A4AA]">이용 중</span>
               <ChevronRightIcon />
             </div>
           ) : (
@@ -173,7 +173,7 @@ export default function MyhomePage() {
           <span className="font-medium text-[16px]">로그아웃</span>
         </button>
 
-        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#9D9D9F]">
+        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#A1A4AA]">
           테마
         </div>
         <button
@@ -190,7 +190,7 @@ export default function MyhomePage() {
 
           {isPlus ? (
             <div className="flex items-center gap-[9px]">
-              <span className="text-[12px] text-[#9D9D9F]">{FONT_LABEL[font]}</span>
+              <span className="text-[12px] text-[#A1A4AA]">{FONT_LABEL[font]}</span>
               <ChevronRightIcon />
             </div>
           ) : (
@@ -200,12 +200,12 @@ export default function MyhomePage() {
         <button className="w-full px-[22px] pt-[18px] pb-[17px] flex justify-between items-center border-b border-[#E6E7E9]">
           <span className="font-medium text-[16px]">화면</span>
           <div className="flex items-center gap-[9px]">
-            {isPlus && <span className="text-[12px] text-[#9D9D9F]">기본</span>}
+            {isPlus && <span className="text-[12px] text-[#A1A4AA]">기본</span>}
             <ChevronRightIcon />
           </div>
         </button>
 
-        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#9D9D9F]">
+        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#A1A4AA]">
           지원
         </div>
         <MenuItem label="서비스 이용약관" />

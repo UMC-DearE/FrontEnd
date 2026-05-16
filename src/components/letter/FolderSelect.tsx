@@ -33,14 +33,14 @@ export default function FolderSelect({
 
           <div className="max-h-[48vh] overflow-auto gap-[10px] flex flex-col no-scrollbar">
             {folders.length === 0 ? (
-              <div className="w-full text-center text-sm text-[#9D9D9F] py-6">
+              <div className="w-full text-center text-sm text-[#A1A4AA] py-6">
                 생성된 폴더가 없습니다
               </div>
             ) : (
               folders.map((f) => (
                 <button
                   key={f.id}
-                  className="w-full text-left h-[37px] bg-[#F4F5F6] px-4 rounded-lg text-sm font-medium text-[#555557]"
+                  className="w-full text-left h-[37px] bg-[#F4F5F6] px-4 rounded-lg text-sm font-medium text-[#585A5F]"
                   onClick={() => {
                     onSelect(f.id);
                     onClose();

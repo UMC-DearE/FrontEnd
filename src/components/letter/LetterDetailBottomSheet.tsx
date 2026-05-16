@@ -61,7 +61,7 @@ export default function LetterDetailBottomSheet({
           </button>
 
           <button
-            className="w-full text-lg font-medium text-[#FF1D0D]"
+            className="w-full text-lg font-medium text-[#FF143B]"
             onClick={() => setConfirmDelete(true)}
           >
             편지 삭제
@@ -90,7 +90,7 @@ export default function LetterDetailBottomSheet({
         <ConfirmModal
           open={confirmDelete}
           title="편지 삭제"
-          titleClassName="text-[#FF1D0D]"
+          titleClassName="text-[#FF143B]"
           description={"편지를 삭제할 경우 되돌릴 수 없어요\n정말 삭제할까요?"}
           cancelText="취소"
           confirmText="삭제"

@@ -181,7 +181,7 @@ export default function LetterDetailSection({
             ch.style.backgroundImage = "none";
             ch.style.boxShadow = "none";
             (ch.style as any).webkitBoxShadow = "none";
-            if (!ch.style.borderColor) ch.style.borderColor = "#E6E7E9";
+            if (!ch.style.borderColor) ch.style.borderColor = "#E7E8EB";
           } catch (e) {
           }
         }
@@ -256,9 +256,9 @@ export default function LetterDetailSection({
       <div
         ref={cardRef}
         data-letter-card
-        className="mb-6 rounded-xl border border-[#E6E7E9] bg-white p-4 text-sm text-[#555557] shadow-[0_0_6px_rgba(0,0,0,0.05)]"
+        className="mb-6 rounded-xl border border-[#E7E8EB] bg-white p-4 text-sm text-[#585A5F] shadow-[0_0_6px_rgba(0,0,0,0.05)]"
       >
-        <div className="mb-3 flex items-center justify-between border-b border-[#E6E7E9] pb-3">
+        <div className="mb-3 flex items-center justify-between border-b border-[#E7E8EB] pb-3">
           <FromBadge
             name={from.name}
             bgColor={from.bgColor}
@@ -299,7 +299,7 @@ export default function LetterDetailSection({
         </div>
 
         <div className="mt-2 flex justify-end">
-          <span className="text-xs font-medium text-[#9D9D9F]">
+          <span className="text-xs font-medium text-[#A1A4AA]">
             {displayReceivedAt}
           </span>
         </div>
@@ -315,7 +315,7 @@ export default function LetterDetailSection({
         </button>
 
         {openSummary && (
-          <div className="flex items-center gap-2 rounded-xl border border-[#E6E7E9] bg-white p-4 text-sm text-[#555557]">
+          <div className="flex items-center gap-2 rounded-xl border border-[#E7E8EB] bg-white p-4 text-sm text-[#585A5F]">
             <img src={aiSummary} alt="" className="w-[19px] h-[19px]" />
             <p>{aiResult.summary}</p>
           </div>
@@ -364,7 +364,7 @@ export default function LetterDetailSection({
                   setIsEditingReply(true);
                 }
               }}
-              className="rounded-xl border border-[#E6E7E9] bg-white px-4 py-[14px] text-sm text-[#555557]"
+              className="rounded-xl border border-[#E7E8EB] bg-white px-4 py-[14px] text-sm text-[#585A5F]"
             >
               {savedReply}
             </div>
@@ -387,7 +387,7 @@ export default function LetterDetailSection({
                     setReplyLoading(false);
                   }
                 }}
-                className="text-xs font-medium text-[#9D9D9F] cursor-pointer"
+                className="text-xs font-medium text-[#A1A4AA] cursor-pointer"
                 disabled={replyLoading || deleteReplyMutation.isPending}
               >
                 삭제
@@ -450,10 +450,10 @@ export default function LetterDetailSection({
               placeholder="답장을 적어보세요"
               className={`
                 w-full
-                border border-[#E6E7E9]
+                border border-[#E7E8EB]
                 rounded-xl px-4 py-[10px]
                 font-medium text-sm
-                bg-white text-primary placeholder-[#C2C4C7]
+                bg-white text-primary placeholder-[#CACBD1]
                 outline-none
                 resize-none
                 overflow-y-hidden
@@ -480,7 +480,7 @@ export default function LetterDetailSection({
                       setReplyLoading(false);
                     }
                   }}
-                  className="text-xs font-medium text-[#9D9D9F]"
+                  className="text-xs font-medium text-[#A1A4AA]"
                   disabled={replyLoading || deleteReplyMutation.isPending}
                 >
                   삭제

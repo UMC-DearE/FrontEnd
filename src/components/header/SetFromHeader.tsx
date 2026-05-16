@@ -16,7 +16,7 @@ export default function SetFromHeader() {
           <div className="flex items-center space-x-2 mr-2">
             <button
               type="button"
-              className="text-base font-normal text-[#555557]"
+              className="text-base font-normal text-[#585A5F]"
               aria-label="관리"
               onClick={() => navigate('/my/from')}
             >

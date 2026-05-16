@@ -23,7 +23,7 @@ function NavItem({ to, label, Icon }: NavItemProps) {
       to={to}
       className={({ isActive }) =>
         `flex-1 flex flex-col items-center gap-2 ${
-          isActive ? "text-primary" : "text-[#C2C4C7]"
+          isActive ? "text-primary" : "text-[#CACBD1]"
         }`
       }
     >
@@ -34,7 +34,7 @@ function NavItem({ to, label, Icon }: NavItemProps) {
           </div>
           <span
             className={`text-xs ${
-              isActive ? "font-medium text-primary" : "text-[#C2C4C7]"
+              isActive ? "font-medium text-primary" : "text-[#CACBD1]"
             }`}
           >
             {label}

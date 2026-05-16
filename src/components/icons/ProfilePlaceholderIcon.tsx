@@ -5,7 +5,7 @@ interface ProfilePlaceholderIconProps {
 
 export default function ProfilePlaceholderIcon({
   size = 32,
-  color = '#C2C4C7',
+  color = '#CACBD1',
 }: ProfilePlaceholderIconProps) {
   return (
     <svg

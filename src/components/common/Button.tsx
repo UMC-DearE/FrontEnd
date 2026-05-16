@@ -28,7 +28,7 @@ export function Button({
         transition-colors
         ${
           disabled
-            ? "bg-[#DCDCDCCC] text-[#9D9D9F]"
+            ? "bg-[#DCDCDCCC] text-[#A1A4AA]"
             : "bg-primary text-white"
         }
         disabled:cursor-not-allowed

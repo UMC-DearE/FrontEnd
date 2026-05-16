@@ -21,7 +21,7 @@ export function BottomButton({
         transition-all
         ${
           disabled
-            ? "bg-[#E6E7E9]"
+            ? "bg-[#E7E8EB]"
             : "bg-[#FF5F2F] cursor-pointer shadow-[0px_4px_10px_rgba(255,79,24,0.2)]"
         }
       `}

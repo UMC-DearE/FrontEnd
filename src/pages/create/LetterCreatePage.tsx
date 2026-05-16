@@ -103,7 +103,7 @@ export default function LetterCreatePage() {
             <div className="w-full max-w-[440px] bg-white px-4 pt-2 pb-[calc(52px+env(safe-area-inset-bottom))]">
               
               {mode === "TEXT" && (
-                <p className="text-sm text-[#9D9D9F] text-center mb-5 font-medium">
+                <p className="text-sm text-[#A1A4AA] text-center mb-5 font-medium">
                   편지는 한 번에 하나만 등록할 수 있어요
                 </p>
               )}

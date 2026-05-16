@@ -101,10 +101,10 @@ export default function LetterForm({
           onChange={handleChange}
           className="
             box-border
-            border border-[#E6E7E9]
+            border border-[#E7E8EB]
             rounded-xl
             px-4 py-4
-            text-sm text-[#555557]
+            text-sm text-[#585A5F]
             leading-[18px]
             mb-[24px]
             resize-none
@@ -116,7 +116,7 @@ export default function LetterForm({
           "
         />
       ) : (
-        <div className="border border-[#E6E7E9] rounded-xl px-4 py-4 text-sm leading-[18px] text-[#555557] mb-6 max-h-[320px] overflow-y-auto thin-scrollbar">
+        <div className="border border-[#E7E8EB] rounded-xl px-4 py-4 text-sm leading-[18px] text-[#585A5F] mb-6 max-h-[320px] overflow-y-auto thin-scrollbar">
           {content}
         </div>
       )}
@@ -129,7 +129,7 @@ export default function LetterForm({
         <div
           role="button"
           onClick={onSelectRecipient}
-          className="w-full h-[45px] border border-[#E6E7E9] rounded-xl px-4 text-sm font-medium flex items-center justify-between cursor-pointer"
+          className="w-full h-[45px] border border-[#E7E8EB] rounded-xl px-4 text-sm font-medium flex items-center justify-between cursor-pointer"
         >
           {from ? (
             <FromBadge
@@ -163,15 +163,15 @@ export default function LetterForm({
             disabled={unknownDate}
             className={`
               flex-1 h-[45px]
-              border border-[#E6E7E9]
+              border border-[#E7E8EB]
               rounded-xl px-4 text-sm font-medium
               outline-none
-              ${date ? "text-[#555557]" : "text-[#C7C7CC]"}
-              ${unknownDate ? "bg-[#F7F7F7]" : "bg-white"}
+              ${date ? "text-[#585A5F]" : "text-[#C7C7CC]"}
+              ${unknownDate ? "bg-[#F7F8F9]" : "bg-white"}
             `}
           />
 
-          <label className="flex items-center gap-2 text-sm font-medium text-[#555557]">
+          <label className="flex items-center gap-2 text-sm font-medium text-[#585A5F]">
             <input
               type="checkbox"
               checked={unknownDate}

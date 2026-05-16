@@ -38,7 +38,7 @@ useEffect(() => {
     <div className="relative">
       {!value && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none mb-13">
-          <div className="text-[#9D9D9F] text-sm font-medium">받은 편지를 복사 후 붙여넣기 하세요</div>
+          <div className="text-[#A1A4AA] text-sm font-medium">받은 편지를 복사 후 붙여넣기 하세요</div>
         </div>
       )}
 
@@ -48,7 +48,7 @@ useEffect(() => {
         onChange={(e) => onChange(e.target.value)}
         className="
           w-full h-[254px]
-          border-[2px] border-[#E6E7E9]
+          border-[2px] border-[#E7E8EB]
           rounded-xl
           p-4
           text-sm

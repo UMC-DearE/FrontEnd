@@ -124,7 +124,7 @@ export default function ImagePreviewList({ images, setImages }: Props) {
               onClick={() => inputRef.current?.click()}
               className="w-[76px] h-[76px] border-[2px] rounded-sm border-[#E7E8EB]
                          flex flex-col items-center justify-center
-                         text-[#6C6C6C] shrink-0"
+                         text-[#737478] shrink-0"
             >
               <img src={uploadImage} alt="upload" className="w-[25px] h-[19px] mb-2" />
               <div className="text-[11px] font-medium">

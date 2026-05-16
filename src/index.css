@@ -171,7 +171,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
   width: 20px;
   height: 20px;
   border-radius: 3px;
-  border: 1px solid #e6e7e9;
+  border: 1px solid #E7E8EB;
   display: inline-block;
   vertical-align: middle;
   position: relative;
