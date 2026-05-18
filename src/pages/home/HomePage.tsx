@@ -368,16 +368,24 @@ export default function HomePage() {
       window.matchMedia('(display-mode: standalone)').matches ||
       (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
 
-    const hideUntil = localStorage.getItem('hidePwaSheetUntil');
-
-    const isHidden = hideUntil && Number(hideUntil) > Date.now();
+    let isHidden = false;
+    try {
+      const hideUntil = localStorage.getItem('hidePwaSheetUntil');
+      isHidden = hideUntil !== null && Number(hideUntil) > Date.now();
+    } catch {
+      // localStorage 접근 불가 시 시트 표시
+    }
 
     return isIOS && isSafari && !isStandalone && !isHidden;
   });
 
   const handleClosePwaSheet = () => {
-    const hideUntil = Date.now() + 24 * 60 * 60 * 1000;
-    localStorage.setItem('hidePwaSheetUntil', String(hideUntil));
+    try {
+      const hideUntil = Date.now() + 24 * 60 * 60 * 1000;
+      localStorage.setItem('hidePwaSheetUntil', String(hideUntil));
+    } catch {
+      // localStorage 저장 실패 시 무시
+    }
     setShowPwaSheet(false);
   };
 
@@ -492,7 +500,7 @@ export default function HomePage() {
           <AddLetterButton />
         </div>
       )}
-      {showPwaSheet && <PwaRecommendSheet onClose={handleClosePwaSheet} />}{' '}
+      {showPwaSheet && <PwaRecommendSheet onClose={handleClosePwaSheet} />}
     </div>
   );
 }

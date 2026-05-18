@@ -27,7 +27,7 @@ export default function PwaRecommendSheet({ onClose }: PwaProps) {
       </div>
       <button
         onClick={onClose}
-        className="flex justify-center items-center text-[13px] font-medium text-[#CACBD1] gap-[28px] underline underline-[#CACBD1] underline-offset-3"
+        className="flex justify-center items-center w-full text-[13px] font-medium text-[#CACBD1] gap-[28px] underline decoration-[#CACBD1] underline-offset-3"
       >
         오늘은 이대로 볼게요
       </button>
