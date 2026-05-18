@@ -21,6 +21,7 @@ import { useDeleteSticker } from '@/hooks/mutations/useDeleteSticker';
 import { useMyMembership } from '@/hooks/queries/useMyMembership';
 import useToast from '@/hooks/useToast';
 import closeIcon from '@/assets/homePage/closeIcon.svg';
+import PwaRecommendSheet from '@/components/pwa/PwaRecommendSheet';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -356,6 +357,30 @@ export default function HomePage() {
     // 저장 버튼을 누를 때까지 서버에 반영하지 않음
   };
 
+  const [showPwaSheet, setShowPwaSheet] = useState(() => {
+    const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+
+    const isSafari =
+      /safari/i.test(window.navigator.userAgent) &&
+      !/chrome|android/i.test(window.navigator.userAgent);
+
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+
+    const hideUntil = localStorage.getItem('hidePwaSheetUntil');
+
+    const isHidden = hideUntil && Number(hideUntil) > Date.now();
+
+    return isIOS && isSafari && !isStandalone && !isHidden;
+  });
+
+  const handleClosePwaSheet = () => {
+    const hideUntil = Date.now() + 24 * 60 * 60 * 1000;
+    localStorage.setItem('hidePwaSheetUntil', String(hideUntil));
+    setShowPwaSheet(false);
+  };
+
   if (homeLoading || randomLoading) return <div>로딩 중...</div>;
   if (homeError || !home) return <div>에러</div>;
 
@@ -389,7 +414,6 @@ export default function HomePage() {
           </div>
         </div>
       )}
-
       <div className={openSheet ? 'relative' : 'relative z-40'}>
         <StickerLayer
           enabled={enabled}
@@ -409,14 +433,12 @@ export default function HomePage() {
           onCommit={onCommitSticker}
         />
       </div>
-
       <ProfileCard
         nickname={home.user.nickname}
         bio={home.user.intro}
         imgUrl={home.user.imgUrl}
         onClickSettings={openEditor}
       />
-
       <ProfileCustomSheet
         open={openSheet}
         bgColor={homeBgColor}
@@ -433,7 +455,6 @@ export default function HomePage() {
           }
         }}
       />
-
       {showResetSheet && (
         <CustomResetSheet
           onClose={() => setShowResetSheet(false)}
@@ -442,14 +463,12 @@ export default function HomePage() {
           onResetAll={handleResetAll}
         />
       )}
-
       <LetterCard
         letter={letter}
         isPinned={letter?.id === pinnedLetterId}
         onPin={handlePin}
         onRequestUnpin={handleRequestUnpin}
       />
-
       <ConfirmModal
         open={pendingUnpinId !== null}
         title="편지 고정 해제"
@@ -459,7 +478,6 @@ export default function HomePage() {
         onCancel={handleCancelUnpin}
         onConfirm={handleConfirmUnpin}
       />
-
       <ConfirmModal
         open={confirmCloseOpen}
         title="저장하지 않고 나갈까요?"
@@ -469,12 +487,12 @@ export default function HomePage() {
         onCancel={handleConfirmClose}
         onConfirm={handleCancelClose}
       />
-
       {!openSheet && (
         <div className="absolute bottom-[127px] right-4">
           <AddLetterButton />
         </div>
       )}
+      {showPwaSheet && <PwaRecommendSheet onClose={handleClosePwaSheet} />}{' '}
     </div>
   );
 }
