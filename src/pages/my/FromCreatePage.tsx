@@ -55,7 +55,7 @@ export default function FromCreatePage() {
         />
       </div>
 
-      <div className="mt-2">
+      <div className="mt-[26px]">
         <FromCreator
           onCreateImmediate={handleCreateImmediate}
           name={input}

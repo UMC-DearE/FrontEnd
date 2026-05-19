@@ -9,8 +9,9 @@ export default function RightButtonHeader({
 }): JSX.Element {
   return (
     <TopSection
+      left={<span style={{width: 24}} />}
       center={
-        <div className="flex items-center text-lg font-semibold leading-none text-primary">
+        <div className="text-lg font-semibold">
           {title}
         </div>
       }
