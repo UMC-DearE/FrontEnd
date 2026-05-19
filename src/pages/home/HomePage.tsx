@@ -381,7 +381,7 @@ export default function HomePage() {
 
   const handleClosePwaSheet = () => {
     try {
-      const hideUntil = Date.now() + 24 * 60 * 60 * 1000;
+      const hideUntil = Date.now() + 7 * 24 * 60 * 60 * 1000;
       localStorage.setItem('hidePwaSheetUntil', String(hideUntil));
     } catch {
       // localStorage 저장 실패 시 무시
