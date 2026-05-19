@@ -37,7 +37,6 @@ export default function LetterBoxPage() {
   const HEADER_SAFE_AREA = 'min(env(safe-area-inset-top, 0px), 32px)';
   const HEADER_HEIGHT = 78;
   const SEARCH_BAR_TOP = 34;
-  const CONTENT_GAP = 20;
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -343,7 +342,7 @@ export default function LetterBoxPage() {
 
       <div
         style={{
-          marginTop: `calc(${HEADER_SAFE_AREA} + ${HEADER_HEIGHT}px + ${CONTENT_GAP}px)`,
+          marginTop: `calc(${HEADER_SAFE_AREA} + ${HEADER_HEIGHT}px)`,
         }}
       >
         <FolderList
@@ -371,7 +370,7 @@ export default function LetterBoxPage() {
           }}
         />
 
-        <div className="flex flex-col gap-3 mb-3 pl-3">
+        <div className="flex flex-col gap-3 mb-3">
           <ToolBar
             folderTotalCount={displayCount}
             allCount={displayAllCount}

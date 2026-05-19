@@ -25,7 +25,7 @@ export default function AddLetterButton({ onClick }: AddLetterButtonProps) {
         <p className="text-[14px] font-semibold leading-none text-white whitespace-nowrap">
           편지 추가
         </p>
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white">
+        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FAFAFA]">
           <img src={plusIcon} alt="편지 추가" className="h-3 w-3" />
         </div>
       </div>
