@@ -233,21 +233,16 @@ export default function LetterDetailSection({
     };
   }, [setFixedAction, handleSaveCard]);
 
-  // receivedAt 포맷
   const displayReceivedAt = (() => {
-    if (receivedAt === null) return "-"; // null이면 -로 처리
+    if (receivedAt === null) return "-";
     if (!receivedAt) return receivedAt;
-    if (/^\d{4}\.\d{2}\.\d{2}$/.test(receivedAt)) return receivedAt;
-
-    const d = new Date(receivedAt);
-    if (!isNaN(d.getTime())) {
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const dd = String(d.getDate()).padStart(2, "0");
-      return `${y}.${m}.${dd}`;
-    }
-
-    return receivedAt.slice(0, 10).replace(/-/g, ".");
+    let value = receivedAt.replace(/\./g, "-");
+    const parts = value.split("-");
+    if (parts.length !== 3) return value;
+    const [year, month, day] = parts;
+    if (!year || !month || !day) return value;
+    if (year.length !== 4 || month.length !== 2 || day.length !== 2) return value;
+    return `${year.slice(2)}-${month}-${day}`;
   })();
 
 
