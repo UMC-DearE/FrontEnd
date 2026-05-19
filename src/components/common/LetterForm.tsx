@@ -33,27 +33,39 @@ export default function LetterForm({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { setFixedAction } = useOutletContext<LayoutContext>();
 
-  // 초기 OCR 텍스트 높이 자동 조절 및 내용 변경 시 높이 재조절(+ 최대 높이 초과 시 스크롤 생김)
-  const MAX_HEIGHT = 176;
+  const LINE_HEIGHT = 18;
+  const MAX_LINES = 15;
+  const PADDING_Y = 32;
+
+  const MAX_HEIGHT = LINE_HEIGHT * MAX_LINES + PADDING_Y;
 
   useLayoutEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
 
-    el.style.height = "auto";
+    el.style.height = 'auto';
 
-    if (el.scrollHeight > MAX_HEIGHT) {
-      el.style.height = `${MAX_HEIGHT}px`;
-      el.style.overflowY = "auto";
-    } else {
-      el.style.height = `${el.scrollHeight}px`;
-      el.style.overflowY = "hidden";
-    }
+    const nextHeight = Math.min(el.scrollHeight, MAX_HEIGHT);
+
+    el.style.height = `${nextHeight}px`;
+    el.style.overflowY =
+      el.scrollHeight > MAX_HEIGHT ? 'auto' : 'hidden';
   }, [content]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onContentChange?.(e.target.value);
   };
+  
+// 날짜 프리뷰 MM-YY-DD 형식
+const formatDatePreview = (value: string) => {
+  if (!value) return "";
+  const parts = value.split("-");
+  if (parts.length !== 3) return value;
+  const [year, month, day] = parts;
+  if (!year || !month || !day) return value;
+  if (year.length !== 4 || month.length !== 2 || day.length !== 2) return value;
+  return `${year.slice(2)}-${month}-${day}`;
+};
 
   // initialDate / initialUnknownDate가 바뀌면 내부 상태도 맞춰줌
   useEffect(() => {
@@ -100,34 +112,35 @@ export default function LetterForm({
           onChange={handleChange}
           className="
             box-border
-            border border-[#E6E7E9]
+            border border-[#E7E8EB]
             rounded-xl
-            px-4 py-[14px]
-            text-sm text-[#555557]
-            leading-relaxed
-            mb-6
+            px-4 py-4
+            text-sm text-[#585A5F]
+            leading-[18px]
+            mb-[24px]
             resize-none
-            overflow-y-hidden
+            overflow-y-auto
+            max-h-[320px]
             focus:ring-0
             focus:outline-none
             thin-scrollbar
           "
         />
       ) : (
-        <div className="border border-[#E6E7E9] rounded-xl px-4 py-[14px] text-sm leading-relaxed text-[#555557] mb-6 max-h-[176px] overflow-y-auto thin-scrollbar">
+        <div className="border border-[#E7E8EB] rounded-xl px-4 py-4 text-sm leading-[18px] text-[#585A5F] mb-6 max-h-[320px] overflow-y-auto thin-scrollbar">
           {content}
         </div>
       )}
 
-      <div className="mb-6">
-        <p className="text-base font-semibold text-primary mb-2">
+      <div className="mb-[24px]">
+        <p className="text-base font-semibold text-primary mb-[12px]">
           누구에게 받은 편지인가요?
         </p>
 
         <div
           role="button"
           onClick={onSelectRecipient}
-          className="w-full h-[45px] border border-[#E6E7E9] rounded-xl px-4 text-sm font-medium flex items-center justify-between cursor-pointer"
+          className="w-full h-[45px] border border-[#E7E8EB] rounded-xl px-4 text-sm font-medium flex items-center justify-between cursor-pointer"
         >
           {from ? (
             <FromBadge
@@ -144,32 +157,43 @@ export default function LetterForm({
         </div>
       </div>
 
-      <div className="mb-6">
-        <p className="text-base font-semibold text-primary mb-2">
+      <div className="mb-[24px]">
+        <p className="text-base font-semibold text-primary mb-[12px]">
           언제 받은 편지인가요?
         </p>
 
         <div className="flex items-center gap-4">
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => {
-              const next = e.target.value;
-              setDate(next);
-              onDateChange?.(next);
-            }}
-            disabled={unknownDate}
-            className={`
-              flex-1 h-[45px]
-              border border-[#E6E7E9]
-              rounded-xl px-4 text-sm font-medium
-              outline-none
-              ${date ? "text-[#555557]" : "text-[#C7C7CC]"}
-              ${unknownDate ? "bg-[#F7F7F7]" : "bg-white"}
-            `}
-          />
+          <div className="relative flex-1 h-[45px]">
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => {
+                const next = e.target.value; // 서버로 넘길 값: YYYY-MM-DD
+                setDate(next);
+                onDateChange?.(next);
+              }}
+              disabled={unknownDate}
+              className="
+                absolute inset-0 w-full h-full
+                opacity-0 cursor-pointer
+              "
+            />
 
-          <label className="flex items-center gap-2 text-sm font-medium text-[#555557]">
+            <div
+              className={`
+                w-full h-[45px]
+                border border-[#E7E8EB]
+                rounded-xl px-4 text-sm font-medium
+                flex items-center
+                ${date ? "text-[#585A5F]" : "text-[#C7C7CC]"}
+                ${unknownDate ? "bg-[#F7F8F9]" : "bg-[#FFFFFF]"}
+              `}
+            >
+              {date ? formatDatePreview(date) : "YY-MM-DD"}
+            </div>
+          </div>
+
+          <label className="flex items-center gap-2 text-sm font-medium text-[#585A5F]">
             <input
               type="checkbox"
               checked={unknownDate}
@@ -189,22 +213,22 @@ export default function LetterForm({
         </div>
       </div>
 
-      <div className="mb-6">
-        <p className="text-base font-semibold text-primary mb-2">
-          AI 한 줄 요약
+      <div className="mb-[24px]">
+        <p className="text-base font-semibold text-primary mb-[12px]">
+          한 줄 요약
         </p>
-        <div className="flex items-center gap-2 bg-[#F7F7F7] rounded-xl p-4 text-sm text-[#555557] leading-relaxed">
+        <div className="flex items-center gap-3 bg-[#F7F8F9] rounded-xl px-[14px] py-[12px] text-sm text-[#585A5F] leading-relaxed">
           <img src={aiSummary} alt="" className="w-[19px] h-[19px]" />
           <p>{aiResult.summary}</p>
         </div>
       </div>
 
-      <div className="mb-8">
-        <p className="text-base font-semibold text-primary mb-2">
-          태그된 감정
+      <div className="mb-[80px]">
+        <p className="text-base font-semibold text-primary mb-[12px]">
+          수집된 감정
         </p>
         <div className="flex gap-2 flex-wrap">
-          {aiResult.emotions.map((emotion) => (
+          {aiResult.emotions.map((emotion) => (                                                         
             <EmotionTag
               key={emotion.emotionId}
               label={emotion.emotionName}

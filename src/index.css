@@ -3,12 +3,12 @@
 @theme {
   --header-height: 105px;
 
-  --color-primary: #141517;
-  --color-secondary: #555557;
+  --color-primary: #121212;
+  --color-secondary: #585A5F;
 
-  --color-orange-point: #ff5f2f;
-  --color-red: #ff1d0d;
-  --color-white: #ffffff;
+  --color-orange-point: #FF5F2F;
+  --color-red: #FF143B;
+  --color-white: #FFFFFF;
 }
 
 @font-face {
@@ -171,7 +171,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
   width: 20px;
   height: 20px;
   border-radius: 3px;
-  border: 1px solid #e6e7e9;
+  border: 1px solid #E7E8EB;
   display: inline-block;
   vertical-align: middle;
   position: relative;

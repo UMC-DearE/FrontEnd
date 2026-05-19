@@ -24,7 +24,7 @@ export default function ConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="relative flex w-full max-w-[440px] min-h-screen items-center justify-center bg-black/40">
-        <div className="w-[294px] rounded-[17px] bg-white px-[18px] pt-[26px] pb-[20px]">
+        <div className="w-[294px] rounded-[17px] bg-white px-[18px] pt-[26px] pb-[20px] shadow-[0_0_12px_0_rgba(0,0,0,0.10)]">
           <div className="flex flex-col gap-[20px]">
             <div className="flex flex-col items-center gap-2">
               <p
@@ -33,7 +33,7 @@ export default function ConfirmModal({
                 {title}
               </p>
               {description ? (
-                <div className="text-center text-xs font-medium text-[#9D9D9F]">
+                <div className="text-center text-xs font-medium text-[#A1A4AA]">
                   {description
                     .split(/\r?\n/)
                     .map((line) => line.trim())
@@ -50,7 +50,7 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onCancel}
-                className="h-[38px] w-[122px] rounded-lg border border-[#E5E5E5] text-sm font-normal text-[#555557]"
+                className="h-[38px] w-[122px] rounded-lg border border-[#E5E5E5] text-sm font-normal text-[#585A5F]"
               >
                 {cancelText}
               </button>

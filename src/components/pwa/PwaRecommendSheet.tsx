@@ -12,7 +12,7 @@ export default function PwaRecommendSheet({ onClose }: PwaProps) {
         className="relative w-full max-w-[440px] min-h-screen bg-black/40 overflow-hidden cursor-pointer"
         onClick={onClose}
       />
-      <div className="pointer-events-auto fixed bottom-0 left-1/2 w-full max-w-[440px] -translate-x-1/2 h-[284px] bg-[#FFFFFF] rounded-t-[17px]">
+      <div className="pointer-events-auto fixed bottom-0 left-1/2 w-full max-w-[440px] -translate-x-1/2 h-[284px] bg-[#FFFFFF] rounded-t-[17px] shadow-[0_0_12px_0_rgba(0,0,0,0.10)]">
         <div className="flex flex-col items-center justify-center px-[89px] py-[30px] text-[14px] font-medium">
           <img src={deareIcon} alt="deare-icon" className="w-[60px] h-[60px]" />
 

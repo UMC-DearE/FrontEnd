@@ -60,12 +60,12 @@ export function InputField({
           w-full h-[50px]
           rounded-xl px-[12px] py-[15px]
           text-base font-medium text-primary
-          border border-[#C2C4C7]
-          placeholder:text-[#C2C4C7]
+          border-[1.2px] border-[#CACBD1]
+          placeholder:text-[#CACBD1]
           focus:outline-none focus:ring-0 focus:border-primary
           overflow-x-auto whitespace-nowrap
         ` +
-            (useGrayWhenBlurred && !isFocused ? " bg-[#F7F7F7]" : " bg-white") +
+            (useGrayWhenBlurred && !isFocused ? " bg-[#F7F8F9]" : " bg-white") +
             (inputClassName ? ` ${inputClassName}` : "")
         }
       />
@@ -73,7 +73,7 @@ export function InputField({
       {rightElement && (
         <div
           ref={rightRef}
-          className="absolute right-[12px] top-1/2 -translate-y-1/2"
+          className="absolute right-[12px] top-[25px] -translate-y-1/2 flex items-center justify-center"
         >
           {rightElement}
         </div>

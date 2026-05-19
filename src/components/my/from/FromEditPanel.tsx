@@ -47,8 +47,8 @@ export default function FromEditPanel({ from, onCancel, onSave, onDelete, fromIn
   };
 
   return (
-    <div className="border border-[#E6E7E9] rounded-xl p-4 bg-white mb-4">
-      <div className="text-xs font-medium text-[#555557] mb-2">
+    <div className="border border-[#E7E8EB] rounded-xl p-4 bg-white mb-4">
+      <div className="text-xs font-medium text-[#585A5F] mb-2">
         이름 수정
       </div>
 
@@ -56,10 +56,10 @@ export default function FromEditPanel({ from, onCancel, onSave, onDelete, fromIn
         value={name}
         onChange={(e) => setName(e.target.value)}
         maxLength={7}
-        className="w-full h-[45px] border border-[#E6E7E9] rounded-xl px-4 text-sm mb-5 outline-none focus:ring-1 focus:ring-primary"
+        className="w-full h-[45px] border border-[#E7E8EB] rounded-xl px-4 text-sm mb-5 outline-none focus:ring-1 focus:ring-primary"
       />
 
-      <div className="text-xs font-medium text-[#9D9D9F] mb-2">
+      <div className="text-xs font-medium text-[#A1A4AA] mb-2">
         색상 선택
       </div>
 
@@ -116,14 +116,14 @@ export default function FromEditPanel({ from, onCancel, onSave, onDelete, fromIn
           name={name || '이름'}
           bgColor={selectedColor}
           fontColor={getHarmoniousTextColor(selectedColor)}
-          size="sm"
+          size="md"
         />
       </div>
 
       <div className="flex justify-between">
         <button
           onClick={() => setShowConfirm(true)}
-          className="text-xs font-medium text-[#FF1D0D] underline"
+          className="text-xs font-medium text-[#FF143B] underline"
         >
           삭제하기
         </button>
@@ -131,7 +131,7 @@ export default function FromEditPanel({ from, onCancel, onSave, onDelete, fromIn
       <div className="flex justify-end gap-[10px]">
         <button
           onClick={onCancel}
-          className="w-[44px] h-[25px] px-[11px] py-[5px] text-xs font-medium rounded-lg bg-[#E6E7E9] text-primary"
+          className="w-[44px] h-[25px] px-[11px] py-[5px] text-xs font-medium rounded-lg bg-[#E7E8EB] text-primary"
         >
           취소
         </button>
@@ -150,7 +150,7 @@ export default function FromEditPanel({ from, onCancel, onSave, onDelete, fromIn
         confirmText='확인'
         onCancel={() => setShowConfirm(false)}
         onConfirm={handleDeleteConfirm}
-        titleClassName="text-[#FF1D0D]"
+        titleClassName="text-[#FF143B]"
       />
       </div>
     </div>

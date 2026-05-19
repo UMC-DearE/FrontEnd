@@ -12,7 +12,7 @@ const TABS: { key: AddMode; label: string }[] = [
 
 export default function AddModeTabs({ mode, onChange }: Props) {
   return (
-    <div className="flex bg-[#F7F7F7] rounded-full w-[190px] h-[32px] m-auto mt-3">
+    <div className="flex bg-[#F7F8F9] rounded-full w-[190px] h-[32px] m-auto mt-3">
       {TABS.map((tab) => (
         <button
           key={tab.key}
@@ -21,7 +21,7 @@ export default function AddModeTabs({ mode, onChange }: Props) {
           className={`flex-1 px-[12px] py-[8px] rounded-full text-[13px] font-semibold transition ${
             mode === tab.key
               ? "bg-primary text-white"
-              : "text-[#C2C4C7]"
+              : "text-[#CACBD1]"
           }`}
         >
           {tab.label}

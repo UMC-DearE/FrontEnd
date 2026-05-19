@@ -107,8 +107,15 @@ export default function LetterCardDefault({
 
   const bgColor = safeColor(from?.bgColor, '#EDEDED');
   const fontColor = safeColor(from?.fontColor, '#555557');
+
   const fromName = from?.name ?? '-';
-  const displayDate = receivedAt && receivedAt.trim().length > 0 ? receivedAt : '-';
+  const formatDate = (value: string) => {
+    const match = value.match(/^\d{4}-\d{2}-\d{2}/);
+    if (!match) return value;
+    return match[0].slice(2).replace(/-/g, '.');
+  };
+  const displayDate =
+    receivedAt && receivedAt.trim().length > 0 ? formatDate(receivedAt.trim()) : '-';
 
   return (
     <div className="w-full shadow-[0_0_4px_0_rgba(217,217,217,0.5)] rounded-lg">

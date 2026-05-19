@@ -16,7 +16,7 @@ export default function ChevronRightIcon({
     >
       <path
         d="M1 1L4 5L1 9"
-        stroke="#6C6C6C"
+        stroke="#737478"
         strokeWidth="1.2"
         strokeLinecap="round"
         strokeLinejoin="round"

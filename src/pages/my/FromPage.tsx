@@ -35,7 +35,7 @@ export default function FromPage() {
 
   if (isLoading) {
     return (
-      <div className="w-full text-center text-sm text-[#9D9D9F] py-6">
+      <div className="w-full text-center text-sm text-[#A1A4AA] py-6">
         불러오는 중...
       </div>
     );
@@ -44,7 +44,7 @@ export default function FromPage() {
   return (
     <div className="flex flex-col gap-4 mt-1 mb-4">
       {fromList.length === 0 ? (
-        <div className="w-full text-center text-sm text-[#9D9D9F] py-6">
+        <div className="w-full text-center text-sm text-[#A1A4AA] py-6">
           저장된 목록이 없어요
         </div>
       ) : (
@@ -80,21 +80,21 @@ export default function FromPage() {
                 }}
               />
             ) : (
-              <div className="flex items-center justify-between border border-[#E6E7E9] rounded-xl p-4 bg-white">
+              <div className="flex items-center justify-between border border-[#E7E8EB] rounded-xl p-4 bg-white">
                 <div className="flex items-center gap-3">
                   <FromBadge
                     name={from.name}
                     bgColor={from.bgColor}
                     fontColor={from.fontColor}
                   />
-                  <div className="flex items-center text-xs font-medium text-[#9D9D9F]">
+                  <div className="flex items-center text-xs font-medium text-[#A1A4AA]">
                     {from.letterCount ?? 0}통의 편지
                   </div>
                 </div>
 
                 <button
                   onClick={() => setEditingFromId(from.fromId)}
-                  className="text-sm font-normal text-[#9D9D9F] border border-[#C2C4C7] rounded-lg px-[10px] py-[2px]"
+                  className="text-sm font-normal text-[#A1A4AA] border border-[#CACBD1] rounded-lg px-[10px] py-[2px]"
                 >
                   수정
                 </button>

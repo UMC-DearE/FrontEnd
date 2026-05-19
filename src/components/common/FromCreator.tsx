@@ -52,10 +52,9 @@ export default function CreateFrom({
   };
 
   return (
-    <div className="mt-4 p-4">
+    <div className="mt-4">
       <div className="flex mb-4 gap-2">
-        <div className="text-sm font-medium text-primary">새로운 From 추가</div>
-        <div className="text-sm font-medium text-[#9D9D9F]">(색상 선택)</div>
+        <div className="text-sm font-medium text-[#A1A4AA]">색상 선택</div>
       </div>
 
       <div className="relative flex gap-3 mb-6 mt-4">
@@ -63,7 +62,7 @@ export default function CreateFrom({
           <button
             key={c}
             onClick={() => setSelectedColor(c)}
-            className={`w-[32px] h-[32px] rounded-full transition-all ${
+            className={`w-[36px] h-[36px] rounded-full transition-all ${
               selectedColor === c ? 'scale-100 shadow-[0_0_8px_rgba(0,0,0,0.2)]' : 'shadow-none'
             }`}
             style={{ background: c }}
@@ -72,9 +71,9 @@ export default function CreateFrom({
 
         <button
           onClick={() => setShowPicker((s) => !s)}
-          className="w-[32px] h-[32px] rounded-full flex items-center justify-center"
+          className="w-[36px] h-[36px] rounded-full flex items-center justify-center"
         >
-          <img src={ColorPicker} alt="upload" className="w-[32px] h-[32px]" />
+          <img src={ColorPicker} alt="upload" className="w-[36px] h-[36px]" />
         </button>
 
         {showPicker && (
@@ -103,10 +102,10 @@ export default function CreateFrom({
         )}
       </div>
 
-      <button onClick={handleCreate} className="flex items-center gap-2 font-medium text-lg text-primary" disabled={disabled}>
+      <button onClick={handleCreate} className="flex items-center gap-2 font-normal text-lg text-primary" disabled={disabled}>
         <img src={Plusbtn} alt="upload" />
-        <FromBadge name={name || '이름'} bgColor={selectedColor} fontColor={getHarmoniousTextColor(selectedColor)} />
-        생성하기
+        <FromBadge size="xl" name={name || '이름'} bgColor={selectedColor} fontColor={getHarmoniousTextColor(selectedColor)} />
+        추가하기
       </button>
     </div>
   );
