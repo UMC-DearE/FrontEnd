@@ -23,7 +23,6 @@ export default function CreateFrom({
   name,
   onNameChange,
   disabled,
-  fromCount,
 }: Props) {
   const [selectedColor, setSelectedColor] = useState('#FEEFEF');
   const [showPicker, setShowPicker] = useState(false);
@@ -62,8 +61,8 @@ export default function CreateFrom({
           <button
             key={c}
             onClick={() => setSelectedColor(c)}
-            className={`w-[36px] h-[36px] rounded-full transition-all ${
-              selectedColor === c ? 'scale-100 shadow-[0_0_8px_rgba(0,0,0,0.2)]' : 'shadow-none'
+            className={`w-[36px] h-[36px] rounded-full transition-all border-[1.2px] ${
+              selectedColor === c ? 'border-primary' : 'border-transparent'
             }`}
             style={{ background: c }}
           />
@@ -78,9 +77,7 @@ export default function CreateFrom({
 
         {showPicker && (
         <div
-          className={`absolute left-6/8 -translate-x-1/2 z-40 ${
-            fromCount && fromCount >= 4 ? 'bottom-full mb-3' : 'top-full mt-3'
-          }`}
+          className="absolute left-6/8 -translate-x-1/2 z-40 top-full mt-3"
         >
           <div className="bg-white rounded-lg p-3 shadow-lg">
               <HexColorPicker color={selectedColor} onChange={(c) => setSelectedColor(c)} />
