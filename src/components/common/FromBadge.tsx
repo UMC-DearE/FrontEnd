@@ -11,7 +11,7 @@ export function FromBadge({ name, bgColor, fontColor, size = 'md' }: FromBadgePr
   const outerClass =
     size === 'sm'
       ? 'inline-flex h-[20px] px-[8px] rounded-[6px]'
-      : 'inline-flex px-[12px] py-[5px] rounded-[6px]';
+      : 'inline-flex items-center justify-center min-w-[47px] h-[26px] px-[12px] rounded-[6px]';
   const textClass =
     size === 'sm'
       ? 'flex items-center text-[12px] font-medium'

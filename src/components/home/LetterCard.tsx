@@ -32,9 +32,9 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
   };
 
   return (
-    <div className="relative mt-5 flex w-full max-w-[440px] min-h-[97px] items-center rounded-[10px] bg-[#FAFAFA] shadow-[0_0_4px_0_rgba(0,0,0,0.12)]">
+    <div className="relative mt-5 flex w-full max-w-[440px] min-h-[97px] items-center rounded-[10px] bg-white shadow-[0_0_4px_0_rgba(0,0,0,0.12)]">
       {/* 날짜 뱃지 */}
-      <div className="mx-3 flex h-[57px] w-[47px] shrink-0 flex-col items-center justify-center rounded-[10px] bg-[#FF4F181A]">
+      <div className="mx-3 flex h-[57px] w-[47px] shrink-0 flex-col items-center justify-center rounded-[10px] bg-[#FF4F18]/10">
         <p className="text-[10px] font-medium text-[#FF5F2F]">{letter?.month ?? ''}</p>
         <p className="text-[15px] font-bold text-[#FF5F2F]">{letter?.day ?? ''}</p>
         <p className="text-[12px] font-medium text-[#FF5F2F]">{letter?.dayOfWeek ?? ''}</p>
@@ -49,7 +49,7 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
             하단 편지 추가 버튼을 눌러 편지를 추가해 보세요!
           </p>
         ) : (
-          <p className="line-clamp-2 break-all font-medium text-[#555557]">{letter.excerpt}</p>
+          <p className="line-clamp-2 break-all font-medium text-[#585A5F]">{letter.excerpt}</p>
         )}
       </div>
 
