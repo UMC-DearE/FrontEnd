@@ -52,7 +52,9 @@ export default function ToolBar({
   return (
     <>
       <div className="relative flex max-w-[440px] h-[25px] gap-[30px] items-center justify-between">
-        <div className="text-[16px] font-semibold text-[#141517]">총 {folderTotalCount}통</div>
+        <div className="text-[16px] font-medium text-[#141517]">
+          총 <span className="font-semibold">{folderTotalCount}</span>통
+        </div>
 
         <div className="relative flex items-center">
           <button

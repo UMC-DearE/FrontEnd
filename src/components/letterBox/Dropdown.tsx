@@ -30,7 +30,7 @@ export default function Dropdown({ value, onSelect }: DropdownProps) {
             >
               <p
                 className={`text-[14px] font-semibold ${
-                  isSelected ? 'text-[#FF5F2F]' : 'text-[#9D9D9F]'
+                  isSelected ? 'text-[#FF5F2F]' : 'text-[#A1A4AA]'
                 }`}
               >
                 {option}
