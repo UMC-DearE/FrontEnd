@@ -7,7 +7,7 @@ import type { Folder } from '@/types/folder';
 import type { Letter } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   getFolderList,
   deleteFolder,
@@ -27,6 +27,8 @@ import LetterCardSkeleton from '@/components/skeleton/LetterCardSkeleton';
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
 
+type LocationState = { selectedFolderId?: FolderSelectId } | null;
+
 const VIEW_MODE_KEY = 'letterbox:viewMode';
 
 const isViewMode = (v: unknown): v is ViewMode => v === '기본 보기' || v === '간편 보기';
@@ -37,9 +39,20 @@ export default function LetterBoxPage() {
   const SEARCH_BAR_TOP = 34;
   const CONTENT_GAP = 20;
 
-  const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>('all');
-  const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
   const navigate = useNavigate();
+  const location = useLocation();
+  const initialFolderId = (location.state as LocationState)?.selectedFolderId ?? 'all';
+
+  const [selectedFolderId, setSelectedFolderId] = useState<FolderSelectId>(initialFolderId);
+  const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
+
+  useEffect(() => {
+    const next = (location.state as LocationState)?.selectedFolderId;
+    if (next != null) {
+      setSelectedFolderId(next);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
 
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const saved = localStorage.getItem(VIEW_MODE_KEY);
@@ -260,11 +273,35 @@ export default function LetterBoxPage() {
     return counts;
   }, [query, searchedLetters, fromCounts]);
 
+  const isDefaultFolder = selectedFolderId === 'all' || selectedFolderId === 'like';
+
+  const selectedFolderName = useMemo(() => {
+    if (typeof selectedFolderId !== 'number') return '';
+    return folders.find((f) => f.id === selectedFolderId)?.name ?? '';
+  }, [folders, selectedFolderId]);
+
+  const handleLikeToggle = (letterId: number, nextLiked: boolean) => {
+    setAllLetters((prev) =>
+      prev.map((l) => (l.id === letterId ? { ...l, isLiked: nextLiked } : l))
+    );
+    setLetters((prev) => {
+      if (selectedFolderId === 'like' && !nextLiked) {
+        return prev.filter((l) => l.id !== letterId);
+      }
+      return prev.map((l) => (l.id === letterId ? { ...l, isLiked: nextLiked } : l));
+    });
+    if (selectedFolderId === 'like') {
+      setTotalElements((prev) => (nextLiked ? prev : Math.max(0, prev - 1)));
+      setAllCount((prev) => (nextLiked ? prev : Math.max(0, prev - 1)));
+    }
+  };
+
   const emptyMessage = useMemo(() => {
     if (query.trim()) return '검색 결과가 없어요.';
     if (selectedFromId !== 'all') return '필터링 결과가 없어요.';
-    return '추가된 편지가 없어요';
-  }, [query, selectedFromId]);
+    if (isDefaultFolder) return '추가된 편지가 없어요';
+    return '저장된 편지가 없어요';
+  }, [query, selectedFromId, isDefaultFolder]);
 
   return (
     <>
@@ -334,7 +371,7 @@ export default function LetterBoxPage() {
           }}
         />
 
-        <div className="flex flex-col gap-[10px] mb-3">
+        <div className="flex flex-col gap-3 mb-3 pl-3">
           <ToolBar
             folderTotalCount={displayCount}
             allCount={displayAllCount}
@@ -347,7 +384,7 @@ export default function LetterBoxPage() {
           />
 
           {isLettersLoading ? (
-            <div className="flex flex-col gap-[10px]">
+            <div className="flex flex-col gap-3">
               {Array.from({ length: 10 }).map((_, i) => (
                 <LetterCardSkeleton key={i} viewMode={viewMode} />
               ))}
@@ -355,12 +392,32 @@ export default function LetterBoxPage() {
           ) : filteredLetters.length === 0 ? (
             <div className="flex flex-col py-[147px] text-center text-[#A1A4AA] text-[15px] justify-center items-center gap-4">
               {emptyMessage}
-              <button
-                onClick={() => navigate('/create')}
-                className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
-              >
-                편지 추가
-              </button>
+              {isDefaultFolder ? (
+                <button
+                  onClick={() => navigate('/create')}
+                  className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
+                >
+                  편지 추가
+                </button>
+              ) : (
+                !query.trim() &&
+                selectedFromId === 'all' && (
+                  <button
+                    onClick={() =>
+                      navigate('/letter/select', {
+                        state: {
+                          folderId: selectedFolderId,
+                          folderName: selectedFolderName,
+                        },
+                      })
+                    }
+                    type="button"
+                    className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
+                  >
+                    폴더에 추가
+                  </button>
+                )
+              )}
             </div>
           ) : (
             filteredLetters.map((letter) => (
@@ -378,6 +435,7 @@ export default function LetterBoxPage() {
                   receivedAt={letter.receivedAt}
                   from={letter.from}
                   searchQuery={query.trim() || undefined}
+                  onLikeToggle={(next) => handleLikeToggle(letter.id, next)}
                 />
               </div>
             ))
