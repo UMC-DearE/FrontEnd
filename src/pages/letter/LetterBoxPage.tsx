@@ -371,7 +371,7 @@ export default function LetterBoxPage() {
           }}
         />
 
-        <div className="flex flex-col gap-3 mb-3 pl-3">
+        <div className="flex flex-col gap-3 mb-3">
           <ToolBar
             folderTotalCount={displayCount}
             allCount={displayAllCount}
