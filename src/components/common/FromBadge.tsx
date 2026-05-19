@@ -4,22 +4,41 @@ interface FromBadgeProps {
   name: string;
   bgColor: string;
   fontColor: string;
-  size?: 'sm' | 'md';
+  size?: 'md' | 'lg' | 'xl';
 }
 
-export function FromBadge({ name, bgColor, fontColor, size = 'md' }: FromBadgeProps) {
-  const outerClass =
-    size === 'sm'
-      ? 'inline-flex h-[20px] px-[8px] rounded-[6px]'
-      : 'inline-flex items-center justify-center min-w-[47px] h-[26px] px-[12px] rounded-[6px]';
-  const textClass =
-    size === 'sm'
-      ? 'flex items-center text-[12px] font-medium'
-      : 'flex items-center text-[13px] font-medium';
+export function FromBadge({
+  name,
+  bgColor,
+  fontColor,
+  size = 'md',
+}: FromBadgeProps) {
+  const sizeClass = {
+    md: {
+      outer: 'inline-flex px-[12px] py-[5px] rounded-[6px]',
+      text: 'flex items-center text-[13px] font-semibold',
+    },
+    lg: {
+      outer: 'inline-flex px-[14px] py-[6px] rounded-[6px]',
+      text: 'flex items-center text-[14px] font-semibold',
+    },
+    xl: {
+      outer: 'inline-flex items-center px-[14px] py-[6px] rounded-[6px]',
+      text: 'text-[16px] leading-[19px] font-semibold',
+    },
+  };
 
   return (
-    <span data-from-badge className={outerClass} style={{ backgroundColor: bgColor }}>
-      <span data-from-badge-text className={textClass} style={{ color: fontColor }}>
+    <span
+      data-from-badge
+      className={sizeClass[size].outer}
+      style={{ backgroundColor: bgColor }}
+    >
+      <span
+        data-from-badge-text
+        className={sizeClass[size].text}
+        style={{ color: fontColor }}
+      >
         {name}
       </span>
     </span>

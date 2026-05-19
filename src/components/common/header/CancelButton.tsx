@@ -10,7 +10,7 @@ export default function CancelButton({ onClick }: { onClick?: MouseEventHandler<
   }
 
   return (
-    <button onClick={handleClick} className="text-base font-normal text-[#555557]" aria-label="취소">
+    <button onClick={handleClick} className="text-base font-normal text-[#585A5F]" aria-label="취소">
       취소
     </button>
   );

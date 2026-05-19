@@ -19,8 +19,8 @@ export default function LoadingSection({
     >
       <img src={loadingImg} alt="loading" className="w-[71px] h-[65px] shake" />
       <div className="flex flex-col items-center">
-        <p className="text-base text-[#555557] font-medium">{title}</p>
-        <p className="text-sm font-medium text-[#9D9D9F]">{subtitle}</p>
+        <p className="text-base text-[#585A5F] font-medium">{title}</p>
+        <p className="text-sm font-medium text-[#A1A4AA]">{subtitle}</p>
       </div>
 
       <div className="w-[135px] h-[16px] bg-[#F4F5F6] rounded-[20px] overflow-hidden px-[2px] py-[2px]">

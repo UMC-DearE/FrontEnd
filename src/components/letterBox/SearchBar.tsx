@@ -10,9 +10,9 @@ export default function SearchBar({
   onClose: () => void;
 }) {
   return (
-    <div className="relative h-[50px] w-full max-w-[440px] rounded-xl border-[1.2px] border-[#C2C4C7] bg-white shadow-[0px_0px_12px_0px_#0000001A] focus-within:border-black">
+    <div className="relative h-[50px] w-full max-w-[440px] rounded-xl border-[1.2px] border-[#CACBD1] bg-white shadow-[0px_0px_12px_0px_#0000001A] focus-within:border-black">
       <p
-        className={`pointer-events-none absolute left-[22px] top-1/2 -translate-y-1/2 text-[16px] font-medium text-[#C2C4C7] transition-opacity ${
+        className={`pointer-events-none absolute left-[22px] top-1/2 -translate-y-1/2 text-[16px] font-medium text-[#CACBD1] transition-opacity ${
           value ? 'opacity-0' : 'opacity-100'
         }`}
       >
