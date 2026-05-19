@@ -1,12 +1,18 @@
 import { api } from '@/api/http';
 
-export type TermType = 'SERVICE' | 'PRIVACY' | 'MARKETING';
+export type TermType = 'SERVICE' | 'PRIVACY';
+
+export type ApiClause = {
+  clauseTitle: string;
+  clauseContent: string;
+};
 
 export type ApiTerm = {
   termId: number;
   title: string;
   type: TermType;
-  content: string;
+  content?: string;
+  clauses: ApiClause[];
   isRequired: boolean;
   effectiveAt: string;
   version: string;
