@@ -83,7 +83,7 @@ export default function LetterForm({
           {mode === "edit" ? "수정 완료" : "편지 추가하기"}
         </BottomButton>
       ),
-      bgColor: '#FAFAFA',
+      bgColor: '#FFFFFF',
     });
 
     return () => {
@@ -167,7 +167,7 @@ export default function LetterForm({
               rounded-xl px-4 text-sm font-medium
               outline-none
               ${date ? "text-[#585A5F]" : "text-[#C7C7CC]"}
-              ${unknownDate ? "bg-[#F7F8F9]" : "bg-white"}
+              ${unknownDate ? "bg-[#F7F8F9]" : "bg-[#FFFFFF]"}
             `}
           />
 

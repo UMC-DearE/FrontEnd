@@ -47,7 +47,7 @@ function NavItem({ to, label, Icon }: NavItemProps) {
 
 export default function BottomNav() {
   return (
-      <div className="w-full h-[95px] bg-[#FAFAFA] border-t border-[#E7E8EB]">
+      <div className="w-full h-[95px] bg-[#FFFFFF]">
       <div className="flex h-full items-start pt-4 px-5 justify-between">
         <NavItem to="/" label="홈" Icon={HomeIcon} />
         <NavItem to="/letter" label="편지함" Icon={LetterIcon} />

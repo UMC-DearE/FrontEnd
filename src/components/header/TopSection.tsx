@@ -9,7 +9,7 @@ export default function TopSection({
 }) {
   return (
     <header
-      className="w-full bg-[#FAFAFA] border-b border-[#E7E8EB]"
+      className="w-full bg-[#FFFFFF] border-b border-[#E7E8EB]"
       style={{
         paddingTop: 'min(env(safe-area-inset-top), 32px)',
       }}

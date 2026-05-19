@@ -49,7 +49,7 @@ export function AppLayout() {
 
   const useHomeBg = pathname === '/' || pathname.startsWith('/home');
 
-  const bgClass = matched?.bg === 'white' ? 'bg-[#FAFAFA]' : 'bg-[#F7F8F9]';
+  const bgClass = matched?.bg === 'white' ? 'bg-[#FFFFFF]' : 'bg-[#F7F8F9]';
 
   const NO_MAIN_PADDING_PATHS = ['/my', '/my/account', '/letterbox', '/create/detail'];
   const noMainPadding =
@@ -102,7 +102,7 @@ export function AppLayout() {
           <div
             className="w-full max-w-[440px] pt-3 pointer-events-auto"
             style={{
-              background: fixedAction.bgColor ?? '#FAFAFA',
+              background: fixedAction.bgColor ?? '#FFFFFF',
               paddingBottom: '52px',
             }}
           >
@@ -112,7 +112,7 @@ export function AppLayout() {
       )}
 
       {!hideBottomNav && !fixedAction && (
-        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-40 bg-[#FAFAFA] pb-safe-bottom">
+        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-40 bg-[#FFFFFF] pb-safe-bottom">
           <BottomNav />
         </nav>
       )}

@@ -64,7 +64,7 @@ export default function EditLetterPage() {
           const draft: CreateFrom = {
             fromId: res.data.from?.fromId,
             name: res.data.from?.name ?? '',
-            bgColor: res.data.from?.bgColor ?? '#FAFAFA',
+            bgColor: res.data.from?.bgColor ?? '#FFFFFF',
             fontColor: res.data.from?.fontColor ?? '#000000',
           };
 
