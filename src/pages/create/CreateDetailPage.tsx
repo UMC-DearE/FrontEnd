@@ -56,7 +56,7 @@ export default function CreateDetailPage() {
       <div
         className="flex-1 px-4"
         style={{
-          marginTop: 'calc(98px + max(env(safe-area-inset-top, 0px) - 20px, 0px))',
+          marginTop: 'calc(98px + max(env(safe-area-inset-top, 0px) - 32px, 0px))',
         }}
       >
         <LetterForm
