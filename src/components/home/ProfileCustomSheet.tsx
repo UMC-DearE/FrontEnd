@@ -86,7 +86,7 @@ export default function ProfileCustomSheet({
                 <button
                   type="button"
                   onClick={handleClickReset}
-                  className="flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-[#E6E7E9] bg-[#F4F5F6] cursor-pointer"
+                  className="flex h-[48px] w-[48px] items-center justify-center rounded-[6px] bg-[#F4F5F6] cursor-pointer"
                 >
                   <img className="w-[25px] h-[25px]" src={resetIcon} alt="bg-icon" />
                 </button>
@@ -99,7 +99,7 @@ export default function ProfileCustomSheet({
                 <button
                   type="button"
                   onClick={handleClickSticker}
-                  className="flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-[#E6E7E9] bg-[#F4F5F6] cursor-pointer"
+                  className="flex h-[48px] w-[48px] items-center justify-center rounded-[6px] bg-[#F4F5F6] cursor-pointer"
                 >
                   <img className="w-[24px] h-[24px]" src={stickerIcon} alt="sticker-icon" />
                 </button>
@@ -112,7 +112,7 @@ export default function ProfileCustomSheet({
                 <button
                   type="button"
                   onClick={handleToggleBgPicker}
-                  className="flex h-[48px] w-[48px] items-center justify-center rounded-[6px] border border-[#E6E7E9] bg-[#F4F5F6] cursor-pointer"
+                  className="flex h-[48px] w-[48px] items-center justify-center rounded-[6px] bg-[#F4F5F6] cursor-pointer"
                 >
                   <img className="w-[25px] h-[25px]" src={bgIcon} alt="bg-icon" />
                 </button>

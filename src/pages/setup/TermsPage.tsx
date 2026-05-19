@@ -7,11 +7,16 @@ import { useNavigate } from "react-router-dom";
 import { getSignupTerms, type ApiTerm } from "@/api/authSignup";
 import { termTypeToKey } from "@/utils/terms";
 
+type Clause = {
+  clauseTitle: string;
+  clauseContent: string;
+};
+
 type TermMeta = {
   termId: number;
   title: string;
   required: boolean;
-  content: string;
+  clauses: Clause[];
 };
 
 type TermMetaMap = Partial<Record<TermsKey, TermMeta>>;
@@ -47,7 +52,7 @@ export default function TermsPage() {
             termId: t.termId,
             title: t.title,
             required: t.isRequired,
-            content: t.content,
+            clauses: t.clauses,
           };
         });
       
@@ -145,8 +150,8 @@ export default function TermsPage() {
             navigate(`/auth/terms/${item.key}`, {
               state: {
                 title: metaMap[item.key]?.title,
-                content: metaMap[item.key]?.content,
-              },
+                clauses: metaMap[item.key]?.clauses,
+              }
             })}
           />
         ))}

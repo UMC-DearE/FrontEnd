@@ -208,8 +208,25 @@ export default function MyhomePage() {
         <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#A1A4AA]">
           지원
         </div>
-        <MenuItem label="서비스 이용약관" />
-        <MenuItem label="개인정보처리방침" />
+        <MenuItem
+          label="서비스 이용약관"
+          onClick={() =>
+            window.open(
+              "https://www.notion.so/35b1829bd7ed807b8067ff1e134ad299?source=copy_link",
+              "_blank"
+            )
+          }
+        />
+
+        <MenuItem
+          label="개인정보처리방침"
+          onClick={() =>
+            window.open(
+              "https://www.notion.so/35b1829bd7ed80699a43f1ac16fefc7f?source=copy_link",
+              "_blank"
+            )
+          }
+        />
       </main>
 
       <PlusModal

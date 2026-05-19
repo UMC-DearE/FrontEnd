@@ -60,7 +60,7 @@ export default function FolderList({
   };
 
   return (
-    <div className="flex gap-[10px] pl-3 pr-[28px] pt-2 pb-1 overflow-x-auto no-scrollbar">
+    <div className="flex gap-[12px] pt-2 pb-[24px] overflow-x-auto no-scrollbar">
       <div className="flex flex-col items-center gap-2 shrink-0" onClick={() => onSelect('all')}>
         <button
           type="button"
@@ -69,7 +69,7 @@ export default function FolderList({
           }`}
         >
           <p
-            className={`text-[14px] font-semibold ${selectedId === 'all' ? 'text-white' : 'text-[#C2C4C7]'}`}
+            className={`text-[14px] font-medium ${selectedId === 'all' ? 'text-[#FAFAFA]' : 'text-[#C2C4C7]'}`}
           >
             ALL
           </p>

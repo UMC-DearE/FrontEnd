@@ -2,29 +2,28 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 
-import AddTypeTabs from "@/components/create/AddModeTabs";
-import ImageAddSection from "@/components/create/ImageAddSection";
-import TextAddSection from "@/components/create/TextAddSection";
-import LoadingSection from "@/components/create/loading/LoadingSection";
-import { BottomButton } from "@/components/common/BottomButton";
+import AddTypeTabs from '@/components/create/AddModeTabs';
+import ImageAddSection from '@/components/create/ImageAddSection';
+import TextAddSection from '@/components/create/TextAddSection';
+import LoadingSection from '@/components/create/loading/LoadingSection';
+import { BottomButton } from '@/components/common/BottomButton';
 
-import { postAnalyzeLetter, runOcr } from "@/api/create";
-import { uploadImage } from "@/api/upload";
-import type { AddMode } from "@/types/create";
-import useToast from "@/hooks/useToast";
+import { postAnalyzeLetter, runOcr } from '@/api/create';
+import { uploadImage } from '@/api/upload';
+import type { AddMode } from '@/types/create';
+import useToast from '@/hooks/useToast';
 
 export default function LetterCreatePage() {
-  const [mode, setMode] = useState<AddMode>("IMAGE");
+  const [mode, setMode] = useState<AddMode>('IMAGE');
   const [images, setImages] = useState<File[]>([]);
-  const [text, setText] = useState("");
+  const [text, setText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const toast = useToast();
   const { setFixedAction } = useOutletContext<any>();
 
-  const isValid =
-    mode === "IMAGE" ? images.length > 0 : text.trim().length > 0;
+  const isValid = mode === 'IMAGE' ? images.length > 0 : text.trim().length > 0;
 
   const handleSubmit = async () => {
     if (!isValid) return;
@@ -40,22 +39,18 @@ export default function LetterCreatePage() {
         finalContent = text;
       }
 
-      if (mode === "IMAGE") {
+      if (mode === 'IMAGE') {
         // 1. 이미지 업로드
-        const uploadResults = await Promise.all(
-          images.map((file) => uploadImage(file, "letter"))
-        );
+        const uploadResults = await Promise.all(images.map((file) => uploadImage(file, 'letter')));
         uploadedImageUrls = uploadResults.map((res) => res.data.url);
-        uploadedImageIds = Array.from(
-          new Set(uploadResults.map((res) => res.data.imageId))
-        );
+        uploadedImageIds = Array.from(new Set(uploadResults.map((res) => res.data.imageId)));
 
         // 2. OCR -> text 변환
         const ocrResponse = await runOcr(uploadedImageIds);
         if (!ocrResponse.success) {
-          throw new Error(ocrResponse.message || "OCR 실패");
+          throw new Error(ocrResponse.message || 'OCR 실패');
         }
-        finalContent = ocrResponse.data.combinedText || "";
+        finalContent = ocrResponse.data.combinedText || '';
       }
 
       // 3. AI 분석
@@ -63,17 +58,17 @@ export default function LetterCreatePage() {
       const aiResult = analyzeResponse;
 
       // 4. 내용 분석 페이지로 이동 (이미지 모드일 경우 업로드된 File 배열을 함께 전달(서버 책임 줄어듦) 혹은 s3에 업로드 된 URL 전달 받아서 띄워도 됨)
-      navigate("/create/detail", {
+      navigate('/create/detail', {
         state: {
           content: finalContent,
           aiResult,
-          images: mode === "IMAGE" ? images : undefined,
+          images: mode === 'IMAGE' ? images : undefined,
           imageUrls: uploadedImageUrls,
           imageIds: uploadedImageIds,
         },
       });
     } catch (e) {
-      toast.show("편지 분석에 실패했어요. 다시 시도해주세요.");
+      toast.show('편지 분석에 실패했어요. 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }
@@ -116,10 +111,7 @@ export default function LetterCreatePage() {
                 setImages={setImages}
               />
             ) : (
-              <TextAddSection
-                value={text}
-                onChange={setText}
-              />
+              <TextAddSection value={text} onChange={setText} />
             )}
           </div>
         </>
@@ -127,4 +119,3 @@ export default function LetterCreatePage() {
     </div>
   );
 }
-

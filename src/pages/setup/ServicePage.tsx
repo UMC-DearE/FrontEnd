@@ -1,52 +1,32 @@
-type TermSection = {
-  title: string;
-  content: string;
+import { useLocation } from "react-router-dom";
+
+type Clause = {
+  clauseTitle: string;
+  clauseContent: string;
 };
 
-const MOCK_SERVICE_TERMS: TermSection[] = [
-  {
-    title: '제 1조(목적)',
-    content:
-      '이 약관은 dear.e(이하 "회사")가 제공하는 편지 보관 서비스(이하 “서비스”)의 이용과 관련하여, 회사와 회원 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.',
-  },
-  {
-    title: '제 2조(정의)',
-    content: `이 약관에서 사용하는 주요 용어의 정의는 다음과 같습니다.
-
-1 ‘서비스’라 함은 구현되는 단말기(PC, TV, 휴대형 단말기 등의 각종 유무선 장치를 포함)와 상관 없이 ’이용자’가 사용할 수 있도록 회사가 제공하는 편지 작성, 감정 보관, 테마 꾸미기 등 일체의 서비스를 말합니다.
-2. ‘이용자'란 이 약관에 따라 회사가 제공하는 서비스를 이용하는 '회원' 및 '비회원’을 말합니다.
-3. ‘회원’은 회사가 제공하는 간편 로그인(예: 카카오톡 로그인)을 통해 본인 인증을 완료하고, dear.e의 다양한 서비스를 지속적으로 이용할 수 있는 자입니다.
-4. ‘비회원’은 회원가입 없이 제한된 범위 내에서 서비스를 이용하는 자입니다.
-5. ‘회원 식별정보’란 회사가 제휴 로그인 서비스(예: 카카오)를 통해 수집한 고유 식별값을 말합니다. 회사는 별도의 아이디(ID) 또는 비밀번호를 설정받지 않습니다.
-6. ‘콘텐츠’란 정보통신망법의 규정에 따라 정보통신망에서 사용되는 부호 ·문자·음성·음향·이미지 또는 영상 등으로 정보형태의 글, 사진, 동영상 및 각종 파일과 링크 등을 말합니다.`,
-  },
-  {
-    title: '제 3조(약관 외 준칙)',
-    content:
-      '이 약관에서 정하지 아니한 사항에 대해서는 법령 또는 회사가 정한 서비스의 개별약관, 운영정책 및 규칙 등(이하 세부지침)의 규정에 따릅니다. 또한 본 약관과 세부지침이 충돌할 경우에는 세부지침에 따릅니다.',
-  },
-  {
-    title: '제 4조(약관의 효력과 변경)',
-    content: `1. 이 약관은 dear.e가 제공하는 모든 인터넷 서비스에 게시하여 공시합니다.
-2. 회사는 '전자상거래 등 에서의 소비자 보호에 관한 법률', ‘약관의 규제에 관한 법률’, ‘정보통신망 이용촉진 및 정보보호 등에 관한 법률’ 등 본 서비스와 관련된 법령에 위배되지 않는 범위에서 이 약관을 변경할 수 있으며, 회사는 약관이 변경되는 경우에 변경된 약관의 내용과 시행일을 정하여, 그 시행일로부터 최소 7 일 (이용자에게 불리하거나 중대한 사항의 변경은 30 일) 이전부터 시행일 후 상당한 기간 동안 공지하고, 기존 이용자에게는 별도의 전자적 수단으로 개별 통지합니다. 변경된 약관은 공지하거나 통지한 시행일로부터 효력이 발생합니다.
-3. 회사가 개정약관을 공지 또는 통지하는 경우 '변경에 동의하지 아니한 경우 공지일 또는 통지를 받은 날로부터 7일(중대한 변경은 30일) 내에 계약을 해지할 수 있으며, 의사표시를 하지 아니한 경우에는 동의한 것으로 본다’는 취지의 내용을 함께 통지합니다.
-4. 이용자가 기간 내에 거절 의사를 표시하지 않았을 때에는 본 약관의 변경에 동의한 것으로 간주합니다.`,
-  },
-];
+type TermDetailState = {
+  title?: string;
+  clauses?: Clause[];
+};
 
 export default function ServicePage() {
+
+  const { state } = useLocation();
+  const { clauses = [] } = (state ?? {}) as TermDetailState;
+
   return (
     <div className="min-h-screen">
       <main className="pb-[110px] pt-[12px]">
         <div className="space-y-[28px]">
-          {MOCK_SERVICE_TERMS.map((section) => (
-            <section key={section.title}>
+          {clauses.map((clause) => (
+            <section key={clause.clauseTitle}>
               <h2 className="text-[16px] font-semibold leading-[150%] text-[#121212]">
-                {section.title}
+                {clause.clauseTitle}
               </h2>
 
               <p className="mt-[8px] whitespace-pre-line text-[14px] font-normal leading-[150%] text-[#737478]">
-                {section.content}
+                {clause.clauseContent}
               </p>
             </section>
           ))}
