@@ -103,13 +103,13 @@ export default function LoginPage() {
         </div>
 
         <div className="shrink-0 space-y-4 flex flex-col items-center min-w-0">
-          <div className="w-full aspect-[408/50] min-w-0">
+          <div className="w-full">
             <SocialLoginButton
               provider="kakao"
               onClick={onKakaoLogin}
             />
           </div>
-          <div className="w-full aspect-[408/50] min-w-0">
+          <div className="w-full">
             <SocialLoginButton
               provider="google"
               onClick={onGoogleLogin}
