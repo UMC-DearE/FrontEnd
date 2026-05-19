@@ -82,6 +82,10 @@ export default function LetterCreatePage() {
     ) : null;
 
   useEffect(() => {
+    if (isLoading) {
+      setFixedAction(null);
+      return;
+    }
     setFixedAction({
       node: (
         <>
@@ -94,7 +98,7 @@ export default function LetterCreatePage() {
       bgColor: '#FFFFFF',
     });
     return () => setFixedAction(null);
-  }, [mode, isValid, text, images]);
+  }, [mode, isValid, text, images, isLoading]);
 
   return (
     <div className="flex flex-col h-full">
