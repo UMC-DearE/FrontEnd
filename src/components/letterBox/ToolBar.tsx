@@ -16,8 +16,9 @@ type ToolBarProps = {
   fromCounts?: Record<number, number>;
   selectedFromId: number | 'all';
   onFromSelect: (fromId: number | 'all') => void;
-  view: Option;
-  onViewChange: (view: Option) => void;
+  view?: Option;
+  onViewChange?: (view: Option) => void;
+  hideViewToggle?: boolean;
 };
 
 export default function ToolBar({
@@ -29,6 +30,7 @@ export default function ToolBar({
   onFromSelect,
   view,
   onViewChange,
+  hideViewToggle = false,
 }: ToolBarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [fromSheetOpen, setFromSheetOpen] = useState(false);
@@ -63,33 +65,41 @@ export default function ToolBar({
             }}
           >
             <p className="text-[#9D9D9F] text-[14px] font-medium mr-1">{selectedFromName}</p>
-            <img src={fromIcon} alt="from-icon" className="w-[14px] h-[12px] mr-[19px]" />
-          </button>
-
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setDropdownOpen((prev) => !prev);
-            }}
-          >
             <img
-              src={dropdownIcon}
-              alt="drop-down-icon"
-              className="w-[25px] h-[25px] cursor-pointer"
+              src={fromIcon}
+              alt="from-icon"
+              className={`w-[14px] h-[12px] ${hideViewToggle ? '' : 'mr-[19px]'}`}
             />
           </button>
 
-          {dropdownOpen && (
-            <div className="absolute right-0 top-[29px] z-50">
-              <Dropdown
-                value={view}
-                onSelect={(option) => {
-                  onViewChange(option);
-                  setDropdownOpen(false);
+          {!hideViewToggle && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDropdownOpen((prev) => !prev);
                 }}
-              />
-            </div>
+              >
+                <img
+                  src={dropdownIcon}
+                  alt="drop-down-icon"
+                  className="w-[25px] h-[25px] cursor-pointer"
+                />
+              </button>
+
+              {dropdownOpen && view && onViewChange && (
+                <div className="absolute right-0 top-[29px] z-50">
+                  <Dropdown
+                    value={view}
+                    onSelect={(option) => {
+                      onViewChange(option);
+                      setDropdownOpen(false);
+                    }}
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
