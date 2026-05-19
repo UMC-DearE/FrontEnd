@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 
 import AddTypeTabs from "@/components/create/AddModeTabs";
 import ImageAddSection from "@/components/create/ImageAddSection";
@@ -20,6 +21,7 @@ export default function LetterCreatePage() {
 
   const navigate = useNavigate();
   const toast = useToast();
+  const { setFixedAction } = useOutletContext<any>();
 
   const isValid =
     mode === "IMAGE" ? images.length > 0 : text.trim().length > 0;
@@ -35,7 +37,7 @@ export default function LetterCreatePage() {
       let uploadedImageIds: number[] | undefined;
 
       if (mode === "TEXT") {
-      finalContent = text;
+        finalContent = text;
       }
 
       if (mode === "IMAGE") {
@@ -77,6 +79,28 @@ export default function LetterCreatePage() {
     }
   };
 
+  const renderBottomInfo = () =>
+    mode === "TEXT" ? (
+      <p className="text-sm text-[#A1A4AA] text-center mb-5 font-medium">
+        편지는 한 번에 하나만 등록할 수 있어요
+      </p>
+    ) : null;
+
+  useEffect(() => {
+    setFixedAction({
+      node: (
+        <>
+          {renderBottomInfo()}
+          <BottomButton disabled={!isValid} onClick={handleSubmit}>
+            완료
+          </BottomButton>
+        </>
+      ),
+      bgColor: '#FFFFFF',
+    });
+    return () => setFixedAction(null);
+  }, [mode, isValid, text, images]);
+
   return (
     <div className="flex flex-col h-full">
       {isLoading ? (
@@ -97,27 +121,6 @@ export default function LetterCreatePage() {
                 onChange={setText}
               />
             )}
-          </div>
-
-          <div className="fixed bottom-0 inset-x-0 flex justify-center">
-            <div className="w-full max-w-[440px] bg-white px-4 pt-2 pb-[calc(52px+env(safe-area-inset-bottom))]">
-              
-              {mode === "TEXT" && (
-                <p className="text-sm text-[#A1A4AA] text-center mb-5 font-medium">
-                  편지는 한 번에 하나만 등록할 수 있어요
-                </p>
-              )}
-
-              <div className="flex justify-center">
-                <BottomButton
-                  disabled={!isValid}
-                  onClick={handleSubmit}
-                >
-                  완료
-                </BottomButton>
-              </div>
-
-            </div>
           </div>
         </>
       )}

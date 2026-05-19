@@ -310,12 +310,12 @@ export default function LetterDetailSection({
           onClick={() => setOpenSummary((v) => !v)}
           className="mb-2 flex w-full items-center justify-between text-base font-semibold text-primary"
         >
-          AI 한 줄 요약
+          한 줄 요약
           <img src={openSummary ? upBar : downBar} alt={openSummary ? "열림" : "닫힘"} />
         </button>
 
         {openSummary && (
-          <div className="flex items-center gap-2 rounded-xl border border-[#E7E8EB] bg-white p-4 text-sm text-[#585A5F]">
+          <div className="flex items-center gap-2 rounded-xl border border-[#E7E8EB] bg-white px-[14px] py-[12px] text-sm text-[#585A5F]">
             <img src={aiSummary} alt="" className="w-[19px] h-[19px]" />
             <p>{aiResult.summary}</p>
           </div>
@@ -324,7 +324,7 @@ export default function LetterDetailSection({
 
       <div className="mb-6">
         <p className="mb-2 text-base font-semibold text-primary">
-          태그된 감정
+          수집된 감정
         </p>
         <div className="flex flex-wrap gap-2">
           {aiResult.emotions.map((emotion) => (

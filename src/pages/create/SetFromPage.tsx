@@ -10,6 +10,7 @@ import FromCreator from '@/components/common/FromCreator';
 import erasebtn from '@/assets/create/erasebtn.svg';
 import type { From } from '@/types/from';
 import { useFromList } from '@/hooks/queries/useFromList';
+import { hangulIncludes } from '@/utils/hangulSearch';
 
 type FromItem = From;
 
@@ -113,21 +114,21 @@ export default function SetFromPage() {
             />
             <div className="flex flex-col gap-[24px] mt-2 justify-center">
               {fromList.length === 0 ? (
-                <div className="w-full flex flex-col items-center gap-[16px] justify-center">
-                  <p className="font-normal text-[15px] text-[#A1A4AA]">
-                    추가된 From이 없어요
-                  </p>
+                <div className="w-full flex flex-col items-center justify-center gap-[16px] min-h-[320px]">
+                <p className="font-normal text-[15px] text-[#A1A4AA]">
+                  추가된 From이 없어요
+                </p>
 
-                  <button
-                    className="w-[125px] h-[38px] bg-[#ffffff] text-[#585A5F] border-[1.2px] border-[#E7E8EB] rounded-lg text-sm font-medium"
-                    onClick={() => setTab('add')}
-                  >
-                    새로 추가
-                  </button>
-                </div>
+                <button
+                  className="w-[125px] h-[38px] bg-[#ffffff] text-[#585A5F] border-[1.2px] border-[#E7E8EB] rounded-lg text-sm font-medium"
+                  onClick={() => setTab('add')}
+                >
+                  새로 추가
+                </button>
+              </div>
               ) : (
                 fromList
-                  .filter((from) => from.name.includes(searchInput))
+                  .filter((from) => hangulIncludes(from.name, searchInput))
                   .map((from) => (
                     <div
                       key={from.fromId}

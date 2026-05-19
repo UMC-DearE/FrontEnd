@@ -55,6 +55,17 @@ export default function LetterForm({
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onContentChange?.(e.target.value);
   };
+  
+// 날짜 프리뷰 MM-YY-DD 형식
+const formatDatePreview = (value: string) => {
+  if (!value) return "";
+  const parts = value.split("-");
+  if (parts.length !== 3) return value;
+  const [year, month, day] = parts;
+  if (!year || !month || !day) return value;
+  if (year.length !== 4 || month.length !== 2 || day.length !== 2) return value;
+  return `${year.slice(2)}-${month}-${day}`;
+};
 
   // initialDate / initialUnknownDate가 바뀌면 내부 상태도 맞춰줌
   useEffect(() => {
@@ -152,24 +163,35 @@ export default function LetterForm({
         </p>
 
         <div className="flex items-center gap-4">
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => {
-              const next = e.target.value;
-              setDate(next);
-              onDateChange?.(next);
-            }}
-            disabled={unknownDate}
-            className={`
-              flex-1 h-[45px]
-              border border-[#E7E8EB]
-              rounded-xl px-4 text-sm font-medium
-              outline-none
-              ${date ? "text-[#585A5F]" : "text-[#C7C7CC]"}
-              ${unknownDate ? "bg-[#F7F8F9]" : "bg-[#FFFFFF]"}
-            `}
-          />
+          <div className="relative flex-1 h-[45px]">
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => {
+                const next = e.target.value; // 서버로 넘길 값: YYYY-MM-DD
+                setDate(next);
+                onDateChange?.(next);
+              }}
+              disabled={unknownDate}
+              className="
+                absolute inset-0 w-full h-full
+                opacity-0 cursor-pointer
+              "
+            />
+
+            <div
+              className={`
+                w-full h-[45px]
+                border border-[#E7E8EB]
+                rounded-xl px-4 text-sm font-medium
+                flex items-center
+                ${date ? "text-[#585A5F]" : "text-[#C7C7CC]"}
+                ${unknownDate ? "bg-[#F7F8F9]" : "bg-[#FFFFFF]"}
+              `}
+            >
+              {date ? formatDatePreview(date) : "YY-MM-DD"}
+            </div>
+          </div>
 
           <label className="flex items-center gap-2 text-sm font-medium text-[#585A5F]">
             <input
@@ -201,12 +223,12 @@ export default function LetterForm({
         </div>
       </div>
 
-      <div className="mb-[40px]">
+      <div className="mb-[80px]">
         <p className="text-base font-semibold text-primary mb-[12px]">
           수집된 감정
         </p>
         <div className="flex gap-2 flex-wrap">
-          {aiResult.emotions.map((emotion) => (
+          {aiResult.emotions.map((emotion) => (                                                         
             <EmotionTag
               key={emotion.emotionId}
               label={emotion.emotionName}
