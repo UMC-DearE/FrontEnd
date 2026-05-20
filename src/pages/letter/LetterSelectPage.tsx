@@ -67,8 +67,9 @@ export default function LetterSelectPage() {
 
         if (!alive) return;
 
-        setAllLetters(res.data.content ?? []);
-        setAllCount(res.data.totalElements ?? 0);
+        const unfolderedLetters = (res.data.content ?? []).filter((l) => l.folderId == null);
+        setAllLetters(unfolderedLetters);
+        setAllCount(unfolderedLetters.length);
       } catch (e) {
         if (!alive) return;
         setAllLetters([]);
