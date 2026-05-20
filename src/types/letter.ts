@@ -15,7 +15,7 @@ export type Letter = {
   receivedAt: string;
   createdAt: string;
   from: LetterFrom;
-  folderId: number;
+  folderId: number | null;
 };
 
 export interface LetterListResult {
