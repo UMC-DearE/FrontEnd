@@ -33,7 +33,7 @@ export default function ConfirmModal({
                 {title}
               </p>
               {description ? (
-                <div className="text-center text-xs font-medium text-[#A1A4AA]">
+                <div className="text-center text-sm font-medium text-[#A1A4AA]">
                   {description
                     .split(/\r?\n/)
                     .map((line) => line.trim())
@@ -50,7 +50,7 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onCancel}
-                className="h-[38px] w-[122px] rounded-lg border border-[#E5E5E5] text-sm font-normal text-[#585A5F]"
+                className="h-[38px] w-[122px] rounded-lg border border-[#E5E5E5] text-[15px] font-normal text-[#585A5F]"
               >
                 {cancelText}
               </button>
@@ -58,7 +58,7 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onConfirm}
-                className="h-[38px] w-[122px] rounded-lg bg-[#111111] text-sm font-medium text-white cursor-pointer"
+                className="h-[38px] w-[122px] rounded-lg bg-[#111111] text-[15px] font-medium text-white cursor-pointer"
               >
                 {confirmText}
               </button>
