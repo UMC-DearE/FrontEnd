@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getRandomLetter } from '@/api/letter';
 import type { RandomLetterData } from '@/types/letter';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
@@ -58,16 +59,35 @@ function getMsUntilMidnight() {
 }
 
 export function useRandomLetterQuery() {
+  const qc = useQueryClient();
   const { data: me } = useMeQuery();
   const userId = me?.userId;
 
-  return useQuery<RandomLetterData>({
+  const query = useQuery<RandomLetterData>({
     queryKey: [...randomLetterKey, userId],
     queryFn: () => fetchOrLoadRandomLetter(userId as number),
     enabled: typeof userId === 'number',
-    staleTime: getMsUntilMidnight,
+    staleTime: Infinity,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
   });
+
+  useEffect(() => {
+    if (typeof userId !== 'number') return;
+
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const scheduleMidnight = () => {
+      timeoutId = setTimeout(() => {
+        qc.invalidateQueries({ queryKey: [...randomLetterKey, userId] });
+        scheduleMidnight();
+      }, getMsUntilMidnight() + 1000);
+    };
+
+    scheduleMidnight();
+    return () => clearTimeout(timeoutId);
+  }, [qc, userId]);
+
+  return query;
 }
