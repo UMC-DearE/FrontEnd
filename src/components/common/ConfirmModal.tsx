@@ -33,7 +33,7 @@ export default function ConfirmModal({
                 {title}
               </p>
               {description ? (
-                <div className="text-center text-xs font-medium text-[#A1A4AA]">
+                <div className="text-center text-[14px] font-medium text-[#A1A4AA]">
                   {description
                     .split(/\r?\n/)
                     .map((line) => line.trim())
