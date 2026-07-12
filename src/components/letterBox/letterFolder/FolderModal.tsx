@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import resetIcon from '@/assets/letterPage/resetIcon.svg';
+import plusIcon from '@/assets/letterPage/folderPlusIcon.svg';
 
 type UploadImageResult = { imageId: number; url: string };
 
@@ -90,22 +91,20 @@ export default function FolderModal({
   const isFormValid = folderName.trim().length > 0 && !isUploading;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="flex w-[393px] min-h-screen items-center justify-center">
-        <div
-          className="relative w-[294px] rounded-[17px] bg-white p-[18px] transition-all duration-300"
-          style={{ height: imageUrl ? '310px' : '272px' }}
-        >
-          <p className="absolute left-1/2 top-[18px] -translate-x-1/2 h-[19px] text-center text-[16px] font-semibold text-black">
-            {title}
-          </p>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
+      <div className="flex w-full max-w-[440px] flex-col items-center gap-[20px] rounded-t-[24px] bg-white px-[20px] pt-[16px] pb-[54px]">
+        <div className="flex flex-col items-center gap-[28px]">
+          <div className="flex flex-col items-center gap-[24px]">
+            <div className="h-[5px] w-[36px] rounded-full bg-[#E7E8EB]" />
+            <p className="text-[16px] font-medium text-[#121212]">{title}</p>
+          </div>
 
-          <div className="absolute left-1/2 top-[59px] -translate-x-1/2 flex justify-center">
+          <div className="flex flex-col items-center gap-[8px]">
             <label className="cursor-pointer">
               {imageUrl ? (
                 <img
                   src={imageUrl}
-                  className="h-[77px] w-[77px] rounded-xl object-cover"
+                  className="h-[88px] w-[88px] rounded-[12px] object-cover"
                   alt="folder-image"
                   onError={() => {
                     setImageUrl(null);
@@ -113,53 +112,42 @@ export default function FolderModal({
                   }}
                 />
               ) : (
-                <div className="h-[77px] w-[77px] rounded-xl bg-[#E6E7E9]" />
+                <div className="flex h-[88px] w-[88px] items-center justify-center rounded-[12px] bg-[#EBEDF0]">
+                  <img src={plusIcon} alt="plus-icon" className="h-[20px] w-[20px]" />
+                </div>
               )}
               <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
             </label>
-          </div>
 
-          {imageUrl && (
-            <button
-              type="button"
-              onClick={handleImageDelete}
-              className="absolute left-1/2 top-[152px] h-[22px] w-[81px] -translate-x-1/2 cursor-pointer rounded-[11px] bg-[#FFEEE8]"
-            >
-              <img
-                src={resetIcon}
-                alt="reset-icon"
-                className="absolute left-[10px] top-1/2 -translate-y-1/2"
-              />
-              <p className="absolute left-[25px] top-1/2 -translate-y-1/2 text-[10px] font-semibold text-[#FF5F2F]">
-                이미지삭제
-              </p>
-            </button>
-          )}
-
-          <div className="absolute left-1/2 bottom-[72px] -translate-x-1/2 flex justify-center">
-            <div className="relative">
-              <p
-                className={`pointer-events-none absolute left-0 right-0 top-1/2 -translate-y-1/2 text-center text-[15px] font-medium text-[#C2C4C7] transition-opacity ${
-                  folderName ? 'opacity-0' : 'opacity-100'
-                }`}
+            {imageUrl && (
+              <button
+                type="button"
+                onClick={handleImageDelete}
+                className="flex h-[22px] cursor-pointer items-center gap-[6px] rounded-[11px] bg-[#FFEEE8] px-[10px]"
               >
-                폴더 이름을 입력하세요 (최대 6자)
-              </p>
-
-              <input
-                value={folderName}
-                onChange={(e) => setFolderName(e.target.value)}
-                maxLength={6}
-                className="h-12 w-[258px] rounded-[9px] bg-[#F4F5F6] px-3 text-center text-[15px] outline-none"
-              />
-            </div>
+                <img src={resetIcon} alt="reset-icon" className="h-[12px] w-[12px]" />
+                <span className="text-[10px] font-semibold text-[#FF5F2F]">이미지삭제</span>
+              </button>
+            )}
           </div>
+        </div>
 
-          <div className="absolute left-1/2 bottom-[18px] -translate-x-1/2 flex gap-[14px]">
+        <div className="flex w-full flex-col gap-[16px]">
+          <input
+            value={folderName}
+            onChange={(e) => setFolderName(e.target.value)}
+            maxLength={6}
+            placeholder="폴더 이름을 입력하세요 (최대 6자)"
+            className={`h-[50px] w-full rounded-[10px] px-[16px] text-center text-[16px] font-medium text-[#121212] outline-none placeholder:text-[#CACBD1] ${
+              folderName ? 'border border-black bg-white' : 'border border-transparent bg-[#F7F8F9]'
+            }`}
+          />
+
+          <div className="flex gap-[21px]">
             <button
               type="button"
               onClick={onCancel}
-              className="h-[38px] w-[122px] cursor-pointer rounded-lg border border-[#E5E5E5] text-[14px] font-medium text-[#555557]"
+              className="h-[50px] flex-1 cursor-pointer rounded-[10px] border-[1.2px] border-[#E7E8EB] bg-white text-[16px] font-medium text-[#737478]"
             >
               취소
             </button>
@@ -168,8 +156,11 @@ export default function FolderModal({
               type="button"
               onClick={handleConfirm}
               disabled={!isFormValid}
-              style={{ backgroundColor: isFormValid ? '#111111' : '#DCDCDCCC' }}
-              className="h-[38px] w-[122px] cursor-pointer rounded-lg text-[14px] font-semibold text-white transition-colors"
+              className={`h-[50px] flex-1 rounded-[10px] text-[16px] font-medium transition-colors ${
+                isFormValid
+                  ? 'cursor-pointer bg-[#121212] text-white'
+                  : 'cursor-not-allowed bg-[#E7E8EB] text-[#FFFFFF]'
+              }`}
             >
               {isUploading ? '업로드중' : '완료'}
             </button>
