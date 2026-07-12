@@ -478,10 +478,8 @@ export default function LetterDetailSection({
       {/* 바텀시트 / 폴더 */}
       <LetterDetailBottomSheet
         open={openMore}
-        folder={folder}
         onClose={() => setOpenMore(false)}
         onAddToFolder={handleOpenFolderSelect}
-        onRemoveFromFolder={() => onRemoveFromFolder?.()}
         onDeleteLetter={() => onDeleteLetter?.()}
         onEdit={() => {
           setOpenMore(false);

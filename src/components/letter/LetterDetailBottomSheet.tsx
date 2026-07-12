@@ -5,27 +5,21 @@ import ConfirmModal from '@/components/common/ConfirmModal';
 
 interface Props {
   open: boolean;
-  // folder metadata object; null if not in folder
-  folder?: { folderId: number; folderName: string } | null;
   onClose: () => void;
   onAddToFolder: () => void;
-  onRemoveFromFolder: () => void;
   onDeleteLetter: () => void;
   onEdit: () => void;
 }
 
 export default function LetterDetailBottomSheet({
   open,
-  folder,
   onClose,
   onAddToFolder,
-  onRemoveFromFolder,
   onDeleteLetter,
   onEdit,
 }: Props) {
   if (!open) return null;
 
-  const [confirmRemove, setConfirmRemove] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
@@ -34,17 +28,15 @@ export default function LetterDetailBottomSheet({
         <button onClick={onClose} className="absolute inset-0 bg-black/40" />
 
         <div className="absolute bottom-0 w-full bg-white rounded-t-2xl py-[62px] flex flex-col gap-[40px]">
+          {/* 폴더 이동으로 통일 (폴더에서 삭제는 이동 시트의 '선택 없음(전체)'로 처리) */}
           <button
             onClick={() => {
-              if (folder) setConfirmRemove(true);
-              else {
-                onClose();
-                onAddToFolder();
-              }
+              onClose();
+              onAddToFolder();
             }}
             className="w-full text-lg font-medium text-primary"
           >
-            {folder ? '폴더에서 삭제' : '폴더 이동'}
+            폴더 이동
           </button>
 
           <button
@@ -64,24 +56,6 @@ export default function LetterDetailBottomSheet({
             편지 삭제
           </button>
         </div>
-
-        <ConfirmModal
-          open={confirmRemove}
-          title="폴더에서 삭제"
-          description={
-            folder?.folderName
-              ? `'${folder.folderName}' 폴더에서 삭제할까요?\n편지는 삭제되지 않아요`
-              : '폴더에서 삭제할까요?\n편지는 삭제되지 않아요'
-          }
-          cancelText="취소"
-          confirmText="삭제"
-          onCancel={() => setConfirmRemove(false)}
-          onConfirm={() => {
-            setConfirmRemove(false);
-            onClose();
-            onRemoveFromFolder();
-          }}
-        />
 
         {/* 편지 삭제 확인 모달 */}
         <ConfirmModal
