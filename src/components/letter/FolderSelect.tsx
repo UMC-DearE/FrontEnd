@@ -1,6 +1,7 @@
 // 편지 상세 - 폴더로 편지 이동 바텀 시트
 
 import type { Folder } from '@/types/folder';
+import BottomSheet from '@/components/common/BottomSheet';
 import allFolderIcon from '@/assets/letterPage/allFolderIcon.svg';
 import newFolderIcon from '@/assets/letterPage/newFolderIcon.svg';
 import defaultFolderIcon from '@/assets/letterPage/default-folder.svg';
@@ -36,21 +37,9 @@ export default function FolderSelect({
   onSelectNone,
   onCreateFolder,
 }: Props) {
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="닫기"
-        className="absolute inset-0 bg-black/40"
-      />
-
-      <div className="relative z-10 flex max-h-[369px] w-full max-w-[440px] flex-col items-center rounded-t-[24px] bg-white px-[20px] pt-[16px] pb-[88px]">
-        <div className="h-[5px] w-[36px] shrink-0 rounded-full bg-[#E7E8EB]" />
-
-        <div className="mt-[20px] flex w-full flex-col overflow-y-auto">
+    <BottomSheet open={open} onClose={onClose} className="max-h-[369px] px-[20px] pb-[88px]">
+      <div className="mt-[20px] flex w-full flex-col overflow-y-auto">
           {/* 선택 없음(전체) */}
           <button
             type="button"
@@ -97,8 +86,7 @@ export default function FolderSelect({
               <span className="text-[16px] font-medium text-[#121212]">새 폴더 만들기</span>
             </button>
           )}
-        </div>
       </div>
-    </div>
+    </BottomSheet>
   );
 }
