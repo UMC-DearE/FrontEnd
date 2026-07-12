@@ -112,6 +112,9 @@ export default function HomePage() {
   const [showResetSheet, setShowResetSheet] = useState(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // 스티커 이동 범위 제한
+  const topBarRef = useRef<HTMLDivElement | null>(null);
+  const bottomBarRef = useRef<HTMLDivElement | null>(null);
 
   const [draftStickers, setDraftStickers] = useState<StickerItem[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -418,7 +421,7 @@ export default function HomePage() {
   return (
     <div ref={containerRef} style={{ backgroundColor: homeBgColor }}>
       {openSheet && (
-        <div className="fixed top-0 left-0 right-0 z-[55] flex justify-center">
+        <div ref={topBarRef} className="fixed top-0 left-0 right-0 z-[55] flex justify-center">
           <div className="w-full max-w-[440px]">
             <CustomizingHeader
               title="홈 편집"
@@ -462,6 +465,8 @@ export default function HomePage() {
           onChange={onChangeStickers}
           onDelete={onDeleteSticker}
           onCommit={onCommitSticker}
+          topBoundRef={topBarRef}
+          bottomBoundRef={bottomBarRef}
         />
       </div>
       <ProfileCard
@@ -472,6 +477,7 @@ export default function HomePage() {
       />
       <ProfileCustomSheet
         open={openSheet}
+        bottomBarRef={bottomBarRef}
         bgColor={homeBgColor}
         onChangeBgColor={setHomeBgColor}
         onPickerStateChange={setPickerOpen}
