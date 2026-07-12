@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import FolderSelect from '@/components/letter/FolderSelect';
 import FolderModal from '@/components/letterBox/letterFolder/FolderModal';
 import type { Folder } from '@/types/folder';
-import { createFolder } from '@/api/folder';
+import { createFolder, getFolderList } from '@/api/folder';
 import { uploadImage as uploadImageApi } from '@/api/upload';
 import { useQueryClient } from '@tanstack/react-query';
 import useToast from '@/hooks/useToast';
@@ -209,11 +209,12 @@ export default function LetterDetailSection({
     imageId: number | null;
   }) => {
     try {
-      const newFolder = await createFolder(folder_name, imageId);
+      await createFolder(folder_name, imageId);
       queryClient.invalidateQueries({ queryKey: ['folders'] });
+      const fresh = await getFolderList();
+      setFolders(fresh);
       setOpenCreateFolder(false);
-      setOpenFolderSelect(false);
-      onAddToFolder?.(newFolder.id);
+      setOpenFolderSelect(true);
     } catch {
       toast.show('폴더를 만들지 못했어요.', 1200);
     }
@@ -495,7 +496,10 @@ export default function LetterDetailSection({
         onClose={() => setOpenFolderSelect(false)}
         onSelect={(folderId) => onAddToFolder?.(folderId)}
         onSelectNone={() => onRemoveFromFolder?.()}
-        onCreateFolder={() => setOpenCreateFolder(true)}
+        onCreateFolder={() => {
+          setOpenFolderSelect(false);
+          setOpenCreateFolder(true);
+        }}
       />
 
       {openCreateFolder && (
@@ -504,7 +508,10 @@ export default function LetterDetailSection({
           initialName=""
           initialImageUrl={null}
           initialImageId={null}
-          onCancel={() => setOpenCreateFolder(false)}
+          onCancel={() => {
+            setOpenCreateFolder(false);
+            setOpenFolderSelect(true);
+          }}
           onConfirm={handleCreateFolder}
           uploadImage={async (file) => {
             const res = await uploadImageApi(file, 'folder');
