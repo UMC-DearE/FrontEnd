@@ -1,3 +1,4 @@
+// 폴더 편지 추가 페이지
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import ToolBar from '@/components/letterBox/ToolBar';
@@ -138,51 +139,58 @@ export default function LetterSelectPage() {
   }, [setFixedAction, selectedIds, isSubmitting, folderId, allLetters.length]);
 
   return (
-    <div className="flex flex-col gap-[10px] mb-3">
-      <ToolBar
-        folderTotalCount={filteredLetters.length}
-        allCount={allCount}
-        froms={froms}
-        fromCounts={fromCounts}
-        selectedFromId={selectedFromId}
-        onFromSelect={setSelectedFromId}
-        hideViewToggle
-      />
-
-      {isLettersLoading ? (
-        <div className="flex flex-col gap-[10px]">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <LetterCardSkeleton key={i} viewMode="기본 보기" />
-          ))}
-        </div>
-      ) : filteredLetters.length === 0 ? (
-        <div className="flex flex-col py-[147px] text-center text-[#A1A4AA] text-[15px] justify-center items-center gap-4">
+    <div className="flex flex-1 flex-col gap-[10px] mb-3">
+      {!isLettersLoading && allLetters.length === 0 ? (
+        // 추가할 편지가 아예 없는 경우 툴바 숨김 처리
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center text-[#A1A4AA] text-[15px]">
           추가할 편지가 없어요
-          {selectedFromId === 'all' && (
-            <button
-              onClick={() => navigate('/create')}
-              className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
-            >
-              편지 추가
-            </button>
-          )}
+          <button
+            onClick={() => navigate('/create')}
+            className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
+          >
+            편지 추가
+          </button>
         </div>
       ) : (
-        filteredLetters.map((letter) => (
-          <div key={letter.id}>
-            <LetterCard
-              letterId={letter.id}
-              viewMode="기본 보기"
-              excerpt={letter.excerpt}
-              isLiked={letter.isLiked}
-              receivedAt={letter.receivedAt}
-              from={letter.from}
-              mode="select"
-              selected={selectedIds.has(letter.id)}
-              onSelectToggle={() => toggleSelected(letter.id)}
-            />
-          </div>
-        ))
+        <>
+          <ToolBar
+            folderTotalCount={filteredLetters.length}
+            allCount={allCount}
+            froms={froms}
+            fromCounts={fromCounts}
+            selectedFromId={selectedFromId}
+            onFromSelect={setSelectedFromId}
+            hideViewToggle
+          />
+
+          {isLettersLoading ? (
+            <div className="flex flex-col gap-[10px]">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <LetterCardSkeleton key={i} viewMode="기본 보기" />
+              ))}
+            </div>
+          ) : filteredLetters.length === 0 ? (
+            <div className="flex flex-col py-[147px] text-center text-[#A1A4AA] text-[15px] justify-center items-center gap-4">
+              추가할 편지가 없어요
+            </div>
+          ) : (
+            filteredLetters.map((letter) => (
+              <div key={letter.id}>
+                <LetterCard
+                  letterId={letter.id}
+                  viewMode="기본 보기"
+                  excerpt={letter.excerpt}
+                  isLiked={letter.isLiked}
+                  receivedAt={letter.receivedAt}
+                  from={letter.from}
+                  mode="select"
+                  selected={selectedIds.has(letter.id)}
+                  onSelectToggle={() => toggleSelected(letter.id)}
+                />
+              </div>
+            ))
+          )}
+        </>
       )}
     </div>
   );
