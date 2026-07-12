@@ -14,23 +14,25 @@ export default function FolderSettingSheet({ open, onClose, onSelect }: FolderSe
       <div className="relative w-full max-w-[440px] min-h-screen overflow-hidden">
         <button type="button" onClick={onClose} className="absolute inset-0 bg-black/40" />
 
-        <div className="fixed bottom-0 left-1/2 h-52 w-full max-w-[440px] -translate-x-1/2 rounded-t-[17px] bg-white">
-          <div className="flex h-full flex-col">
-            <div className="flex flex-col mt-[63px] gap-10 items-center justify-center">
+        <div className="fixed bottom-0 left-1/2 w-full max-w-[440px] -translate-x-1/2 rounded-t-[24px] bg-white pt-[16px] pb-[40px]">
+          <div className="flex flex-col items-center">
+            <div className="h-[5px] w-[36px] shrink-0 rounded-full bg-[#E7E8EB]" />
+
+            <div className="mt-[36px] flex w-full flex-col items-center gap-[40px]">
               <button
                 type="button"
                 onClick={() => onSelect('editFolder')}
-                className="flex items-center justify-center cursor-pointer"
+                className="cursor-pointer text-[18px] text-[#141517]"
               >
-                <p className="w-[67px] h-[21px] text-[18px] text-[#141517]">폴더 수정</p>
+                폴더 수정
               </button>
 
               <button
                 type="button"
                 onClick={() => onSelect('deleteFolder')}
-                className="flex items-center justify-center cursor-pointer"
+                className="cursor-pointer text-[18px] text-[#FF1D0D]"
               >
-                <p className="w-[67px] h-[21px] text-[18px] text-[#FF1D0D]">폴더 삭제</p>
+                폴더 삭제
               </button>
             </div>
           </div>
