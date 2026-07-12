@@ -1,3 +1,4 @@
+// 홈 화면
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
@@ -47,15 +48,12 @@ export default function HomePage() {
   const updateHomeColorMutation = useUpdateHomeColor();
 
   const { data: randomData, isLoading: randomLoading } = useRandomLetterQuery();
-  // 가장 오래된 편지 1건만 조회해 "자정 이전에 추가된 편지"가 있는지 판정한다.
   const { data: letterListData, isLoading: letterListLoading } = useLetterLists({
     page: 0,
     size: 1,
     sort: 'createdAt,asc',
   });
 
-  // 랜덤 편지 표시 여부는 서버 응답이 아니라 클라이언트 자정 기준으로 게이트한다.
-  // (서버는 오늘 추가한 편지도 즉시 랜덤에 포함해 반환하므로 그대로 믿으면 안 됨)
   const { hasAnyLetter, hasLetterBeforeToday } = useMemo(() => {
     const totalElements = letterListData?.data.totalElements ?? 0;
     const oldest = letterListData?.data.content?.[0];
@@ -447,7 +445,7 @@ export default function HomePage() {
           </div>
         </div>
       )}
-      <div className={openSheet ? 'relative' : 'relative z-40'}>
+      <div className="relative z-30">
         <StickerLayer
           enabled={enabled}
           containerRef={containerRef}
