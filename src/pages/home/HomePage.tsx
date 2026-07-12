@@ -13,6 +13,7 @@ import { uploadImage } from '@/api/upload';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
 import { useUpdateHomeColor } from '@/hooks/mutations/useUpdateHomeColor';
 import { useRandomLetterQuery } from '@/hooks/queries/useRandomLetterQuery';
+import { useLetterLists } from '@/hooks/queries/useLetterList';
 import { usePinLetter } from '@/hooks/mutations/usePinLetter';
 import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
 import { useCreateSticker } from '@/hooks/mutations/useCreateSticker';
@@ -46,6 +47,30 @@ export default function HomePage() {
   const updateHomeColorMutation = useUpdateHomeColor();
 
   const { data: randomData, isLoading: randomLoading } = useRandomLetterQuery();
+  // 가장 오래된 편지 1건만 조회해 "자정 이전에 추가된 편지"가 있는지 판정한다.
+  const { data: letterListData, isLoading: letterListLoading } = useLetterLists({
+    page: 0,
+    size: 1,
+    sort: 'createdAt,asc',
+  });
+
+  // 랜덤 편지 표시 여부는 서버 응답이 아니라 클라이언트 자정 기준으로 게이트한다.
+  // (서버는 오늘 추가한 편지도 즉시 랜덤에 포함해 반환하므로 그대로 믿으면 안 됨)
+  const { hasAnyLetter, hasLetterBeforeToday } = useMemo(() => {
+    const totalElements = letterListData?.data.totalElements ?? 0;
+    const oldest = letterListData?.data.content?.[0];
+    const todayMidnight = new Date();
+    todayMidnight.setHours(0, 0, 0, 0);
+    return {
+      hasAnyLetter: totalElements > 0,
+      hasLetterBeforeToday:
+        !!oldest && new Date(oldest.createdAt).getTime() < todayMidnight.getTime(),
+    };
+  }, [letterListData]);
+
+  const showRandom = hasLetterBeforeToday && !!randomData?.hasLetter;
+  const isRandomWaiting = hasAnyLetter && !showRandom;
+
   const pinMutation = usePinLetter();
   const unpinMutation = useUnpinLetter();
 
@@ -56,7 +81,7 @@ export default function HomePage() {
   const letter: HomeCardLetter | null = useMemo(() => {
     if (!randomData) return null;
 
-    if (!randomData.hasLetter) {
+    if (!showRandom) {
       return {
         id: 0,
         excerpt: '',
@@ -66,6 +91,7 @@ export default function HomePage() {
       };
     }
 
+    // 랜덤 편지
     return {
       id: randomData.letterId,
       excerpt: randomData.randomPhrase,
@@ -73,13 +99,12 @@ export default function HomePage() {
       day: randomData.date.day,
       dayOfWeek: randomData.date.dayOfWeek,
     };
-  }, [randomData]);
+  }, [randomData, showRandom]);
 
   const pinnedLetterId = useMemo(() => {
-    if (!randomData) return null;
-    if (!randomData.hasLetter) return null;
+    if (!randomData || !showRandom) return null;
     return randomData.isPinned ? randomData.letterId : null;
-  }, [randomData]);
+  }, [randomData, showRandom]);
 
   const [pendingUnpinId, setPendingUnpinId] = useState<number | null>(null);
 
@@ -389,7 +414,7 @@ export default function HomePage() {
     setShowPwaSheet(false);
   };
 
-  if (homeLoading || randomLoading) return <div>로딩 중...</div>;
+  if (homeLoading || randomLoading || letterListLoading) return <div>로딩 중...</div>;
   if (homeError || !home) return <div>에러</div>;
 
   return (
@@ -476,6 +501,7 @@ export default function HomePage() {
         isPinned={letter?.id === pinnedLetterId}
         onPin={handlePin}
         onRequestUnpin={handleRequestUnpin}
+        waiting={isRandomWaiting}
       />
       <ConfirmModal
         open={pendingUnpinId !== null}
