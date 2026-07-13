@@ -15,7 +15,7 @@ export default function EditLetterHeader({ images }: Props) {
     <ThumbnailHeader
       title="편지 수정"
       confirmTitle="편지 수정 취소"
-      confirmDescription="편지 수정을 취소할까요? 내용은 저장되지 않아요"
+      confirmDescription={"편지 수정을 취소할까요?\n내용은 저장되지 않아요"}
       images={images}
       onConfirmExit={() => {
         if (id) {
