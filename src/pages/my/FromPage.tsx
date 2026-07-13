@@ -56,20 +56,37 @@ export default function FromPage() {
                 fromIndex={index}
                 onCancel={() => setEditingFromId(null)}
                 onSave={async (updated) => {
-                  try {
-                    await updateFromMutation.mutateAsync({
-                      fromId: updated.fromId,
-                      payload: {
-                        name: updated.name,
-                        bgColor: updated.bgColor,
-                        fontColor: updated.fontColor,
-                      },
-                    });
-                    setEditingFromId(null);
-                  } catch {
-                    toast.show('프롬 수정 중 오류가 발생했어요.');
-                  }
-                }}
+                const normalizeFromName = (name: string) =>
+                  name.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+
+                const trimmedName = updated.name.trim();
+
+                const isDuplicate = fromList.some(
+                  (item) =>
+                    item.fromId !== updated.fromId &&
+                    normalizeFromName(item.name) === normalizeFromName(trimmedName),
+                );
+
+                if (isDuplicate) {
+                  toast.show('같은 이름의 프롬이 이미 있어요');
+                  return;
+                }
+
+                try {
+                  await updateFromMutation.mutateAsync({
+                    fromId: updated.fromId,
+                    payload: {
+                      name: trimmedName,
+                      bgColor: updated.bgColor,
+                      fontColor: updated.fontColor,
+                    },
+                  });
+
+                  setEditingFromId(null);
+                } catch {
+                  toast.show('프롬 수정 중 오류가 발생했어요.');
+                }
+              }}
                 onDelete={async (id) => {
                   try {
                     await deleteFromMutation.mutateAsync(id);
