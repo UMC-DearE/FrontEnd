@@ -29,7 +29,7 @@ export default function BottomSheet({
       />
 
       <div
-        className={`relative z-10 w-full max-w-[440px] rounded-t-[24px] bg-white pt-[16px] ${className}`}
+        className={`relative z-10 w-full max-w-[440px] rounded-t-[24px] bg-white pt-[16px] pb-[60px] ${className}`}
       >
         <div className={`flex w-full flex-col items-center ${contentClassName}`}>
           <div className="h-[5px] w-[36px] shrink-0 rounded-full bg-[#E7E8EB]" />

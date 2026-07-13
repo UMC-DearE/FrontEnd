@@ -38,7 +38,7 @@ export default function FolderSelect({
   onCreateFolder,
 }: Props) {
   return (
-    <BottomSheet open={open} onClose={onClose} className="max-h-[369px] px-[20px] pb-[88px]">
+    <BottomSheet open={open} onClose={onClose} className="max-h-[369px] px-[20px]">
       <div className="mt-[20px] flex w-full flex-col overflow-y-auto">
           {/* 선택 없음(전체) */}
           <button

@@ -10,7 +10,7 @@ interface FolderSettingSheetProps {
 
 export default function FolderSettingSheet({ open, onClose, onSelect }: FolderSettingSheetProps) {
   return (
-    <BottomSheet open={open} onClose={onClose} className="pb-[40px]">
+    <BottomSheet open={open} onClose={onClose}>
       <div className="mt-[36px] flex w-full flex-col items-center gap-[40px]">
         <button
           type="button"
