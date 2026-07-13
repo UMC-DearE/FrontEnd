@@ -39,6 +39,27 @@ export default function LetterForm({
 
   const MAX_HEIGHT = LINE_HEIGHT * MAX_LINES + PADDING_Y;
 
+
+  const dateInputRef = useRef<HTMLInputElement>(null);
+
+  const openDatePicker = () => {
+    const input = dateInputRef.current;
+
+    if (!input || unknownDate) return;
+
+    try {
+      if (typeof input.showPicker === "function") {
+        input.showPicker();
+      } else {
+        input.focus();
+        input.click();
+      }
+    } catch {
+      input.focus();
+      input.click();
+    }
+  };
+
   useLayoutEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
@@ -163,44 +184,68 @@ const formatDatePreview = (value: string) => {
         </p>
 
         <div className="flex items-center gap-4">
-          <div className="relative flex-1 h-[45px]">
+          <div
+            role="button"
+            tabIndex={unknownDate ? -1 : 0}
+            onClick={openDatePicker}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openDatePicker();
+              }
+            }}
+            className={`
+              relative flex-1 h-[45px]
+              ${unknownDate ? "cursor-default" : "cursor-pointer"}
+            `}
+          >
             <input
+              ref={dateInputRef}
               type="date"
               value={date}
               onChange={(e) => {
-                const next = e.target.value; // 서버로 넘길 값: YYYY-MM-DD
+                const next = e.target.value;
+
                 setDate(next);
                 onDateChange?.(next);
               }}
               disabled={unknownDate}
               className="
-                absolute inset-0 w-full h-full
-                opacity-0 cursor-pointer
+                absolute inset-0
+                z-10
+                w-full h-full
+                opacity-0
+                cursor-pointer
               "
             />
 
             <div
               className={`
+                pointer-events-none
                 w-full h-[45px]
                 border border-[#E7E8EB]
-                rounded-xl px-4 text-sm font-medium
+                rounded-xl
+                px-4
+                text-sm font-medium
                 flex items-center
                 ${date ? "text-[#585A5F]" : "text-[#C7C7CC]"}
-                ${unknownDate ? "bg-[#F7F8F9]" : "bg-[#FFFFFF]"}
+                ${unknownDate ? "bg-[#F7F8F9]" : "bg-white"}
               `}
             >
               {date ? formatDatePreview(date) : "YY-MM-DD"}
             </div>
           </div>
 
-          <label className="flex items-center gap-2 text-sm font-medium text-[#585A5F]">
+          <label className="flex items-center gap-2 text-sm font-medium text-[#585A5F] cursor-pointer">
             <input
               type="checkbox"
               checked={unknownDate}
               onChange={(e) => {
                 const checked = e.target.checked;
+
                 setUnknownDate(checked);
                 onUnknownDateChange?.(checked);
+
                 if (checked) {
                   setDate("");
                   onDateChange?.("");
@@ -208,6 +253,7 @@ const formatDatePreview = (value: string) => {
               }}
               className="checkbox-accent checkbox-custom"
             />
+
             날짜 모름
           </label>
         </div>

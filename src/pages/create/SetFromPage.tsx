@@ -11,6 +11,7 @@ import erasebtn from '@/assets/create/erasebtn.svg';
 import type { From } from '@/types/from';
 import { useFromList } from '@/hooks/queries/useFromList';
 import { hangulIncludes } from '@/utils/hangulSearch';
+import useToast from '@/hooks/useToast';
 
 type FromItem = From;
 
@@ -36,6 +37,7 @@ export default function SetFromPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as SetFromPageState;
+  const toast = useToast();
 
   const { data: fromList = [] } = useFromList();
 
@@ -59,6 +61,27 @@ export default function SetFromPage() {
       },
     });
   };
+
+  const normalizeFromName = (name: string) =>
+  name.trim().replace(/\s+/g, ' ').toLowerCase();
+
+const handleDraftCreate = (draft: CreateFrom) => {
+  const normalizedDraftName = normalizeFromName(draft.name);
+
+  const isDuplicate = fromList.some(
+    (from) => normalizeFromName(from.name) === normalizedDraftName,
+  );
+
+  if (isDuplicate) {
+  toast.show('같은 이름의 프롬이 이미 있어요');
+  return;
+}
+
+  goBackWithDraft({
+    ...draft,
+    name: draft.name.trim(),
+  });
+};
 
   const handleSelect = (from: FromItem) => {
     goBackWithDraft({
@@ -181,11 +204,11 @@ export default function SetFromPage() {
             }
           />
           <FromCreator
-            onDraftCreate={goBackWithDraft}
-            name={addInput}
-            onNameChange={setAddInput}
-            fromCount={fromList.length}
-          />
+  onDraftCreate={handleDraftCreate}
+  name={addInput}
+  onNameChange={setAddInput}
+  fromCount={fromList.length}
+/>
         </div>
       )}
     </div>

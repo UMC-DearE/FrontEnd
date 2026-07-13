@@ -6,6 +6,7 @@ import type { CreateFrom } from '@/types/from';
 import erasebtn from '@/assets/create/erasebtn.svg';
 import useToast from '@/hooks/useToast';
 import { useCreateFrom } from '@/hooks/mutations/useCreateFrom';
+import { useFromList } from '@/hooks/queries/useFromList';
 
 export default function FromCreatePage() {
   const navigate = useNavigate();
@@ -13,18 +14,45 @@ export default function FromCreatePage() {
   const [input, setInput] = useState('');
   const createFromMutation = useCreateFrom();
 
+  const { data: fromList = [] } = useFromList();
+
+  const normalizeFromName = (name: string) =>
+    name.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+
   const handleCreateImmediate = async (draft: CreateFrom) => {
     if (createFromMutation.isPending) return;
+
+    const trimmedName = draft.name.trim();
+    const normalizedName = normalizeFromName(trimmedName);
+
+    const isDuplicate = fromList.some(
+      (from) => normalizeFromName(from.name) === normalizedName,
+    );
+
+    if (isDuplicate) {
+      toast.show('같은 이름의 프롬이 이미 있어요');
+      return;
+    }
+
     try {
-      const res = await createFromMutation.mutateAsync(draft);
+      const res = await createFromMutation.mutateAsync({
+        ...draft,
+        name: trimmedName,
+      });
+
       if (!res.success) {
         toast.show(res.message || '프롬 생성에 실패했어요.');
         return;
       }
+
       navigate('/my/from', {
         replace: true,
         state: {
-          createdFrom: { ...draft, fromId: res.data.fromId },
+          createdFrom: {
+            ...draft,
+            name: trimmedName,
+            fromId: res.data.fromId,
+          },
         },
       });
     } catch {
@@ -45,6 +73,7 @@ export default function FromCreatePage() {
           rightElement={
             input ? (
               <button
+                type="button"
                 onClick={() => setInput('')}
                 className="flex items-center justify-center w-6 h-6"
               >
@@ -66,4 +95,3 @@ export default function FromCreatePage() {
     </div>
   );
 }
-
