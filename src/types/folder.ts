@@ -1,4 +1,4 @@
-import type { CommonResponse } from "./common";
+import type { CommonResponse } from './common';
 
 export type Folder = {
   id: number;
@@ -22,10 +22,12 @@ export type CreateFolderRequest = {
   imageId: number | null;
 };
 
+export type FolderImageAction = 'CHANGE' | 'DELETE';
+
 export type UpdateFolderRequest = {
-  name: string;
-  imageId: number | null;
+  name?: string;
+  imageAction?: FolderImageAction;
+  imageId?: number;
 };
 
 export type FolderLetterResponse = CommonResponse<Record<string, never>>;
-

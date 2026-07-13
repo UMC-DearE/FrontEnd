@@ -1,10 +1,17 @@
 // 편지함 폴더 모달
 
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import type { FolderImageAction } from '@/types/folder';
 import resetIcon from '@/assets/letterPage/resetIcon.svg';
 import plusIcon from '@/assets/letterPage/folderPlusIcon.svg';
 
 type UploadImageResult = { imageId: number; url: string };
+
+export type FolderModalResult = {
+  folder_name: string;
+  imageId: number | null;
+  imageAction: FolderImageAction | null;
+};
 
 interface FolderModalProps {
   title?: string;
@@ -12,7 +19,7 @@ interface FolderModalProps {
   initialImageUrl: string | null;
   initialImageId: number | null;
   onCancel: () => void;
-  onConfirm: (data: { folder_name: string; imageId: number | null }) => void;
+  onConfirm: (data: FolderModalResult) => void;
   uploadImage: (
     file: File,
     dir: 'profile' | 'letter' | 'sticker' | 'folder'
@@ -85,7 +92,15 @@ export default function FolderModal({
   const handleConfirm = () => {
     const name = folderName.trim();
     if (!name || isUploading) return;
-    onConfirm({ folder_name: name, imageId });
+
+    let imageAction: FolderImageAction | null = null;
+    if (imageId != null && imageId !== initialImageId) {
+      imageAction = 'CHANGE';
+    } else if (imageId == null && initialImageId != null) {
+      imageAction = 'DELETE';
+    }
+
+    onConfirm({ folder_name: name, imageId, imageAction });
   };
 
   const isFormValid = folderName.trim().length > 0 && !isUploading;
