@@ -25,8 +25,6 @@ interface FolderModalProps {
     file: File,
     dir: 'profile' | 'letter' | 'sticker' | 'folder'
   ) => Promise<UploadImageResult>;
-  onImageDelete?: () => Promise<void>;
-  currentFolderId?: number | null;
 }
 
 export default function FolderModal({
@@ -37,8 +35,6 @@ export default function FolderModal({
   onCancel,
   onConfirm,
   uploadImage,
-  onImageDelete,
-  currentFolderId,
 }: FolderModalProps) {
   const [folderName, setFolderName] = useState(initialName);
   const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl);
@@ -77,27 +73,26 @@ export default function FolderModal({
     }
   };
 
-  const handleImageDelete = async () => {
+  const handleImageDelete = () => {
     if (objectUrlRef.current) {
       URL.revokeObjectURL(objectUrlRef.current);
       objectUrlRef.current = null;
     }
     setImageUrl(null);
     setImageId(null);
-
-    if (currentFolderId != null && onImageDelete) {
-      await onImageDelete();
-    }
   };
 
   const handleConfirm = () => {
     const name = folderName.trim();
     if (!name || isUploading) return;
 
+    const hadImage = initialImageUrl != null;
+    const hasImage = imageUrl != null;
+
     let imageAction: FolderImageAction | null = null;
     if (imageId != null && imageId !== initialImageId) {
       imageAction = 'CHANGE';
-    } else if (imageId == null && initialImageId != null) {
+    } else if (!hasImage && hadImage) {
       imageAction = 'DELETE';
     }
 
