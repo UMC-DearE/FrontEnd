@@ -1,8 +1,9 @@
 // 홈 화면
 import { useMemo, useRef, useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
 import ProfileCard from '@/components/home/ProfileCard';
+import ProfileSettingSheet from '@/components/home/ProfileSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import LetterCard, { type HomeCardLetter } from '@/components/home/LetterCard';
 import AddLetterButton from '@/components/home/AddLetterButton';
@@ -43,6 +44,7 @@ const fitToMaxSide = (w: number, h: number, maxSide: number) => {
 const cloneStickers = (arr: StickerItem[]) => arr.map((s) => ({ ...s }));
 
 export default function HomePage() {
+  const navigate = useNavigate();
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
   const { data: home, isLoading: homeLoading, isError: homeError } = useHomeQuery();
   const updateHomeColorMutation = useUpdateHomeColor();
@@ -107,6 +109,7 @@ export default function HomePage() {
   const [pendingUnpinId, setPendingUnpinId] = useState<number | null>(null);
 
   const [openSheet, setOpenSheet] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [showResetSheet, setShowResetSheet] = useState(false);
@@ -473,7 +476,19 @@ export default function HomePage() {
         nickname={home.user.nickname}
         bio={home.user.intro}
         imgUrl={home.user.imgUrl}
-        onClickSettings={openEditor}
+        onClickSettings={() => setProfileMenuOpen(true)}
+      />
+      <ProfileSettingSheet
+        open={profileMenuOpen}
+        onClose={() => setProfileMenuOpen(false)}
+        onSelect={(type) => {
+          setProfileMenuOpen(false);
+          if (type === 'editProfile') {
+            navigate('/my/profile');
+          } else {
+            openEditor();
+          }
+        }}
       />
       <ProfileCustomSheet
         open={openSheet}
