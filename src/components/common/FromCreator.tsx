@@ -1,66 +1,31 @@
-// 프롬 생성하기 공용 UI - 검색창은 각각 컴포넌트에서 따로
+// 프롬 생성하기 공용 UI - 색상 선택 + 미리보기 (제출 로직/버튼은 각 페이지에서 처리)
 
 import { useState } from 'react';
 import { getHarmoniousTextColor } from '@/utils/color';
-import type { CreateFrom } from '@/types/from';
 import ColorPicker from '@/assets/create/color-picker.svg';
 import { HexColorPicker } from 'react-colorful';
-import Plusbtn from '@/assets/create/plusbtn.svg';
 import { FromBadge } from '@/components/common/FromBadge';
 
 type Props = {
-  onDraftCreate?: (draft: CreateFrom) => void; // 생성된 draft를 부모 컴포넌트로 전달(setFromPage)
-  onCreateImmediate?: (draft: CreateFrom) => Promise<any>; // 생성된 draft로 바로 프롬 생성 api 호출(fromCreatePage)
   name: string;
-  onNameChange: (v: string) => void;
-  disabled?: boolean;
-  fromCount?: number; // 현재 From 개수 (개수에 따라 컬러피커 위치 조정용)
+  selectedColor: string;
+  onColorChange: (c: string) => void;
 };
 
-export default function CreateFrom({
-  onDraftCreate,
-  onCreateImmediate,
-  name,
-  onNameChange,
-  disabled,
-}: Props) {
-  const [selectedColor, setSelectedColor] = useState('#FEEFEF');
+export default function CreateFrom({ name, selectedColor, onColorChange }: Props) {
   const [showPicker, setShowPicker] = useState(false);
 
-  const handleCreate = async () => {
-    const trimmed = name.trim();
-    if (!trimmed) return;
-
-    const shortName = trimmed.slice(0, 7); // 최대 7자 제한
-
-    const draft: CreateFrom = {
-      name: shortName,
-      bgColor: selectedColor,
-      fontColor: getHarmoniousTextColor(selectedColor),
-    };
-
-    if (onDraftCreate) {
-      onDraftCreate(draft);
-      return;
-    }
-
-    if (onCreateImmediate) {
-      await onCreateImmediate(draft);
-      onNameChange('');
-    }
-  };
-
   return (
-    <div className="mt-4">
-      <div className="flex mb-4 gap-2">
+    <div className="mt-7">
+      <div className="flex mb-3 gap-2">
         <div className="text-sm font-medium text-[#A1A4AA]">색상 선택</div>
       </div>
 
-      <div className="relative flex gap-3 mb-6 mt-4">
+      <div className="relative flex gap-3 mb-7">
         {['#FFE2DD', '#FFF3C4', '#EAF5FF', '#E4F7EB'].map((c) => (
           <button
             key={c}
-            onClick={() => setSelectedColor(c)}
+            onClick={() => onColorChange(c)}
             className={`w-[36px] h-[36px] rounded-full transition-all border-[1.2px] ${
               selectedColor === c ? 'border-primary' : 'border-transparent'
             }`}
@@ -76,15 +41,13 @@ export default function CreateFrom({
         </button>
 
         {showPicker && (
-        <div
-          className="absolute left-6/8 -translate-x-1/2 z-40 top-full mt-3"
-        >
-          <div className="bg-white rounded-lg p-3 shadow-lg">
-              <HexColorPicker color={selectedColor} onChange={(c) => setSelectedColor(c)} />
+          <div className="absolute left-6/8 -translate-x-1/2 z-40 top-full mt-3">
+            <div className="bg-white rounded-lg p-3 shadow-lg">
+              <HexColorPicker color={selectedColor} onChange={onColorChange} />
               <div className="mt-2 flex items-center gap-2 justify-between">
                 <input
                   value={selectedColor}
-                  onChange={(e) => setSelectedColor(e.target.value)}
+                  onChange={(e) => onColorChange(e.target.value)}
                   className="w-28 rounded border px-2 py-1 text-sm"
                 />
                 <button
@@ -99,11 +62,15 @@ export default function CreateFrom({
         )}
       </div>
 
-      <button onClick={handleCreate} className="flex items-center gap-2 font-normal text-lg text-primary" disabled={disabled}>
-        <img src={Plusbtn} alt="upload" />
-        <FromBadge size="xl" name={name || '이름'} bgColor={selectedColor} fontColor={getHarmoniousTextColor(selectedColor)} />
-        추가하기
-      </button>
+      <div className="w-full rounded-2xl bg-[#F7F8F9] border border-dashed border-[#CACBD1] px-[125px] py-[24px] flex flex-col items-center justify-center gap-3">
+        <p className="text-[13px] font-normal text-[#A1A4AA]">이렇게 만들어져요 👀</p>
+        <FromBadge
+          size="xl"
+          name={name || '이름'}
+          bgColor={selectedColor}
+          fontColor={getHarmoniousTextColor(selectedColor)}
+        />
+      </div>
     </div>
   );
 }

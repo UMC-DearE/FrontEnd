@@ -1,30 +1,35 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { InputField } from '@/components/common/InputField';
 import FromCreator from '@/components/common/FromCreator';
-import type { CreateFrom } from '@/types/from';
+import { BottomButton } from '@/components/common/BottomButton';
 import erasebtn from '@/assets/create/erasebtn.svg';
 import useToast from '@/hooks/useToast';
 import { useCreateFrom } from '@/hooks/mutations/useCreateFrom';
 import { useFromList } from '@/hooks/queries/useFromList';
+import { getHarmoniousTextColor } from '@/utils/color';
+import type { AppLayoutContext } from '@/layouts/AppLayout';
 
 export default function FromCreatePage() {
   const navigate = useNavigate();
   const toast = useToast();
   const [input, setInput] = useState('');
+  const [selectedColor, setSelectedColor] = useState('#FFA2A2');
   const createFromMutation = useCreateFrom();
+  const { setFixedAction } = useOutletContext<AppLayoutContext>();
 
   const { data: fromList = [] } = useFromList();
 
   const normalizeFromName = (name: string) =>
     name.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 
-  const handleCreateImmediate = async (draft: CreateFrom) => {
+  const handleCreateImmediate = async () => {
     if (createFromMutation.isPending) return;
 
-    const trimmedName = draft.name.trim();
-    const normalizedName = normalizeFromName(trimmedName);
+    const trimmedName = input.trim();
+    if (!trimmedName) return;
 
+    const normalizedName = normalizeFromName(trimmedName);
     const isDuplicate = fromList.some(
       (from) => normalizeFromName(from.name) === normalizedName,
     );
@@ -34,11 +39,14 @@ export default function FromCreatePage() {
       return;
     }
 
+    const draft = {
+      name: trimmedName.slice(0, 7),
+      bgColor: selectedColor,
+      fontColor: getHarmoniousTextColor(selectedColor),
+    };
+
     try {
-      const res = await createFromMutation.mutateAsync({
-        ...draft,
-        name: trimmedName,
-      });
+      const res = await createFromMutation.mutateAsync(draft);
 
       if (!res.success) {
         toast.show(res.message || '프롬 생성에 실패했어요.');
@@ -50,7 +58,6 @@ export default function FromCreatePage() {
         state: {
           createdFrom: {
             ...draft,
-            name: trimmedName,
             fromId: res.data.fromId,
           },
         },
@@ -60,38 +67,51 @@ export default function FromCreatePage() {
     }
   };
 
-  return (
-    <div>
-      <div className="p-0 mt-3 px-0">
-        <InputField
-          value={input}
-          onChange={setInput}
-          placeholder="이름을 입력하세요"
-          useGrayWhenBlurred
-          maxLength={7}
-          inputClassName="h-[50px] rounded-xl px-4 text-base font-medium outline-none cursor-text focus:bg-white focus:ring-1 focus:ring-primary"
-          rightElement={
-            input ? (
-              <button
-                type="button"
-                onClick={() => setInput('')}
-                className="flex items-center justify-center w-6 h-6"
-              >
-                <img src={erasebtn} alt="clear" />
-              </button>
-            ) : undefined
-          }
-        />
-      </div>
+  useEffect(() => {
+    setFixedAction({
+      node: (
+        <BottomButton
+          disabled={!input.trim() || createFromMutation.isPending}
+          onClick={handleCreateImmediate}
+        >
+          추가하기
+        </BottomButton>
+      ),
+    });
 
-      <div className="mt-[26px]">
-        <FromCreator
-          onCreateImmediate={handleCreateImmediate}
-          name={input}
-          onNameChange={setInput}
-          disabled={createFromMutation.isPending}
-        />
-      </div>
+    return () => setFixedAction(null);
+  }, [input, selectedColor, createFromMutation.isPending, fromList]);
+
+return (
+  <div className="flex flex-col h-full">
+    <div className="flex mb-3 justify-between mt-1">
+      <div className="text-sm font-medium text-[#A1A4AA]">이름 입력</div>
+      <div className="text-sm font-medium text-[#A1A4AA]">{input.length}/10</div>
     </div>
-  );
+    <InputField
+      value={input}
+      onChange={(v) => setInput(v.slice(0, 10))}
+      placeholder="편지를 준 사람의 이름"
+      useGrayWhenBlurred
+      maxLength={10}
+      inputClassName="h-[50px] rounded-xl px-4 text-base font-medium outline-none cursor-text focus:bg-white focus:ring-1 focus:ring-primary"
+      rightElement={
+        input ? (
+          <button
+            onClick={() => setInput('')}
+            className="flex items-center justify-center w-6 h-6"
+          >
+            <img src={erasebtn} alt="clear" className="w-5 h-5 block" />
+          </button>
+        ) : undefined
+      }
+    />
+
+    <FromCreator
+      name={input}
+      selectedColor={selectedColor}
+      onColorChange={setSelectedColor}
+    />
+  </div>
+);
 }

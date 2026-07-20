@@ -9,6 +9,9 @@ import { FONT_FAMILY } from '@/utils/fontMap';
 export type AppLayoutContext = {
   homeBgColor: string;
   setHomeBgColor: (color: string) => void;
+  setFixedAction: (
+    action: { node: React.ReactNode; bgColor?: string } | null,
+  ) => void;
 };
 
 export function AppLayout() {
