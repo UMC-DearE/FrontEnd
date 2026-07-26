@@ -1,5 +1,3 @@
-// 서버 응답 X - goBackWithDraft로 상태 전달하여 이전 페이지에서 처리
-
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import type { CreateResultPayload } from '@/types/create';
@@ -44,8 +42,9 @@ export default function SetFromPage() {
     setName: setAddInput,
     selectedColor,
     setSelectedColor,
-    buildDraftOrWarn,
+    createFromAndGetDraft,
     fromList,
+    isCreating,
   } = useFromDraftForm();
 
   const goBackWithDraft = (draft: CreateFrom) => {
@@ -69,8 +68,8 @@ export default function SetFromPage() {
     });
   };
 
-  const handleDraftCreate = () => {
-    const draft = buildDraftOrWarn();
+  const handleDraftCreate = async () => {
+    const draft = await createFromAndGetDraft();
     if (!draft) return;
     goBackWithDraft(draft);
   };
@@ -93,14 +92,14 @@ export default function SetFromPage() {
 
     setFixedAction({
       node: (
-        <BottomButton disabled={!addInput.trim()} onClick={handleDraftCreate}>
+        <BottomButton disabled={!addInput.trim() || isCreating} onClick={handleDraftCreate}>
           추가하기
         </BottomButton>
       ),
     });
 
     return () => setFixedAction(null);
-  }, [tab, addInput, selectedColor, fromList]);
+  }, [tab, addInput, selectedColor, fromList, isCreating]);
 
   return (
     <div className="flex flex-col h-full">

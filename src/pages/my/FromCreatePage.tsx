@@ -4,16 +4,12 @@ import { InputField } from '@/components/common/InputField';
 import FromCreator from '@/components/common/FromCreator';
 import { BottomButton } from '@/components/common/BottomButton';
 import erasebtn from '@/assets/create/erasebtn.svg';
-import useToast from '@/hooks/useToast';
-import { useCreateFrom } from '@/hooks/mutations/useCreateFrom';
 import { useFromDraftForm } from '@/hooks/useFromDraftForm';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
 import { FROM_NAME_MAX_LENGTH } from '@/constants/from';
 
 export default function FromCreatePage() {
   const navigate = useNavigate();
-  const toast = useToast();
-  const createFromMutation = useCreateFrom();
   const { setFixedAction } = useOutletContext<AppLayoutContext>();
 
   const {
@@ -21,43 +17,26 @@ export default function FromCreatePage() {
     setName: setInput,
     selectedColor,
     setSelectedColor,
-    buildDraftOrWarn,
+    createFromAndGetDraft,
+    isCreating,
     fromList,
   } = useFromDraftForm();
 
   const handleCreateImmediate = async () => {
-    if (createFromMutation.isPending) return;
-
-    const draft = buildDraftOrWarn();
+    const draft = await createFromAndGetDraft();
     if (!draft) return;
 
-    try {
-      const res = await createFromMutation.mutateAsync(draft);
-
-      if (!res.success) {
-        toast.show(res.message || '프롬 생성에 실패했어요.');
-        return;
-      }
-
-      navigate('/my/from', {
-        replace: true,
-        state: {
-          createdFrom: {
-            ...draft,
-            fromId: res.data.fromId,
-          },
-        },
-      });
-    } catch {
-      toast.show('프롬 생성 중 오류가 발생했어요.');
-    }
+    navigate('/my/from', {
+      replace: true,
+      state: { createdFrom: draft },
+    });
   };
 
   useEffect(() => {
     setFixedAction({
       node: (
         <BottomButton
-          disabled={!input.trim() || createFromMutation.isPending}
+          disabled={!input.trim() || isCreating}
           onClick={handleCreateImmediate}
         >
           추가하기
@@ -66,7 +45,7 @@ export default function FromCreatePage() {
     });
 
     return () => setFixedAction(null);
-  }, [input, selectedColor, createFromMutation.isPending, fromList]);
+  }, [input, selectedColor, isCreating, fromList]);
 
   return (
     <div className="flex flex-col h-full">
