@@ -3,18 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import type { CreateResultPayload } from '@/types/create';
-import type { CreateFrom } from '@/types/from';
+import type { CreateFrom, From } from '@/types/from';
 import { FromBadge } from '@/components/common/FromBadge';
 import { InputField } from '@/components/common/InputField';
 import FromCreator from '@/components/common/FromCreator';
 import { BottomButton } from '@/components/common/BottomButton';
 import erasebtn from '@/assets/create/erasebtn.svg';
-import type { From } from '@/types/from';
-import { useFromList } from '@/hooks/queries/useFromList';
 import { hangulIncludes } from '@/utils/hangulSearch';
-import { getHarmoniousTextColor } from '@/utils/color';
-import useToast from '@/hooks/useToast';
+import { useFromDraftForm } from '@/hooks/useFromDraftForm';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
+import { FROM_NAME_MAX_LENGTH } from '@/constants/from';
 
 type FromItem = From;
 
@@ -36,15 +34,19 @@ type SetFromPageState =
 export default function SetFromPage() {
   const [tab, setTab] = useState<'select' | 'add'>('select');
   const [searchInput, setSearchInput] = useState('');
-  const [addInput, setAddInput] = useState('');
-  const [selectedColor, setSelectedColor] = useState('#FFA2A2');
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as SetFromPageState;
-  const toast = useToast();
   const { setFixedAction } = useOutletContext<AppLayoutContext>();
 
-  const { data: fromList = [] } = useFromList();
+  const {
+    name: addInput,
+    setName: setAddInput,
+    selectedColor,
+    setSelectedColor,
+    buildDraftOrWarn,
+    fromList,
+  } = useFromDraftForm();
 
   const goBackWithDraft = (draft: CreateFrom) => {
     if (state && 'mode' in state && state.mode === 'edit') {
@@ -67,28 +69,10 @@ export default function SetFromPage() {
     });
   };
 
-  const normalizeFromName = (name: string) =>
-    name.trim().replace(/\s+/g, ' ').toLowerCase();
-
   const handleDraftCreate = () => {
-    const trimmed = addInput.trim();
-    if (!trimmed) return;
-
-    const normalizedDraftName = normalizeFromName(trimmed);
-    const isDuplicate = fromList.some(
-      (from) => normalizeFromName(from.name) === normalizedDraftName,
-    );
-
-    if (isDuplicate) {
-      toast.show('같은 이름의 프롬이 이미 있어요');
-      return;
-    }
-
-    goBackWithDraft({
-      name: trimmed.slice(0, 7),
-      bgColor: selectedColor,
-      fontColor: getHarmoniousTextColor(selectedColor),
-    });
+    const draft = buildDraftOrWarn();
+    if (!draft) return;
+    goBackWithDraft(draft);
   };
 
   const handleSelect = (from: FromItem) => {
@@ -148,7 +132,7 @@ export default function SetFromPage() {
               onChange={setSearchInput}
               placeholder="이름 검색"
               useGrayWhenBlurred
-              maxLength={9}
+              maxLength={FROM_NAME_MAX_LENGTH}
               inputClassName="h-[50px] rounded-xl px-4 text-base font-medium outline-none cursor-text focus:bg-white focus:ring-1 focus:ring-primary mb-4"
               rightElement={
                 searchInput ? (
@@ -161,7 +145,7 @@ export default function SetFromPage() {
                 ) : undefined
               }
             />
-            <div className="flex flex-col gap-[24px] mt-2 justify-center">
+            <div className="flex flex-col gap-[24px] mt-2 justify-center mb-5">
               {fromList.length === 0 ? (
                 <div className="w-full flex flex-col items-center justify-center gap-[16px] min-h-[320px]">
                   <p className="font-normal text-[15px] text-[#A1A4AA]">
@@ -209,14 +193,16 @@ export default function SetFromPage() {
         <div className="flex flex-col h-full mt-5">
           <div className="flex mb-3 justify-between">
             <div className="text-sm font-medium text-[#A1A4AA]">이름 입력</div>
-            <div className="text-sm font-medium text-[#A1A4AA]">{addInput.length}/10</div>
+            <div className="text-sm font-medium text-[#A1A4AA]">
+              {addInput.length}/{FROM_NAME_MAX_LENGTH}
+            </div>
           </div>
           <InputField
             value={addInput}
-            onChange={(v) => setAddInput(v.slice(0, 10))}
+            onChange={setAddInput}
             placeholder="편지를 준 사람의 이름"
             useGrayWhenBlurred
-            maxLength={10}
+            maxLength={FROM_NAME_MAX_LENGTH}
             inputClassName="h-[50px] rounded-xl px-4 text-base font-medium outline-none cursor-text focus:bg-white focus:ring-1 focus:ring-primary"
             rightElement={
               addInput ? (

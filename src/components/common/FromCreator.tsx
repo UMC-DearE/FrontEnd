@@ -64,12 +64,14 @@ export default function CreateFrom({ name, selectedColor, onColorChange }: Props
 
       <div className="w-full rounded-2xl bg-[#F7F8F9] border border-dashed border-[#CACBD1] px-[125px] py-[24px] flex flex-col items-center justify-center gap-3">
         <p className="text-[13px] font-normal text-[#A1A4AA]">이렇게 만들어져요 👀</p>
-        <FromBadge
-          size="xl"
-          name={name || '이름'}
-          bgColor={selectedColor}
-          fontColor={getHarmoniousTextColor(selectedColor)}
-        />
+        <div className="shadow-[0px_0px_4px_0px_rgba(0,0,0,0.12)] rounded-[6px]">
+          <FromBadge
+            size="xl"
+            name={name || '이름'}
+            bgColor={selectedColor}
+            fontColor={getHarmoniousTextColor(selectedColor)}
+          />
+        </div>
       </div>
     </div>
   );
