@@ -50,6 +50,7 @@ export default function StylePage() {
           변경
         </BottomButton>
       ),
+      bgColor: '#F7F8F9',
     });
 
     return () => setFixedAction(null);
@@ -63,7 +64,7 @@ export default function StylePage() {
         </div>
 
         <div
-          className="rounded-[15px] w-[361px] h-[175px] shadow-[0_0_2px_rgba(0,0,0,0.08)] py-[40px] bg-white"
+          className="rounded-[15px] w-full h-[175px] shadow-[0_0_2px_rgba(0,0,0,0.08)] py-[40px] bg-white"
           style={{ fontFamily: current.fontFamily }}
           >
           <div className="text-center text-[18px] font-medium leading-[1.5] text-[#141517]">

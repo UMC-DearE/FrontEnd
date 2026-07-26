@@ -225,7 +225,7 @@ export default function LetterDetailSection({
           편지 카드 저장
         </BottomButton>
       ),
-      bgColor: "#F8F8F8",
+      bgColor: "#F7F8F9",
     });
 
     return () => {
