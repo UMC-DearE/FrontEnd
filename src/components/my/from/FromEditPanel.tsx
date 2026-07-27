@@ -68,10 +68,8 @@ export default function FromEditPanel({ from, onCancel, onSave, onDelete, fromIn
           <button
             key={c}
             onClick={() => setSelectedColor(c)}
-            className={`w-[32px] h-[32px] rounded-full transition-all ${
-              selectedColor === c
-                ? 'scale-100 shadow-[0_0_8px_rgba(0,0,0,0.2)]'
-                : 'shadow-none'
+            className={`w-[32px] h-[32px] rounded-full transition-all border-[1.2px] ${
+              selectedColor === c ? 'border-primary' : 'border-transparent'
             }`}
             style={{ background: c }}
           />

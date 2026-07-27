@@ -50,6 +50,7 @@ export default function StylePage() {
           변경
         </BottomButton>
       ),
+      bgColor: '#F7F8F9',
     });
 
     return () => setFixedAction(null);
