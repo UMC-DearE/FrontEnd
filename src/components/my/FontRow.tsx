@@ -24,7 +24,7 @@ export function FontRow({
       type="button"
       onClick={onClick}
       className={clsx(
-        "w-full h-[80px] text-left rounded-[12px] border-[1.2px] px-[20px] py-[21px] flex items-center justify-between",
+        "w-full min-h-[80px] text-left rounded-[12px] border-[1.2px] px-[20px] py-[21px] flex items-center justify-between gap-[12px]",
         selected ? "border-[#141517]" : "border-[#E6E7E9]"
       )}
     >
