@@ -222,8 +222,17 @@ export default function LetterDetailSection({
 
   useEffect(() => {
     setFixedAction({
+<<<<<<< HEAD
       node: <BottomButton onClick={handleSaveCard}>편지 카드 저장</BottomButton>,
       bgColor: '#F8F8F8',
+=======
+      node: (
+        <BottomButton onClick={handleSaveCard}>
+          편지 카드 저장
+        </BottomButton>
+      ),
+      bgColor: "#F7F8F9",
+>>>>>>> origin/develop
     });
 
     return () => {
