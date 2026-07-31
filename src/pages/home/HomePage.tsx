@@ -227,6 +227,7 @@ export default function HomePage() {
   const handleCompleteCustomizing = async () => {
     // 통합 API가 스티커 전체를 덮어쓰므로 추가/수정/삭제를 구분하지 않고 draft를 그대로 전송
     const saved = draftStickers.filter((s) => s.imageId !== null && s.imageId !== undefined);
+    const droppedCount = draftStickers.length - saved.length;
 
     setOpenSheet(false);
     setSelectedId(null);
@@ -235,6 +236,9 @@ export default function HomePage() {
     setBgColorBackup(null);
 
     try {
+      if (droppedCount > 0) {
+        toast.show(`이미지 업로드에 실패한 스티커 ${droppedCount}개는 저장되지 않았어요.`);
+      }
       await updateHomeMutation.mutateAsync({
         request: {
           homeColor: homeBgColor,
