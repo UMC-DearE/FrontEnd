@@ -2,9 +2,7 @@ interface ChevronRightIconProps {
   className?: string;
 }
 
-export default function ChevronRightIcon({
-  className,
-}: ChevronRightIconProps) {
+export default function ChevronRightIcon({ className }: ChevronRightIconProps) {
   return (
     <svg
       width="5"

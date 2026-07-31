@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useOutletContext } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 
 import AddTypeTabs from '@/components/create/AddModeTabs';
 import ImageAddSection from '@/components/create/ImageAddSection';
@@ -11,6 +11,7 @@ import { BottomButton } from '@/components/common/BottomButton';
 import { postAnalyzeLetter, runOcr } from '@/api/create';
 import { uploadImage } from '@/api/upload';
 import type { AddMode } from '@/types/create';
+import type { AppLayoutContext } from '@/layouts/AppLayout';
 import useToast from '@/hooks/useToast';
 
 export default function LetterCreatePage() {
@@ -21,7 +22,7 @@ export default function LetterCreatePage() {
 
   const navigate = useNavigate();
   const toast = useToast();
-  const { setFixedAction } = useOutletContext<any>();
+  const { setFixedAction } = useOutletContext<AppLayoutContext>();
 
   const isValid = mode === 'IMAGE' ? images.length > 0 : text.trim().length > 0;
 
@@ -35,7 +36,7 @@ export default function LetterCreatePage() {
       let uploadedImageUrls: string[] | undefined;
       let uploadedImageIds: number[] | undefined;
 
-      if (mode === "TEXT") {
+      if (mode === 'TEXT') {
         finalContent = text;
       }
 
@@ -67,7 +68,7 @@ export default function LetterCreatePage() {
           imageIds: uploadedImageIds,
         },
       });
-    } catch (e) {
+    } catch {
       toast.show('편지 분석에 실패했어요. 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
@@ -75,7 +76,7 @@ export default function LetterCreatePage() {
   };
 
   const renderBottomInfo = () =>
-    mode === "TEXT" ? (
+    mode === 'TEXT' ? (
       <p className="text-sm text-[#A1A4AA] text-center mb-5 font-medium">
         편지는 한 번에 하나만 등록할 수 있어요
       </p>
@@ -109,11 +110,8 @@ export default function LetterCreatePage() {
           <AddTypeTabs mode={mode} onChange={setMode} />
 
           <div className="flex-1 mt-[24px]">
-            {mode === "IMAGE" ? (
-              <ImageAddSection
-                images={images}
-                setImages={setImages}
-              />
+            {mode === 'IMAGE' ? (
+              <ImageAddSection images={images} setImages={setImages} />
             ) : (
               <TextAddSection value={text} onChange={setText} />
             )}

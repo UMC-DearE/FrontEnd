@@ -1,1 +1,1 @@
-export const meQueryKey = ["me"] as const;
+export const meQueryKey = ['me'] as const;

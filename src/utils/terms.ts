@@ -1,11 +1,11 @@
-import type { TermsKey } from "@/types/terms";
+import type { TermsKey } from '@/types/terms';
 
 export function termTypeToKey(type: string): TermsKey | null {
-  switch ((type ?? "").toUpperCase()) {
-    case "SERVICE":
-      return "service";
-    case "PRIVACY":
-      return "privacy";
+  switch ((type ?? '').toUpperCase()) {
+    case 'SERVICE':
+      return 'service';
+    case 'PRIVACY':
+      return 'privacy';
     default:
       return null;
   }

@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/stores/authStore';
-import { useStyleStore } from "@/stores/styleStores";
+import { useStyleStore } from '@/stores/styleStores';
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 import type { UserProfile, UpdateMeRequest, UpdateMeResponse } from '@/types/user';
 import { normalizeImageUrl } from './upload';
@@ -93,7 +93,7 @@ api.interceptors.response.use(
       return api(originalRequest);
     } catch (refreshError) {
       delete api.defaults.headers.common.Authorization;
-      useAuthStore.getState().setAuthStatus("unauthenticated");
+      useAuthStore.getState().setAuthStatus('unauthenticated');
 
       return Promise.reject(refreshError);
     } finally {
@@ -105,14 +105,14 @@ api.interceptors.response.use(
 export async function logout() {
   try {
     // 서버: Redis refresh 삭제 + 쿠키 만료
-    await api.post("/auth/logout");
+    await api.post('/auth/logout');
   } finally {
     // 프론트: 메모리 access 토큰 제거 + 인증 상태 초기화
     delete api.defaults.headers.common.Authorization;
-    useAuthStore.getState().setAuthStatus("unauthenticated");
+    useAuthStore.getState().setAuthStatus('unauthenticated');
 
     useStyleStore.getState().resetStyle();
-    localStorage.removeItem("deare-style");
+    localStorage.removeItem('deare-style');
   }
 }
 
@@ -139,5 +139,5 @@ export async function updateMe(payload: UpdateMeRequest): Promise<UpdateMeRespon
 }
 
 export async function deleteMe(): Promise<void> {
-  await api.delete("/users/me");
+  await api.delete('/users/me');
 }

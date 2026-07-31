@@ -1,6 +1,6 @@
-import type { CommonResponse } from "./common";
+import type { CommonResponse } from './common';
 
-export type AddMode = "IMAGE" | "TEXT";
+export type AddMode = 'IMAGE' | 'TEXT';
 
 export interface CreateResultPayload {
   content: string;
@@ -73,4 +73,3 @@ export interface CreateLetterResponseData {
 }
 
 export type CreateLetterResponse = CommonResponse<CreateLetterResponseData>;
-

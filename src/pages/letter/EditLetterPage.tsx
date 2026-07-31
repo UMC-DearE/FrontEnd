@@ -135,7 +135,7 @@ export default function EditLetterPage() {
   if (error) return <div className="p-4 text-red-500">{error}</div>;
   if (!data || !fromDraft) return null;
 
-  const hasContentChanged = content !== (data.content ?? "");
+  const hasContentChanged = content !== (data.content ?? '');
   const showSubmittingLoading = isSubmitting && hasContentChanged;
 
   const headerImages = locationState?.imageUrls ?? data.imageUrls ?? [];
@@ -155,11 +155,7 @@ export default function EditLetterPage() {
         }}
       >
         {showSubmittingLoading ? (
-          <LoadingSection
-            className="pt-25"
-            title="편지를 수정하고 있어요"
-            subtitle="editing"
-          />
+          <LoadingSection className="pt-25" title="편지를 수정하고 있어요" subtitle="editing" />
         ) : (
           <LetterForm
             mode="edit"

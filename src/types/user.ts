@@ -1,6 +1,6 @@
-export type MembershipPlan = "FREE" | "PLUS";
+export type MembershipPlan = 'FREE' | 'PLUS';
 
-export type Provider = "KAKAO" | "GOOGLE";
+export type Provider = 'KAKAO' | 'GOOGLE';
 
 export interface UserProfile {
   userId: number;

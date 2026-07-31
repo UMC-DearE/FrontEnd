@@ -34,19 +34,13 @@ export default function FromPage() {
   }, [createdFrom, queryClient]);
 
   if (isLoading) {
-    return (
-      <div className="w-full text-center text-sm text-[#A1A4AA] py-6">
-        불러오는 중...
-      </div>
-    );
+    return <div className="w-full text-center text-sm text-[#A1A4AA] py-6">불러오는 중...</div>;
   }
 
   return (
     <div className="flex flex-col gap-4 mt-1 mb-4">
       {fromList.length === 0 ? (
-        <div className="w-full text-center text-sm text-[#A1A4AA] py-6">
-          저장된 목록이 없어요
-        </div>
+        <div className="w-full text-center text-sm text-[#A1A4AA] py-6">저장된 목록이 없어요</div>
       ) : (
         fromList.map((from, index) => (
           <div key={from.fromId}>
@@ -56,37 +50,37 @@ export default function FromPage() {
                 fromIndex={index}
                 onCancel={() => setEditingFromId(null)}
                 onSave={async (updated) => {
-                const normalizeFromName = (name: string) =>
-                  name.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+                  const normalizeFromName = (name: string) =>
+                    name.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 
-                const trimmedName = updated.name.trim();
+                  const trimmedName = updated.name.trim();
 
-                const isDuplicate = fromList.some(
-                  (item) =>
-                    item.fromId !== updated.fromId &&
-                    normalizeFromName(item.name) === normalizeFromName(trimmedName),
-                );
+                  const isDuplicate = fromList.some(
+                    (item) =>
+                      item.fromId !== updated.fromId &&
+                      normalizeFromName(item.name) === normalizeFromName(trimmedName)
+                  );
 
-                if (isDuplicate) {
-                  toast.show('같은 이름의 프롬이 이미 있어요');
-                  return;
-                }
+                  if (isDuplicate) {
+                    toast.show('같은 이름의 프롬이 이미 있어요');
+                    return;
+                  }
 
-                try {
-                  await updateFromMutation.mutateAsync({
-                    fromId: updated.fromId,
-                    payload: {
-                      name: trimmedName,
-                      bgColor: updated.bgColor,
-                      fontColor: updated.fontColor,
-                    },
-                  });
+                  try {
+                    await updateFromMutation.mutateAsync({
+                      fromId: updated.fromId,
+                      payload: {
+                        name: trimmedName,
+                        bgColor: updated.bgColor,
+                        fontColor: updated.fontColor,
+                      },
+                    });
 
-                  setEditingFromId(null);
-                } catch {
-                  toast.show('프롬 수정 중 오류가 발생했어요.');
-                }
-              }}
+                    setEditingFromId(null);
+                  } catch {
+                    toast.show('프롬 수정 중 오류가 발생했어요.');
+                  }
+                }}
                 onDelete={async (id) => {
                   try {
                     await deleteFromMutation.mutateAsync(id);
@@ -99,11 +93,7 @@ export default function FromPage() {
             ) : (
               <div className="flex items-center justify-between border border-[#E7E8EB] rounded-xl p-4 bg-white">
                 <div className="flex items-center gap-3">
-                  <FromBadge
-                    name={from.name}
-                    bgColor={from.bgColor}
-                    fontColor={from.fontColor}
-                  />
+                  <FromBadge name={from.name} bgColor={from.bgColor} fontColor={from.fontColor} />
                   <div className="flex items-center text-xs font-medium text-[#A1A4AA]">
                     {from.letterCount ?? 0}통의 편지
                   </div>
@@ -123,4 +113,3 @@ export default function FromPage() {
     </div>
   );
 }
-

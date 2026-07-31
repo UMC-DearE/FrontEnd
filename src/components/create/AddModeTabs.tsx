@@ -1,4 +1,4 @@
-import type { AddMode } from "@/types/create";
+import type { AddMode } from '@/types/create';
 
 interface Props {
   mode: AddMode;
@@ -6,8 +6,8 @@ interface Props {
 }
 
 const TABS: { key: AddMode; label: string }[] = [
-  { key: "IMAGE", label: "이미지로 추가" },
-  { key: "TEXT", label: "텍스트로 추가" },
+  { key: 'IMAGE', label: '이미지로 추가' },
+  { key: 'TEXT', label: '텍스트로 추가' },
 ];
 
 export default function AddModeTabs({ mode, onChange }: Props) {
@@ -19,9 +19,7 @@ export default function AddModeTabs({ mode, onChange }: Props) {
           type="button"
           onClick={() => onChange(tab.key)}
           className={`flex-1 px-[12px] py-[8px] rounded-full text-[13px] font-semibold transition ${
-            mode === tab.key
-              ? "bg-primary text-white"
-              : "text-[#CACBD1]"
+            mode === tab.key ? 'bg-primary text-white' : 'text-[#CACBD1]'
           }`}
         >
           {tab.label}

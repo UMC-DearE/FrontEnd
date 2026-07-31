@@ -1,19 +1,19 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { likeLetter, unlikeLetter } from "@/api/letter";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { likeLetter, unlikeLetter } from '@/api/letter';
+import type { LetterDetailResponse } from '@/types/letter';
 
 export function useToggleLetterLike(letterId: number) {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: (nextLiked: boolean) =>
-      nextLiked ? likeLetter(letterId) : unlikeLetter(letterId),
+    mutationFn: (nextLiked: boolean) => (nextLiked ? likeLetter(letterId) : unlikeLetter(letterId)),
 
     onMutate: async (nextLiked) => {
-      await qc.cancelQueries({ queryKey: ["letter", letterId] });
+      await qc.cancelQueries({ queryKey: ['letter', letterId] });
 
-      const prev = qc.getQueryData<any>(["letter", letterId]);
+      const prev = qc.getQueryData<LetterDetailResponse>(['letter', letterId]);
 
-      qc.setQueryData(["letter", letterId], (old: any) => {
+      qc.setQueryData(['letter', letterId], (old?: LetterDetailResponse) => {
         if (!old) return old;
         return {
           ...old,
@@ -29,7 +29,7 @@ export function useToggleLetterLike(letterId: number) {
 
     onError: (_err, _nextLiked, ctx) => {
       if (ctx?.prev) {
-        qc.setQueryData(["letter", letterId], ctx.prev);
+        qc.setQueryData(['letter', letterId], ctx.prev);
       }
     },
   });

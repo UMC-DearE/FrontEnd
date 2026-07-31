@@ -8,7 +8,7 @@ export const normalizeImageUrl = (url: string): string => {
   if (!url) return url;
 
   // 앞뒤 공백 및 쌍따옴표 제거
-  let cleaned = url.trim().replace(/^"|"$/g, '');
+  const cleaned = url.trim().replace(/^"|"$/g, '');
 
   // 이미 절대경로면 그대로 반환
   if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) return cleaned;

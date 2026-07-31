@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 
 type Clause = {
   clauseTitle: string;
@@ -11,7 +11,6 @@ type TermDetailState = {
 };
 
 export default function PrivacyPage() {
-
   const { state } = useLocation();
   const { clauses = [] } = (state ?? {}) as TermDetailState;
 

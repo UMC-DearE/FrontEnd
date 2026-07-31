@@ -1,5 +1,5 @@
-import checkOn from "@/assets/terms/check_on.svg";
-import checkOff from "@/assets/terms/check_off.svg";
+import checkOn from '@/assets/terms/check_on.svg';
+import checkOff from '@/assets/terms/check_off.svg';
 
 interface CheckCircleProps {
   checked: boolean;
@@ -7,11 +7,7 @@ interface CheckCircleProps {
   ariaLabel: string;
 }
 
-export default function CheckCircle({
-  checked,
-  onClick,
-  ariaLabel,
-}: CheckCircleProps) {
+export default function CheckCircle({ checked, onClick, ariaLabel }: CheckCircleProps) {
   return (
     <button
       type="button"
@@ -20,12 +16,7 @@ export default function CheckCircle({
       aria-label={ariaLabel}
       className="shrink-0 w-6 h-6 flex items-center justify-center"
     >
-      <img
-        src={checked ? checkOn : checkOff}
-        alt=""
-        className="w-6 h-6"
-        draggable={false}
-      />
+      <img src={checked ? checkOn : checkOff} alt="" className="w-6 h-6" draggable={false} />
     </button>
   );
 }

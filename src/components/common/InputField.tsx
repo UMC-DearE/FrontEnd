@@ -1,8 +1,8 @@
 // 오른쪽에 rightElement를 넣을 수 있는 입력 필드
 // rightElement의 width에 따라 paddingRight 자동 조정
 
-import { useEffect, useRef, useState } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 
 interface InputFieldProps {
   value: string;
@@ -41,7 +41,7 @@ export function InputField({
   }, [rightElement]);
 
   return (
-    <div className={`relative w-full ${containerClassName ?? ""}`}>
+    <div className={`relative w-full ${containerClassName ?? ''}`}>
       <input
         type="text"
         value={value}
@@ -50,11 +50,7 @@ export function InputField({
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         placeholder={placeholder}
-        style={
-          rightPadding !== null
-            ? { paddingRight: rightPadding }
-            : undefined
-        }
+        style={rightPadding !== null ? { paddingRight: rightPadding } : undefined}
         className={
           `
           w-full h-[50px]
@@ -65,8 +61,8 @@ export function InputField({
           focus:outline-none focus:ring-0 focus:border-primary
           overflow-x-auto whitespace-nowrap
         ` +
-            (useGrayWhenBlurred && !isFocused ? " bg-[#F7F8F9]" : " bg-white") +
-            (inputClassName ? ` ${inputClassName}` : "")
+          (useGrayWhenBlurred && !isFocused ? ' bg-[#F7F8F9]' : ' bg-white') +
+          (inputClassName ? ` ${inputClassName}` : '')
         }
       />
 
@@ -81,6 +77,3 @@ export function InputField({
     </div>
   );
 }
-
-
-

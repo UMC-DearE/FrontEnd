@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { logout } from "@/api/http";
-import ProfilePlaceholderIcon from "@/components/icons/ProfilePlaceholderIcon";
-import ConfirmModal from "@/components/common/ConfirmModal";
-import { useMeQuery } from "@/hooks/queries/useMeQuery";
-import { useDeleteMe } from "@/hooks/mutations/useDeleteMe";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '@/api/http';
+import ProfilePlaceholderIcon from '@/components/icons/ProfilePlaceholderIcon';
+import ConfirmModal from '@/components/common/ConfirmModal';
+import { useMeQuery } from '@/hooks/queries/useMeQuery';
+import { useDeleteMe } from '@/hooks/mutations/useDeleteMe';
 
 export default function AccountPage() {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export default function AccountPage() {
     await deleteMeMutate();
     setOpenDeleteModal(false);
     await logout();
-    navigate("/login", { replace: true });
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -30,10 +30,10 @@ export default function AccountPage() {
         <div className="w-[24px] h-[24px] rounded-full bg-[#F2F3F5] flex items-center justify-center">
           <ProfilePlaceholderIcon size={16} />
         </div>
-        <span className="text-[13px] text-[#555557]">{me?.email || "이메일 정보 없음"}</span>
+        <span className="text-[13px] text-[#555557]">{me?.email || '이메일 정보 없음'}</span>
       </div>
 
-      <div className="pt-[15px]"/>
+      <div className="pt-[15px]" />
       <button
         type="button"
         onClick={() => setOpenDeleteModal(true)}
@@ -45,9 +45,7 @@ export default function AccountPage() {
       <ConfirmModal
         open={openDeleteModal}
         title="계정 삭제"
-        description={
-          "계정 내의 삭제된 편지들은 복구되지 않습니다. \n정말로 삭제하시겠습니까?"
-        }
+        description={'계정 내의 삭제된 편지들은 복구되지 않습니다. \n정말로 삭제하시겠습니까?'}
         cancelText="취소"
         confirmText="확인"
         onCancel={() => setOpenDeleteModal(false)}

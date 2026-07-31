@@ -1,7 +1,7 @@
-import kakaoIcon from "@/assets/onboarding/kakao.svg";
-import googleIcon from "@/assets/onboarding/google.svg";
+import kakaoIcon from '@/assets/onboarding/kakao.svg';
+import googleIcon from '@/assets/onboarding/google.svg';
 
-type Provider = "kakao" | "google";
+type Provider = 'kakao' | 'google';
 
 interface SocialLoginButtonProps {
   provider: Provider;
@@ -14,36 +14,33 @@ export function SocialLoginButton({
   provider,
   onClick,
   disabled,
-  className = "",
+  className = '',
 }: SocialLoginButtonProps) {
-  const isKakao = provider === "kakao";
+  const isKakao = provider === 'kakao';
 
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      aria-label={isKakao ? "카카오 로그인" : "구글 로그인"}
+      aria-label={isKakao ? '카카오 로그인' : '구글 로그인'}
       className={`
         w-full max-w-[408px] h-[50px]
         rounded-[12px]
         flex items-center justify-center gap-2
         transition active:scale-[0.99]
         disabled:opacity-60 disabled:cursor-not-allowed
-        ${isKakao
-          ? "bg-[#FEE500] text-[#141517]"
-          : "bg-white text-[#555557] border border-[#E6E7E9]"}
+        ${
+          isKakao
+            ? 'bg-[#FEE500] text-[#141517]'
+            : 'bg-white text-[#555557] border border-[#E6E7E9]'
+        }
         ${className}
       `}
     >
-      <img
-        src={isKakao ? kakaoIcon : googleIcon}
-        alt=""
-        className="shrink-0"
-        draggable={false}
-      />
+      <img src={isKakao ? kakaoIcon : googleIcon} alt="" className="shrink-0" draggable={false} />
       <span className="text-[16px] font-medium leading-none">
-        {isKakao ? "Kakao 로그인" : "Google 로그인"}
+        {isKakao ? 'Kakao 로그인' : 'Google 로그인'}
       </span>
     </button>
   );

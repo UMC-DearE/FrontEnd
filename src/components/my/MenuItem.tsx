@@ -1,5 +1,5 @@
-import { PremiumBadge } from "@/components/common/PremiumBadge";
-import ChevronRightIcon from "@/components/icons/ChevronRightIcon";
+import { PremiumBadge } from '@/components/common/PremiumBadge';
+import ChevronRightIcon from '@/components/icons/ChevronRightIcon';
 
 export interface MyMenuItemProps {
   label: string;
@@ -9,7 +9,7 @@ export interface MyMenuItemProps {
   rightText?: string;
 }
 
-const DEFAULT_DIVIDER = "border-b border-[#E6E7E9]";
+const DEFAULT_DIVIDER = 'border-b border-[#E6E7E9]';
 
 export default function MyMenuItem({
   label,

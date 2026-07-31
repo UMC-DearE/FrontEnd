@@ -1,8 +1,8 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateMe } from "@/api/http";
-import type { UpdateMeRequest, UpdateMeResponse } from "@/types/user";
-import { meQueryKey } from "@/hooks/queries/userKeys";
-import { homeQueryKey } from "../queries/homeKeys";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { updateMe } from '@/api/http';
+import type { UpdateMeRequest, UpdateMeResponse } from '@/types/user';
+import { meQueryKey } from '@/hooks/queries/userKeys';
+import { homeQueryKey } from '../queries/homeKeys';
 
 export function useUpdateMe() {
   const queryClient = useQueryClient();

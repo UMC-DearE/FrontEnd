@@ -106,18 +106,22 @@ export default function SetFromPage() {
       {/* 상단 탭 */}
       <div className="flex mt-1 gap-[20px] w-full px-3">
         <button
-          className={"flex-1 flex items-center justify-center bg-transparent"}
-          onClick={() => setTab('select')}>
+          className={'flex-1 flex items-center justify-center bg-transparent'}
+          onClick={() => setTab('select')}
+        >
           <span
-            className={`w-full h-[40px] flex items-center justify-center text-base border-b-[3px] transition-colors duration-150 ${tab === 'select' ? 'text-primary border-primary font-semibold' : 'text-[#A1A4AA] border-transparent font-normal'}`}>
+            className={`w-full h-[40px] flex items-center justify-center text-base border-b-[3px] transition-colors duration-150 ${tab === 'select' ? 'text-primary border-primary font-semibold' : 'text-[#A1A4AA] border-transparent font-normal'}`}
+          >
             기존에서 선택
           </span>
         </button>
         <button
-          className={"flex-1 flex items-center justify-center bg-transparent"}
-          onClick={() => setTab('add')}>
+          className={'flex-1 flex items-center justify-center bg-transparent'}
+          onClick={() => setTab('add')}
+        >
           <span
-            className={`w-full h-[40px] flex items-center justify-center text-base border-b-[3px] transition-colors duration-150 ${tab === 'add' ? 'text-primary border-primary font-semibold' : 'text-[#A1A4AA] border-transparent font-normal'}`}>
+            className={`w-full h-[40px] flex items-center justify-center text-base border-b-[3px] transition-colors duration-150 ${tab === 'add' ? 'text-primary border-primary font-semibold' : 'text-[#A1A4AA] border-transparent font-normal'}`}
+          >
             새로 추가
           </span>
         </button>
@@ -147,9 +151,7 @@ export default function SetFromPage() {
             <div className="flex flex-col gap-[24px] mt-2 justify-center mb-5">
               {fromList.length === 0 ? (
                 <div className="w-full flex flex-col items-center justify-center gap-[16px] min-h-[320px]">
-                  <p className="font-normal text-[15px] text-[#A1A4AA]">
-                    추가된 From이 없어요
-                  </p>
+                  <p className="font-normal text-[15px] text-[#A1A4AA]">추가된 From이 없어요</p>
 
                   <button
                     className="w-[125px] h-[38px] bg-[#ffffff] text-[#585A5F] border-[1.2px] border-[#E7E8EB] rounded-lg text-sm font-medium"
@@ -162,10 +164,7 @@ export default function SetFromPage() {
                 fromList
                   .filter((from) => hangulIncludes(from.name, searchInput))
                   .map((from) => (
-                    <div
-                      key={from.fromId}
-                      className="flex items-center justify-between"
-                    >
+                    <div key={from.fromId} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <FromBadge
                           size="lg"

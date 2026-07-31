@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addLetterToFolder, removeLetterFromFolder } from "@/api/folder";
-import useToast from "@/hooks/useToast";
-import type { FolderLetterResponse } from "@/types/folder";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { addLetterToFolder, removeLetterFromFolder } from '@/api/folder';
+import useToast from '@/hooks/useToast';
+import type { FolderLetterResponse } from '@/types/folder';
 
 export function useLetterFolder(letterId: number) {
   const queryClient = useQueryClient();
@@ -11,14 +11,14 @@ export function useLetterFolder(letterId: number) {
     mutationFn: (folderId: number) => addLetterToFolder(folderId, letterId),
     onSuccess: (res) => {
       if (!res.success) {
-        toast.show(res.message || "폴더에 추가하지 못했어요.");
+        toast.show(res.message || '폴더에 추가하지 못했어요.');
         return;
       }
-      queryClient.invalidateQueries({ queryKey: ["letter", letterId] });
-      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      queryClient.invalidateQueries({ queryKey: ['letter', letterId] });
+      queryClient.invalidateQueries({ queryKey: ['folders'] });
     },
     onError: () => {
-      toast.show("폴더에 추가하지 못했어요.");
+      toast.show('폴더에 추가하지 못했어요.');
     },
   });
 
@@ -26,14 +26,14 @@ export function useLetterFolder(letterId: number) {
     mutationFn: (folderId: number) => removeLetterFromFolder(folderId, letterId),
     onSuccess: (res) => {
       if (!res.success) {
-        toast.show(res.message || "폴더에서 삭제하지 못했어요.");
+        toast.show(res.message || '폴더에서 삭제하지 못했어요.');
         return;
       }
-      queryClient.invalidateQueries({ queryKey: ["letter", letterId] });
-      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      queryClient.invalidateQueries({ queryKey: ['letter', letterId] });
+      queryClient.invalidateQueries({ queryKey: ['folders'] });
     },
     onError: () => {
-      toast.show("폴더에서 삭제하지 못했어요.");
+      toast.show('폴더에서 삭제하지 못했어요.');
     },
   });
 

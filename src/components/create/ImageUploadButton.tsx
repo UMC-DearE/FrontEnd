@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import useToast from "@/hooks/useToast";
+import { useRef } from 'react';
+import useToast from '@/hooks/useToast';
 
 interface Props {
   images: File[];
@@ -18,13 +18,11 @@ export default function ImageUploadButton({ setImages }: Props) {
     setImages((prev) => {
       const remain = 10 - prev.length;
       if (remain <= 0) {
-        toast.show("이미지는 최대 10장까지 업로드할 수 있어요.");
+        toast.show('이미지는 최대 10장까지 업로드할 수 있어요.');
         return prev;
       }
 
-      const existingKeySet = new Set(
-        prev.map((f) => `${f.name}_${f.size}_${f.lastModified}`)
-      );
+      const existingKeySet = new Set(prev.map((f) => `${f.name}_${f.size}_${f.lastModified}`));
 
       const uniqueNewFiles: File[] = [];
       let hasDuplicate = false;
@@ -40,7 +38,7 @@ export default function ImageUploadButton({ setImages }: Props) {
       }
 
       if (hasDuplicate) {
-        toast.show("중복된 이미지입니다.");
+        toast.show('중복된 이미지입니다.');
       }
 
       if (uniqueNewFiles.length === 0) {
@@ -51,7 +49,7 @@ export default function ImageUploadButton({ setImages }: Props) {
     });
 
     // 같은 파일 다시 선택할 수 있도록 input 초기화
-    e.target.value = "";
+    e.target.value = '';
   };
 
   return (
@@ -63,14 +61,7 @@ export default function ImageUploadButton({ setImages }: Props) {
         이미지 업로드
       </button>
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        hidden
-        onChange={handleChange}
-      />
+      <input ref={inputRef} type="file" accept="image/*" multiple hidden onChange={handleChange} />
     </>
   );
 }

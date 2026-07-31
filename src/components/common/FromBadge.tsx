@@ -7,12 +7,7 @@ interface FromBadgeProps {
   size?: 'md' | 'lg' | 'xl';
 }
 
-export function FromBadge({
-  name,
-  bgColor,
-  fontColor,
-  size = 'md',
-}: FromBadgeProps) {
+export function FromBadge({ name, bgColor, fontColor, size = 'md' }: FromBadgeProps) {
   const sizeClass = {
     md: {
       outer: 'inline-flex px-[12px] py-[5px] rounded-[6px]',
@@ -29,16 +24,8 @@ export function FromBadge({
   };
 
   return (
-    <span
-      data-from-badge
-      className={sizeClass[size].outer}
-      style={{ backgroundColor: bgColor }}
-    >
-      <span
-        data-from-badge-text
-        className={sizeClass[size].text}
-        style={{ color: fontColor }}
-      >
+    <span data-from-badge className={sizeClass[size].outer} style={{ backgroundColor: bgColor }}>
+      <span data-from-badge-text className={sizeClass[size].text} style={{ color: fontColor }}>
         {name}
       </span>
     </span>
