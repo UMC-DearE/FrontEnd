@@ -13,14 +13,11 @@ import CustomizingHeader from '@/components/header/CustomizingHeader';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import { uploadImage } from '@/api/upload';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
-import { useUpdateHomeColor } from '@/hooks/mutations/useUpdateHomeColor';
+import { useUpdateHome } from '@/hooks/mutations/useUpdateHome';
 import { useRandomLetterQuery } from '@/hooks/queries/useRandomLetterQuery';
 import { useLetterLists } from '@/hooks/queries/useLetterList';
 import { usePinLetter } from '@/hooks/mutations/usePinLetter';
 import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
-import { useCreateSticker } from '@/hooks/mutations/useCreateSticker';
-import { useUpdateSticker } from '@/hooks/mutations/useUpdateSticker';
-import { useDeleteSticker } from '@/hooks/mutations/useDeleteSticker';
 import { useMyMembership } from '@/hooks/queries/useMyMembership';
 import useToast from '@/hooks/useToast';
 import closeIcon from '@/assets/homePage/closeIcon.svg';
@@ -47,7 +44,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
   const { data: home, isLoading: homeLoading, isError: homeError } = useHomeQuery();
-  const updateHomeColorMutation = useUpdateHomeColor();
+  const updateHomeMutation = useUpdateHome();
 
   const { data: randomData, isLoading: randomLoading } = useRandomLetterQuery();
   const { data: letterListData, isLoading: letterListLoading } = useLetterLists({
@@ -73,10 +70,6 @@ export default function HomePage() {
 
   const pinMutation = usePinLetter();
   const unpinMutation = useUnpinLetter();
-
-  const createStickerMutation = useCreateSticker();
-  const updateStickerMutation = useUpdateSticker();
-  const deleteStickerMutation = useDeleteSticker();
 
   const letter: HomeCardLetter | null = useMemo(() => {
     if (!randomData) return null;
@@ -239,29 +232,8 @@ export default function HomePage() {
   };
 
   const handleCompleteCustomizing = async () => {
-    const draftIds = new Set(draftStickers.map((s) => s.id));
-    const baseById = new Map(baseStickers.map((s) => [s.id, s]));
-
-    const deleted = baseStickers.filter((s) => s.id > 0 && !draftIds.has(s.id));
-
-    const added = draftStickers.filter(
-      (s) => !baseById.has(s.id) && s.imageId !== null && s.imageId !== undefined
-    );
-
-    const updated = draftStickers.filter((d) => {
-      if (d.id <= 0) return false;
-      const b = baseById.get(d.id);
-      if (!b) return false;
-      return (
-        b.x !== d.x ||
-        b.y !== d.y ||
-        b.z !== d.z ||
-        b.rotation !== d.rotation ||
-        b.scale !== d.scale
-      );
-    });
-
-    const bgChanged = bgColorBackup !== null && homeBgColor !== bgColorBackup;
+    // 통합 API가 스티커 전체를 덮어쓰므로 추가/수정/삭제를 구분하지 않고 draft를 그대로 전송
+    const saved = draftStickers.filter((s) => s.imageId !== null && s.imageId !== undefined);
 
     setOpenSheet(false);
     setSelectedId(null);
@@ -270,36 +242,29 @@ export default function HomePage() {
     setBgColorBackup(null);
 
     try {
-      await Promise.all([
-        ...deleted.map((s) => deleteStickerMutation.mutateAsync({ stickerId: s.id })),
-        ...added.map((s) =>
-          createStickerMutation.mutateAsync({
-            request: {
-              imageId: s.imageId as number,
-              posX: s.x,
-              posY: s.y,
-              posZ: s.z,
-              rotation: s.rotation,
-              scale: s.scale,
-            },
-            imageUrl: s.src,
-            clientStickerId: s.id,
-          })
-        ),
-        ...updated.map((s) =>
-          updateStickerMutation.mutateAsync({
-            stickerId: s.id,
-            body: {
-              posX: s.x,
-              posY: s.y,
-              posZ: s.z,
-              rotation: s.rotation,
-              scale: s.scale,
-            },
-          })
-        ),
-        bgChanged ? updateHomeColorMutation.mutateAsync(homeBgColor) : Promise.resolve(),
-      ]);
+      await updateHomeMutation.mutateAsync({
+        request: {
+          homeColor: homeBgColor,
+          stickers: saved.map((s) => ({
+            imageId: s.imageId as number,
+            posX: s.x,
+            posY: s.y,
+            posZ: s.z,
+            rotation: s.rotation,
+            scale: s.scale,
+          })),
+        },
+        optimisticStickers: saved.map((s) => ({
+          stickerId: s.id,
+          imageId: s.imageId as number,
+          imageUrl: s.src,
+          posX: s.x,
+          posY: s.y,
+          posZ: s.z,
+          rotation: s.rotation,
+          scale: s.scale,
+        })),
+      });
     } catch (e) {
       console.error(e);
     }
