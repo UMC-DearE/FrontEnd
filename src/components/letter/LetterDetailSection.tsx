@@ -144,7 +144,7 @@ export default function LetterDetailSection({
 
         // 기존 shadow 제거해야지 안에 회색 비침 현상 방지
         clonedEl.style.boxShadow = 'none';
-        (clonedEl.style as any).webkitBoxShadow = 'none';
+        (clonedEl.style as unknown as Record<string, string>).webkitBoxShadow = 'none';
 
         // 전체 overflow visible로 변경(캡쳐할 때만)
         clonedEl.style.overflow = 'visible';
@@ -174,9 +174,11 @@ export default function LetterDetailSection({
             ch.style.backgroundColor = '#FFFFFF';
             ch.style.backgroundImage = 'none';
             ch.style.boxShadow = 'none';
-            (ch.style as any).webkitBoxShadow = 'none';
+            (ch.style as unknown as Record<string, string>).webkitBoxShadow = 'none';
             if (!ch.style.borderColor) ch.style.borderColor = '#E7E8EB';
-          } catch (e) {}
+          } catch {
+            // 일부 요소는 스타일 접근이 실패할 수 있어 무시한다
+          }
         }
       },
     });
@@ -234,7 +236,7 @@ export default function LetterDetailSection({
   const displayReceivedAt = (() => {
     if (receivedAt === null) return '-';
     if (!receivedAt) return receivedAt;
-    let value = receivedAt.replace(/\./g, '-');
+    const value = receivedAt.replace(/\./g, '-');
     const parts = value.split('-');
     if (parts.length !== 3) return value;
     const [year, month, day] = parts;
