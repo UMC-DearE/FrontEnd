@@ -40,52 +40,52 @@ export default function FolderSelect({
   return (
     <BottomSheet open={open} onClose={onClose} className="max-h-[369px] px-[20px]">
       <div className="mt-[20px] flex w-full flex-col overflow-y-auto">
-          {/* 선택 없음(전체) */}
+        {/* 선택 없음(전체) */}
+        <button
+          type="button"
+          onClick={() => {
+            onSelectNone();
+            onClose();
+          }}
+          className="flex w-full items-center gap-[12px] px-[20px] py-[10px]"
+        >
+          <img src={allFolderIcon} alt="" className="h-[40px] w-[40px] shrink-0" />
+          <span className="text-[16px] font-medium text-[#121212]">선택 없음(전체)</span>
+          <SelectRadio selected={selectedFolderId == null} />
+        </button>
+
+        {/* 폴더 목록 */}
+        {folders.map((f) => (
           <button
+            key={f.id}
             type="button"
             onClick={() => {
-              onSelectNone();
+              onSelect(f.id);
               onClose();
             }}
             className="flex w-full items-center gap-[12px] px-[20px] py-[10px]"
           >
-            <img src={allFolderIcon} alt="" className="h-[40px] w-[40px] shrink-0" />
-            <span className="text-[16px] font-medium text-[#121212]">선택 없음(전체)</span>
-            <SelectRadio selected={selectedFolderId == null} />
+            <img
+              src={f.imageUrl || defaultFolderIcon}
+              alt=""
+              className="h-[40px] w-[40px] shrink-0 rounded-[8px] object-cover"
+            />
+            <span className="truncate text-[16px] font-medium text-[#121212]">{f.name}</span>
+            <SelectRadio selected={selectedFolderId === f.id} />
           </button>
+        ))}
 
-          {/* 폴더 목록 */}
-          {folders.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              onClick={() => {
-                onSelect(f.id);
-                onClose();
-              }}
-              className="flex w-full items-center gap-[12px] px-[20px] py-[10px]"
-            >
-              <img
-                src={f.imageUrl || defaultFolderIcon}
-                alt=""
-                className="h-[40px] w-[40px] shrink-0 rounded-[8px] object-cover"
-              />
-              <span className="truncate text-[16px] font-medium text-[#121212]">{f.name}</span>
-              <SelectRadio selected={selectedFolderId === f.id} />
-            </button>
-          ))}
-
-          {/* 새 폴더 만들기 */}
-          {folders.length < 3 && (
-            <button
-              type="button"
-              onClick={onCreateFolder}
-              className="flex w-full items-center gap-[12px] px-[20px] py-[10px]"
-            >
-              <img src={newFolderIcon} alt="" className="h-[40px] w-[40px] shrink-0" />
-              <span className="text-[16px] font-medium text-[#121212]">새 폴더 만들기</span>
-            </button>
-          )}
+        {/* 새 폴더 만들기 */}
+        {folders.length < 3 && (
+          <button
+            type="button"
+            onClick={onCreateFolder}
+            className="flex w-full items-center gap-[12px] px-[20px] py-[10px]"
+          >
+            <img src={newFolderIcon} alt="" className="h-[40px] w-[40px] shrink-0" />
+            <span className="text-[16px] font-medium text-[#121212]">새 폴더 만들기</span>
+          </button>
+        )}
       </div>
     </BottomSheet>
   );

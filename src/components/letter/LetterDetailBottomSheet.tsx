@@ -23,7 +23,12 @@ export default function LetterDetailBottomSheet({
 
   return (
     <>
-      <BottomSheet open={open} onClose={onClose} className="px-[20px]" contentClassName="gap-[12px]">
+      <BottomSheet
+        open={open}
+        onClose={onClose}
+        className="px-[20px]"
+        contentClassName="gap-[12px]"
+      >
         <div className="flex w-full flex-col items-center">
           {/* 폴더 이동으로 통일 (폴더에서 삭제는 이동 시트의 '선택 없음(전체)'로 처리) */}
           <button
