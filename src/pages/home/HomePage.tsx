@@ -47,25 +47,18 @@ export default function HomePage() {
   const updateHomeMutation = useUpdateHome();
 
   const { data: randomData, isLoading: randomLoading } = useRandomLetterQuery();
+  // 편지 보유 여부에 따라 안내 문구 렌더링
+  // 1 -> 매일 자정에 초기화되는...
+  // 0 -> 아직 추가한 편지가 없어요
   const { data: letterListData, isLoading: letterListLoading } = useLetterLists({
     page: 0,
     size: 1,
-    sort: 'createdAt,asc',
   });
 
-  const { hasAnyLetter, hasLetterBeforeToday } = useMemo(() => {
-    const totalElements = letterListData?.data.totalElements ?? 0;
-    const oldest = letterListData?.data.content?.[0];
-    const todayMidnight = new Date();
-    todayMidnight.setHours(0, 0, 0, 0);
-    return {
-      hasAnyLetter: totalElements > 0,
-      hasLetterBeforeToday:
-        !!oldest && new Date(oldest.createdAt).getTime() < todayMidnight.getTime(),
-    };
-  }, [letterListData]);
+  const hasAnyLetter = (letterListData?.data.totalElements ?? 0) > 0;
 
-  const showRandom = hasLetterBeforeToday && !!randomData?.hasLetter;
+  const showRandom = !!randomData?.hasLetter;
+  // 편지는 있는데 랜덤 편지가 없는 상태
   const isRandomWaiting = hasAnyLetter && !showRandom;
 
   const pinMutation = usePinLetter();
