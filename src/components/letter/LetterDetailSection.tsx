@@ -79,7 +79,7 @@ export default function LetterDetailSection({
   content,
   aiResult,
   from,
-  receivedAt = '2025.06.02',
+  receivedAt,
   folder = null,
   reply: initialReply,
   onSave,
