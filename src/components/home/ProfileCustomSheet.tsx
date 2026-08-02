@@ -14,6 +14,7 @@ interface ProfileCustomSheetProps {
   onPickerStateChange?: (isOpen: boolean) => void;
   onDeselectSticker?: () => void;
   onClickReset?: () => void;
+  bottomBarRef?: React.Ref<HTMLDivElement>;
 }
 
 const normalizeHex = (v: string) => {
@@ -32,6 +33,7 @@ export default function ProfileCustomSheet({
   onPickerStateChange,
   onDeselectSticker,
   onClickReset,
+  bottomBarRef,
 }: ProfileCustomSheetProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showPicker, setShowPicker] = useState(false);
@@ -79,7 +81,10 @@ export default function ProfileCustomSheet({
         className="relative w-full max-w-[440px] min-h-screen 
       overflow-hidden pointer-events-none"
       >
-        <div className="pointer-events-auto fixed bottom-0 left-1/2 h-[126px] w-full max-w-[440px] -translate-x-1/2 bg-white">
+        <div
+          ref={bottomBarRef}
+          className="pointer-events-auto fixed bottom-0 left-1/2 h-[126px] w-full max-w-[440px] -translate-x-1/2 bg-white"
+        >
           <div className="flex h-full flex-col items-center">
             <div className="mt-[20px] flex items-start justify-center gap-[54px]">
               <div className="flex flex-col items-center gap-[14px]">

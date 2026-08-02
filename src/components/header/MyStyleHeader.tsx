@@ -1,8 +1,8 @@
 // 마이페이지 - 스타일 페이지 헤더
 
-import TopSection from "./TopSection";
-import BackButton from "../common/header/BackButton";
-import { PremiumBadge } from "../common/PremiumBadge";
+import TopSection from './TopSection';
+import BackButton from '../common/header/BackButton';
+import { PremiumBadge } from '../common/PremiumBadge';
 
 export default function StyleHeader() {
   return (

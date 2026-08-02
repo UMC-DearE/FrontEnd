@@ -50,9 +50,23 @@ export async function getHome(): Promise<HomeDataDto> {
   return data;
 }
 
-type UpdateHomeColorResponse = ApiResponse<{ homeColor: string }>;
+export type HomeStickerRequest = {
+  imageId: number;
+  posX: number;
+  posY: number;
+  posZ: number;
+  rotation: number;
+  scale: number;
+};
 
-export async function updateHomeColor(homeColor: string) {
-  const res = await api.patch<UpdateHomeColorResponse>('/users/me/homecolor', { homeColor });
-  return res.data.data.homeColor;
+export type UpdateHomeRequest = {
+  homeColor: string;
+  stickers: HomeStickerRequest[];
+};
+
+// 저장 성공 시 data는 null로 내려옴 (갱신된 홈은 GET /home 재조회로 받아야 함)
+type UpdateHomeResponse = ApiResponse<null>;
+
+export async function updateHome(body: UpdateHomeRequest) {
+  await api.put<UpdateHomeResponse>('/home', body);
 }

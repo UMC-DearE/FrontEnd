@@ -23,7 +23,8 @@ export default function CreateDetailPage() {
   const location = useLocation();
   const state = location.state as LocationState;
 
-  const [fromDraft, setFromDraft] = useState<CreateFrom | undefined>(state?.selectedFromDraft);
+  // 라우터 state에서만 오고 이후 갱신되지 않으므로 파생값으로 충분
+  const fromDraft: CreateFrom | undefined = state?.selectedFromDraft;
   const [content, setContent] = useState<string>(state?.content ?? '');
   const [date, setDate] = useState<string>(state?.date ?? '');
   const [unknownDate, setUnknownDate] = useState<boolean>(state?.unknownDate ?? false);
@@ -35,9 +36,6 @@ export default function CreateDetailPage() {
     if (!state) {
       navigate('/create', { replace: true });
       return;
-    }
-    if (state.selectedFromDraft) {
-      setFromDraft(state.selectedFromDraft);
     }
   }, [state, navigate]);
 

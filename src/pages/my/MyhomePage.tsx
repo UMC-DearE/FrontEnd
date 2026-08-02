@@ -17,15 +17,11 @@ import { useAuthStore } from '@/stores/authStore';
 
 import { FONT_LABEL } from '@/utils/fontLabelMap';
 import { logout } from '@/api/http';
-import { getMyMembership, payMyMembershipTemp } from "@/api/membership";
+import { getMyMembership, payMyMembershipTemp } from '@/api/membership';
 import { getMyTheme, serverFontToClient } from '@/api/theme';
-import { useMeQuery } from "@/hooks/queries/useMeQuery";
+import { useMeQuery } from '@/hooks/queries/useMeQuery';
 
-export function MyProfileSection({
-  nickname,
-  profileImageUrl,
-  isPlus,
-}: MyProfileSectionProps) {
+export function MyProfileSection({ nickname, profileImageUrl, isPlus }: MyProfileSectionProps) {
   const navigate = useNavigate();
 
   return (
@@ -47,11 +43,7 @@ export function MyProfileSection({
       <div className="flex items-center gap-[15px]">
         <div className="w-[60px] h-[60px] rounded-full bg-[#F2F3F5] flex items-center justify-center overflow-hidden">
           {profileImageUrl ? (
-            <img
-              src={profileImageUrl}
-              alt="프로필 이미지"
-              className="w-full h-full object-cover"
-            />
+            <img src={profileImageUrl} alt="프로필 이미지" className="w-full h-full object-cover" />
           ) : (
             <ProfilePlaceholderIcon size={28} />
           )}
@@ -59,15 +51,11 @@ export function MyProfileSection({
 
         <div className="flex-1">
           <div className="flex items-center gap-[10px]">
-            <span className="font-medium text-[16px] truncate">
-              {nickname}
-            </span>
+            <span className="font-medium text-[16px] truncate">{nickname}</span>
             {isPlus && <PremiumBadge label="Plus" />}
           </div>
 
-          <p className="font-medium text-[12px] text-[#A1A4AA] mt-2">
-            프로필 수정
-          </p>
+          <p className="font-medium text-[12px] text-[#A1A4AA] mt-2">프로필 수정</p>
         </div>
 
         <ChevronRightIcon />
@@ -99,16 +87,15 @@ export default function MyhomePage() {
       try {
         const membership = await getMyMembership();
         if (!mounted) return;
-        
+
         setIsPlus(membership.isPlus);
 
         const theme = await getMyTheme();
         if (!mounted) return;
         setFont(serverFontToClient(theme.font));
-
       } catch {
-        setAuthStatus("unauthenticated");
-        navigate("/login", { replace: true });
+        setAuthStatus('unauthenticated');
+        navigate('/login', { replace: true });
       }
     })();
     return () => {
@@ -118,8 +105,8 @@ export default function MyhomePage() {
 
   useEffect(() => {
     if (isMeError) {
-      setAuthStatus("unauthenticated");
-      navigate("/login", { replace: true });
+      setAuthStatus('unauthenticated');
+      navigate('/login', { replace: true });
     }
   }, [isMeError, navigate, setAuthStatus]);
 
@@ -136,9 +123,9 @@ export default function MyhomePage() {
     <>
       <main className="bg-white -mt-[20px]">
         <MyProfileSection
-        nickname={me?.nickname || '사용자'}
-        profileImageUrl={me?.profileImageUrl ?? null}
-        isPlus={isPlus} 
+          nickname={me?.nickname || '사용자'}
+          profileImageUrl={me?.profileImageUrl ?? null}
+          isPlus={isPlus}
         />
 
         <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#A1A4AA]">
@@ -212,8 +199,8 @@ export default function MyhomePage() {
           label="서비스 이용약관"
           onClick={() =>
             window.open(
-              "https://www.notion.so/35b1829bd7ed807b8067ff1e134ad299?source=copy_link",
-              "_blank"
+              'https://www.notion.so/35b1829bd7ed807b8067ff1e134ad299?source=copy_link',
+              '_blank'
             )
           }
         />
@@ -222,8 +209,8 @@ export default function MyhomePage() {
           label="개인정보처리방침"
           onClick={() =>
             window.open(
-              "https://www.notion.so/35b1829bd7ed80699a43f1ac16fefc7f?source=copy_link",
-              "_blank"
+              'https://www.notion.so/35b1829bd7ed80699a43f1ac16fefc7f?source=copy_link',
+              '_blank'
             )
           }
         />

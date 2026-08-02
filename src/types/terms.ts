@@ -1,4 +1,4 @@
-export type TermsKey = "service" | "privacy";
+export type TermsKey = 'service' | 'privacy';
 
 export type TermsState = Record<TermsKey, boolean>;
 

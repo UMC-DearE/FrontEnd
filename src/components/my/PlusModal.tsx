@@ -1,49 +1,40 @@
 // 마이페이지 플러스멤버십 모달
 
-import { createPortal } from "react-dom";
-import PaymentButton from "@/components/common/PaymentButton";
-import type { PlusModalProps } from "@/types/modal";
-import type { ReactNode } from "react";
-import fontIcon from "@/assets/myPage/fontIcon.svg";
-import stickerIcon from "@/assets/myPage/stickerIcon.svg";
+import { createPortal } from 'react-dom';
+import PaymentButton from '@/components/common/PaymentButton';
+import type { PlusModalProps } from '@/types/modal';
+import type { ReactNode } from 'react';
+import fontIcon from '@/assets/myPage/fontIcon.svg';
+import stickerIcon from '@/assets/myPage/stickerIcon.svg';
 
 export default function PlusModal({ open, onPay, onClose }: PlusModalProps) {
   if (!open) return null;
 
-  const container = document.getElementById("app-frame");
+  const container = document.getElementById('app-frame');
   if (!container) return null;
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex justify-center">
       <div className="relative w-full min-h-screen">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute inset-0 bg-black/40"
-        />
+        <button type="button" onClick={onClose} className="absolute inset-0 bg-black/40" />
 
         <div className="absolute bottom-0 w-full bg-white rounded-t-2xl p-4 flex flex-col items-stretch">
-        
-        <h2 className="text-center mt-3">
-          <span className="text-[20px] font-medium tracking-tight">
-            Dear.e{" "}
-          </span>
-          <span className="text-[20px] font-semibold tracking-tight">
-            Plus
-          </span>
-        </h2>
-        <p className="text-center text-[12px] text-[#555557] mt-2 mb-7">
-          한 번 결제로 평생 소장하세요.
-        </p>
+          <h2 className="text-center mt-3">
+            <span className="text-[20px] font-medium tracking-tight">Dear.e </span>
+            <span className="text-[20px] font-semibold tracking-tight">Plus</span>
+          </h2>
+          <p className="text-center text-[12px] text-[#555557] mt-2 mb-7">
+            한 번 결제로 평생 소장하세요.
+          </p>
 
-        <div className="space-y-[10px] mb-7">
-          <Benefit iconSrc={fontIcon} title="폰트 변경" desc="다양한 감성 폰트 제공" />
-          <Benefit iconSrc={stickerIcon} title="스티커 무제한" desc="마음껏 꾸미기 가능" />
-        </div>
+          <div className="space-y-[10px] mb-7">
+            <Benefit iconSrc={fontIcon} title="폰트 변경" desc="다양한 감성 폰트 제공" />
+            <Benefit iconSrc={stickerIcon} title="스티커 무제한" desc="마음껏 꾸미기 가능" />
+          </div>
 
-        <button type="button" onClick={onPay} className="w-full mb-[36px]">
-          <PaymentButton amountText="1,990원" />
-        </button>
+          <button type="button" onClick={onPay} className="w-full mb-[36px]">
+            <PaymentButton amountText="1,990원" />
+          </button>
         </div>
       </div>
     </div>,

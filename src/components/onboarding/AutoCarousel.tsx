@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 export default function AutoCarousel({
   items,
@@ -60,11 +60,7 @@ export default function AutoCarousel({
   return (
     <div className="overflow-hidden w-full min-w-0">
       <div
-        className={`flex ${
-          renderTransition
-            ? "transition-transform duration-500 ease-out"
-            : ""
-        }`}
+        className={`flex ${renderTransition ? 'transition-transform duration-500 ease-out' : ''}`}
         style={{ transform: `translateX(-${renderIdx * 100}%)` }}
       >
         {slides.map((node, i) => (

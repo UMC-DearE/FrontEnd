@@ -35,10 +35,7 @@ export default function FromCreatePage() {
   useEffect(() => {
     setFixedAction({
       node: (
-        <BottomButton
-          disabled={!input.trim() || isCreating}
-          onClick={handleCreateImmediate}
-        >
+        <BottomButton disabled={!input.trim() || isCreating} onClick={handleCreateImmediate}>
           추가하기
         </BottomButton>
       ),
@@ -74,11 +71,7 @@ export default function FromCreatePage() {
         }
       />
 
-      <FromCreator
-        name={input}
-        selectedColor={selectedColor}
-        onColorChange={setSelectedColor}
-      />
+      <FromCreator name={input} selectedColor={selectedColor} onColorChange={setSelectedColor} />
     </div>
   );
 }

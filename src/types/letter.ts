@@ -84,18 +84,29 @@ export interface LetterLikeData {
 
 export type LetterLikeResponse = CommonResponse<LetterLikeData>;
 
-export type RandomLetterData = {
-  hasLetter: boolean;
-  date: {
-    fullDate: string;
-    month: string;
-    day: number;
-    dayOfWeek: string;
-  };
-  letterId: number;
-  randomPhrase: string;
-  isPinned: boolean;
+export type RandomLetterDate = {
+  fullDate: string;
+  month: string;
+  day: number;
+  dayOfWeek: string;
 };
+
+// 추첨된 편지가 삭제된 경우 hasLetter: false
+export type RandomLetterData =
+  | {
+      hasLetter: true;
+      date: RandomLetterDate;
+      letterId: number;
+      randomPhrase: string;
+      isPinned: boolean;
+    }
+  | {
+      hasLetter: false;
+      date: RandomLetterDate;
+      letterId: null;
+      randomPhrase: null;
+      isPinned: boolean;
+    };
 
 export type RandomLetterApiResponse = {
   success: boolean;

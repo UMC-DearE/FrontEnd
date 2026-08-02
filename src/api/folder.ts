@@ -1,5 +1,10 @@
 import { api } from '@/api/http';
-import type { Folder, FolderListResponse, FolderLetterResponse } from '@/types/folder';
+import type {
+  Folder,
+  FolderListResponse,
+  FolderLetterResponse,
+  UpdateFolderRequest,
+} from '@/types/folder';
 import { normalizeImageUrl } from '@/api/upload';
 
 export async function getFolderList(): Promise<Folder[]> {
@@ -22,10 +27,7 @@ export async function createFolder(folder_name: string, imageId: number | null):
   };
 }
 
-export async function updateFolder(
-  folderId: number,
-  body: { name: string; imageId: number | null }
-) {
+export async function updateFolder(folderId: number, body: UpdateFolderRequest) {
   await api.patch(`/folders/${folderId}`, body);
 }
 
@@ -41,9 +43,7 @@ export async function addLetterToFolder(
   folderId: number,
   letterId: number
 ): Promise<FolderLetterResponse> {
-  const res = await api.post<FolderLetterResponse>(
-    `/folders/${folderId}/letters/${letterId}`
-  );
+  const res = await api.post<FolderLetterResponse>(`/folders/${folderId}/letters/${letterId}`);
   return res.data;
 }
 
@@ -51,8 +51,6 @@ export async function removeLetterFromFolder(
   folderId: number,
   letterId: number
 ): Promise<FolderLetterResponse> {
-  const res = await api.delete<FolderLetterResponse>(
-    `/folders/${folderId}/letters/${letterId}`
-  );
+  const res = await api.delete<FolderLetterResponse>(`/folders/${folderId}/letters/${letterId}`);
   return res.data;
 }

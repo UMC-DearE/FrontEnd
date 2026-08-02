@@ -1,9 +1,18 @@
 // 편지함 폴더 모달
 
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import type { FolderImageAction } from '@/types/folder';
+import BottomSheet from '@/components/common/BottomSheet';
 import resetIcon from '@/assets/letterPage/resetIcon.svg';
+import plusIcon from '@/assets/letterPage/folderPlusIcon.svg';
 
 type UploadImageResult = { imageId: number; url: string };
+
+export type FolderModalResult = {
+  folder_name: string;
+  imageId: number | null;
+  imageAction: FolderImageAction | null;
+};
 
 interface FolderModalProps {
   title?: string;
@@ -11,13 +20,11 @@ interface FolderModalProps {
   initialImageUrl: string | null;
   initialImageId: number | null;
   onCancel: () => void;
-  onConfirm: (data: { folder_name: string; imageId: number | null }) => void;
+  onConfirm: (data: FolderModalResult) => void;
   uploadImage: (
     file: File,
     dir: 'profile' | 'letter' | 'sticker' | 'folder'
   ) => Promise<UploadImageResult>;
-  onImageDelete?: () => Promise<void>;
-  currentFolderId?: number | null;
 }
 
 export default function FolderModal({
@@ -28,8 +35,6 @@ export default function FolderModal({
   onCancel,
   onConfirm,
   uploadImage,
-  onImageDelete,
-  currentFolderId,
 }: FolderModalProps) {
   const [folderName, setFolderName] = useState(initialName);
   const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl);
@@ -68,114 +73,106 @@ export default function FolderModal({
     }
   };
 
-  const handleImageDelete = async () => {
+  const handleImageDelete = () => {
     if (objectUrlRef.current) {
       URL.revokeObjectURL(objectUrlRef.current);
       objectUrlRef.current = null;
     }
     setImageUrl(null);
     setImageId(null);
-
-    if (currentFolderId != null && onImageDelete) {
-      await onImageDelete();
-    }
   };
 
   const handleConfirm = () => {
     const name = folderName.trim();
     if (!name || isUploading) return;
-    onConfirm({ folder_name: name, imageId });
+
+    const hadImage = initialImageUrl != null;
+    const hasImage = imageUrl != null;
+
+    let imageAction: FolderImageAction | null = null;
+    if (imageId != null && imageId !== initialImageId) {
+      imageAction = 'CHANGE';
+    } else if (!hasImage && hadImage) {
+      imageAction = 'DELETE';
+    }
+
+    onConfirm({ folder_name: name, imageId, imageAction });
   };
 
   const isFormValid = folderName.trim().length > 0 && !isUploading;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="flex w-[393px] min-h-screen items-center justify-center">
-        <div
-          className="relative w-[294px] rounded-[17px] bg-white p-[18px] transition-all duration-300"
-          style={{ height: imageUrl ? '310px' : '272px' }}
-        >
-          <p className="absolute left-1/2 top-[18px] -translate-x-1/2 h-[19px] text-center text-[16px] font-semibold text-black">
-            {title}
-          </p>
+    <BottomSheet open onClose={onCancel} className="px-[20px]" contentClassName="gap-[20px]">
+      <div className="flex flex-col items-center gap-[28px]">
+        <p className="text-[16px] font-medium text-[#121212]">{title}</p>
 
-          <div className="absolute left-1/2 top-[59px] -translate-x-1/2 flex justify-center">
-            <label className="cursor-pointer">
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  className="h-[77px] w-[77px] rounded-xl object-cover"
-                  alt="folder-image"
-                  onError={() => {
-                    setImageUrl(null);
-                    setImageId(null);
-                  }}
-                />
-              ) : (
-                <div className="h-[77px] w-[77px] rounded-xl bg-[#E6E7E9]" />
-              )}
-              <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-            </label>
-          </div>
+        <div className="flex flex-col items-center gap-[8px]">
+          <label className="cursor-pointer">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                className="h-[88px] w-[88px] rounded-[12px] object-cover"
+                alt="folder-image"
+                onError={() => {
+                  setImageUrl(null);
+                  setImageId(null);
+                }}
+              />
+            ) : (
+              <div className="flex h-[88px] w-[88px] items-center justify-center rounded-[12px] bg-[#EBEDF0]">
+                <img src={plusIcon} alt="plus-icon" className="h-[20px] w-[20px]" />
+              </div>
+            )}
+            <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+          </label>
 
           {imageUrl && (
             <button
               type="button"
               onClick={handleImageDelete}
-              className="absolute left-1/2 top-[152px] h-[22px] w-[81px] -translate-x-1/2 cursor-pointer rounded-[11px] bg-[#FFEEE8]"
+              className="flex h-[22px] cursor-pointer items-center gap-[6px] rounded-[11px] bg-[#FFEEE8] px-[10px]"
             >
-              <img
-                src={resetIcon}
-                alt="reset-icon"
-                className="absolute left-[10px] top-1/2 -translate-y-1/2"
-              />
-              <p className="absolute left-[25px] top-1/2 -translate-y-1/2 text-[10px] font-semibold text-[#FF5F2F]">
-                이미지삭제
-              </p>
+              <img src={resetIcon} alt="reset-icon" className="h-[12px] w-[12px]" />
+              <span className="text-[10px] font-semibold text-[#FF5F2F]">이미지삭제</span>
             </button>
           )}
-
-          <div className="absolute left-1/2 bottom-[72px] -translate-x-1/2 flex justify-center">
-            <div className="relative">
-              <p
-                className={`pointer-events-none absolute left-0 right-0 top-1/2 -translate-y-1/2 text-center text-[15px] font-medium text-[#C2C4C7] transition-opacity ${
-                  folderName ? 'opacity-0' : 'opacity-100'
-                }`}
-              >
-                폴더 이름을 입력하세요 (최대 6자)
-              </p>
-
-              <input
-                value={folderName}
-                onChange={(e) => setFolderName(e.target.value)}
-                maxLength={6}
-                className="h-12 w-[258px] rounded-[9px] bg-[#F4F5F6] px-3 text-center text-[15px] outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="absolute left-1/2 bottom-[18px] -translate-x-1/2 flex gap-[14px]">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="h-[38px] w-[122px] cursor-pointer rounded-lg border border-[#E5E5E5] text-[14px] font-medium text-[#555557]"
-            >
-              취소
-            </button>
-
-            <button
-              type="button"
-              onClick={handleConfirm}
-              disabled={!isFormValid}
-              style={{ backgroundColor: isFormValid ? '#111111' : '#DCDCDCCC' }}
-              className="h-[38px] w-[122px] cursor-pointer rounded-lg text-[14px] font-semibold text-white transition-colors"
-            >
-              {isUploading ? '업로드중' : '완료'}
-            </button>
-          </div>
         </div>
       </div>
-    </div>
+
+      <div className="flex w-full flex-col gap-[16px]">
+        <input
+          value={folderName}
+          onChange={(e) => setFolderName(e.target.value)}
+          maxLength={6}
+          placeholder="폴더 이름을 입력하세요 (최대 6자)"
+          className={`h-[50px] w-full rounded-[10px] px-[16px] text-center text-[16px] font-medium text-[#121212] outline-none placeholder:text-[#CACBD1] ${
+            folderName ? 'border border-black bg-white' : 'border border-transparent bg-[#F7F8F9]'
+          }`}
+        />
+
+        <div className="flex gap-[21px]">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="h-[50px] flex-1 cursor-pointer rounded-[10px] border-[1.2px] border-[#E7E8EB] bg-white text-[16px] font-medium text-[#737478]"
+          >
+            취소
+          </button>
+
+          <button
+            type="button"
+            onClick={handleConfirm}
+            disabled={!isFormValid}
+            className={`h-[50px] flex-1 rounded-[10px] text-[16px] font-medium transition-colors ${
+              isFormValid
+                ? 'cursor-pointer bg-[#121212] text-white'
+                : 'cursor-not-allowed bg-[#E7E8EB] text-[#FFFFFF]'
+            }`}
+          >
+            {isUploading ? '업로드중' : '완료'}
+          </button>
+        </div>
+      </div>
+    </BottomSheet>
   );
 }

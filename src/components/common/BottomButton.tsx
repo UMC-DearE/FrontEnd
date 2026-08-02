@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
 interface BottomButtonProps {
   disabled?: boolean;
@@ -6,11 +6,7 @@ interface BottomButtonProps {
   children: ReactNode;
 }
 
-export function BottomButton({
-  disabled = false,
-  onClick,
-  children,
-}: BottomButtonProps) {
+export function BottomButton({ disabled = false, onClick, children }: BottomButtonProps) {
   return (
     <button
       type="button"
@@ -21,8 +17,8 @@ export function BottomButton({
         transition-all
         ${
           disabled
-            ? "bg-[#E7E8EB]"
-            : "bg-[#FF5F2F] cursor-pointer shadow-[0px_4px_10px_rgba(255,79,24,0.2)]"
+            ? 'bg-[#E7E8EB]'
+            : 'bg-[#FF5F2F] cursor-pointer shadow-[0px_4px_10px_rgba(255,79,24,0.2)]'
         }
       `}
     >
@@ -30,5 +26,3 @@ export function BottomButton({
     </button>
   );
 }
-
-

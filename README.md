@@ -1,4 +1,5 @@
 # 💌 Dear.e
+
 > **아날로그의 온기를 스마트하게, 편지 아카이빙 서비스**
 
 <p>디어리의 프론트엔드 저장소입니다!</p>
@@ -6,24 +7,29 @@
 ![메인화면](./public/canvas.png)
 <br /><br />
 
-
 ## 🤖 핵심 기능
-###  📭 편지 작성 및 AI 분석
+
+### 📭 편지 작성 및 AI 분석
+
 - 이미지, 텍스트 업로드 시 AI가 내용을 분석해 한 줄 요약과 감정 태그를 함께 생성하여 그 날의 감정을 다시 마주하고 정리할 수 있습니다.
 - 완성된 편지 카드를 이미지로 저장하여 기록을 보관하거나 공유할 수 있습니다.
 
-###  🫧 감정 아카이브 및 시각화
+### 🫧 감정 아카이브 및 시각화
+
 - 편지를 인물별, 감정별로 열람하고, 버블 차트로 감정 변화를 시각화합니다.
 
 ### ⏳ 편지 리마인드 및 답장
+
 - 매일 자정, 과거 편지의 일부를 랜덤으로 띄워 다시 감정을 환기합니다.
 
 ### 🎨 개인화 및 사용자 경험 강화
+
 - 배경 색상과 스티커를 활용해 자유롭게 홈 화면을 커스터마이징 할 수 있습니다.
 - 폰트 테마를 선택하여 자신의 취향에 맞게 기록의 분위기를 바꿀 수 있습니다.
-<br /><br />
+  <br /><br />
 
-## 🛠️ Tech Stack   
+## 🛠️ Tech Stack
+
 ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
@@ -37,9 +43,7 @@
 ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
 <br /><br />
 
-
 ## 💖 FE Developer
-
 
 <table>
 <tr>
@@ -67,6 +71,7 @@
 ## 🔗 Git Convention
 
 ### 📌 Git Flow
+
 - 모든 개발은 `develop` 브랜치 기준
 - `main` 브랜치는 **직접 작업** 금지
 - 기능 개발은 `feature/*`
@@ -75,11 +80,11 @@
 
 ### 📌 커밋 타입
 
-| 라벨      | 용도     |
-|-----------|----------|
-| feat      | 기능 개발   |
-| fix       | 버그 수정   |
-| docs      | 문서       |
-| refactor  | 리팩토링    |
-| style     | UI 수정    |
-| chore     | 설정 관련   |
+| 라벨     | 용도      |
+| -------- | --------- |
+| feat     | 기능 개발 |
+| fix      | 버그 수정 |
+| docs     | 문서      |
+| refactor | 리팩토링  |
+| style    | UI 수정   |
+| chore    | 설정 관련 |

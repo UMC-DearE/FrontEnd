@@ -1,4 +1,4 @@
-import type React from "react";
+import type React from 'react';
 
 export type HeartOutlineIconProps = React.SVGProps<SVGSVGElement>;
 
@@ -19,7 +19,6 @@ export default function HeartOutlineIcon(props: HeartOutlineIconProps) {
         strokeWidth="1.2"
         strokeLinejoin="round"
       />
-
     </svg>
   );
 }

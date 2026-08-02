@@ -6,8 +6,7 @@ import useToast from '@/hooks/useToast';
 import { FROM_NAME_MAX_LENGTH } from '@/constants/from';
 import type { CreateFrom } from '@/types/from';
 
-const normalizeFromName = (name: string) =>
-  name.trim().replace(/\s+/g, ' ').toLowerCase();
+const normalizeFromName = (name: string) => name.trim().replace(/\s+/g, ' ').toLowerCase();
 
 export function useFromDraftForm(initialColor = '#FFA2A2') {
   const [name, setNameRaw] = useState('');

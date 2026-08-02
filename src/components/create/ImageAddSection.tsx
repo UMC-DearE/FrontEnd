@@ -1,5 +1,5 @@
-import ImageUploadButton from "./ImageUploadButton.tsx";
-import ImagePreviewList from "./ImagePreviewList";
+import ImageUploadButton from './ImageUploadButton.tsx';
+import ImagePreviewList from './ImagePreviewList';
 
 interface Props {
   images: File[];
@@ -15,7 +15,7 @@ export default function ImageAddSection({ images, setImages }: Props) {
         </p>
         <ImageUploadButton images={images} setImages={setImages} />
       </div>
-        <ImagePreviewList images={images} setImages={setImages} />
+      <ImagePreviewList images={images} setImages={setImages} />
     </div>
   );
 }

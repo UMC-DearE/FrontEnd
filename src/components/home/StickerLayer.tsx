@@ -23,6 +23,8 @@ type Props = {
   onChange: (next: StickerItem[]) => void;
   onDelete: (id: number) => void;
   onCommit?: (id: number) => void;
+  topBoundRef?: React.RefObject<HTMLElement | null>;
+  bottomBoundRef?: React.RefObject<HTMLElement | null>;
 };
 
 type DragState =
@@ -60,6 +62,8 @@ export default function StickerLayer({
   onChange,
   onDelete,
   onCommit,
+  topBoundRef,
+  bottomBoundRef,
 }: Props) {
   const dragRef = useRef<DragState>(null);
 
@@ -139,9 +143,30 @@ export default function StickerLayer({
     const p = getLocalPoint(e.clientX, e.clientY);
 
     if (d.kind === 'move') {
-      const nx = d.startX + (p.x - d.startPx);
-      const ny = d.startY + (p.y - d.startPy);
-      onChange(stickers.map((s) => (s.id === d.id ? { ...s, x: nx, y: ny } : s)));
+      const s = stickers.find((x) => x.id === d.id);
+      if (!s) return;
+
+      const cRect = containerRef.current?.getBoundingClientRect();
+      const cTop = cRect?.top ?? 0;
+      const cw = cRect?.width ?? 0;
+      const ch = cRect?.height ?? 0;
+      const halfW = (s.w * s.scale) / 2;
+      const halfH = (s.h * s.scale) / 2;
+
+      const topRect = topBoundRef?.current?.getBoundingClientRect();
+      const botRect = bottomBoundRef?.current?.getBoundingClientRect();
+      const topLimit = topRect ? topRect.bottom - cTop : 0;
+      const bottomLimit = botRect ? botRect.top - cTop : ch;
+
+      const minY = topLimit + halfH;
+      const maxY = bottomLimit - halfH;
+      const minX = halfW;
+      const maxX = cw - halfW;
+
+      const nx = clamp(d.startX + (p.x - d.startPx), minX, Math.max(minX, maxX));
+      const ny = clamp(d.startY + (p.y - d.startPy), minY, Math.max(minY, maxY));
+
+      onChange(stickers.map((x) => (x.id === d.id ? { ...x, x: nx, y: ny } : x)));
       return;
     }
 

@@ -1,10 +1,6 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
-type AuthStatus =
-  | "checking"
-  | "authenticated"
-  | "signup_required"
-  | "unauthenticated";
+type AuthStatus = 'checking' | 'authenticated' | 'signup_required' | 'unauthenticated';
 
 type AuthState = {
   authStatus: AuthStatus;
@@ -12,6 +8,6 @@ type AuthState = {
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
-  authStatus: "checking",
+  authStatus: 'checking',
   setAuthStatus: (authStatus) => set({ authStatus }),
 }));

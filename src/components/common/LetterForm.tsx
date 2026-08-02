@@ -1,13 +1,13 @@
 // 편지 추가 - 내용 분석 및 편지 수정 공통 UI
 
-import { useLayoutEffect, useRef, useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
-import { EmotionTag } from "@/components/common/EmotionTag";
-import { BottomButton } from "@/components/common/BottomButton";
-import { FromBadge } from "@/components/common/FromBadge";
-import aiSummary from "@/assets/create/ai-summary.svg";
-import selectFrom from "@/assets/create/select-from.svg";
-import type { LetterFormProps } from "@/types/letterForm";
+import { useLayoutEffect, useRef, useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
+import { EmotionTag } from '@/components/common/EmotionTag';
+import { BottomButton } from '@/components/common/BottomButton';
+import { FromBadge } from '@/components/common/FromBadge';
+import aiSummary from '@/assets/create/ai-summary.svg';
+import selectFrom from '@/assets/create/select-from.svg';
+import type { LetterFormProps } from '@/types/letterForm';
 
 type LayoutContext = {
   setFixedAction: (payload: { node: React.ReactNode; bgColor?: string } | null) => void;
@@ -18,7 +18,7 @@ export default function LetterForm({
   content,
   aiResult,
   from,
-  initialDate = "",
+  initialDate = '',
   initialUnknownDate = false,
   onSelectRecipient,
   onDateChange,
@@ -39,7 +39,6 @@ export default function LetterForm({
 
   const MAX_HEIGHT = LINE_HEIGHT * MAX_LINES + PADDING_Y;
 
-
   const dateInputRef = useRef<HTMLInputElement>(null);
 
   const openDatePicker = () => {
@@ -48,7 +47,7 @@ export default function LetterForm({
     if (!input || unknownDate) return;
 
     try {
-      if (typeof input.showPicker === "function") {
+      if (typeof input.showPicker === 'function') {
         input.showPicker();
       } else {
         input.focus();
@@ -69,24 +68,23 @@ export default function LetterForm({
     const nextHeight = Math.min(el.scrollHeight, MAX_HEIGHT);
 
     el.style.height = `${nextHeight}px`;
-    el.style.overflowY =
-      el.scrollHeight > MAX_HEIGHT ? 'auto' : 'hidden';
+    el.style.overflowY = el.scrollHeight > MAX_HEIGHT ? 'auto' : 'hidden';
   }, [content]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onContentChange?.(e.target.value);
   };
-  
-// 날짜 프리뷰 MM-YY-DD 형식
-const formatDatePreview = (value: string) => {
-  if (!value) return "";
-  const parts = value.split("-");
-  if (parts.length !== 3) return value;
-  const [year, month, day] = parts;
-  if (!year || !month || !day) return value;
-  if (year.length !== 4 || month.length !== 2 || day.length !== 2) return value;
-  return `${year.slice(2)}-${month}-${day}`;
-};
+
+  // 날짜 프리뷰 MM-YY-DD 형식
+  const formatDatePreview = (value: string) => {
+    if (!value) return '';
+    const parts = value.split('-');
+    if (parts.length !== 3) return value;
+    const [year, month, day] = parts;
+    if (!year || !month || !day) return value;
+    if (year.length !== 4 || month.length !== 2 || day.length !== 2) return value;
+    return `${year.slice(2)}-${month}-${day}`;
+  };
 
   // initialDate / initialUnknownDate가 바뀌면 내부 상태도 맞춰줌
   useEffect(() => {
@@ -112,7 +110,7 @@ const formatDatePreview = (value: string) => {
             })
           }
         >
-          {mode === "edit" ? "수정 완료" : "편지 추가하기"}
+          {mode === 'edit' ? '수정 완료' : '편지 추가하기'}
         </BottomButton>
       ),
       bgColor: '#FFFFFF',
@@ -154,9 +152,7 @@ const formatDatePreview = (value: string) => {
       )}
 
       <div className="mb-[24px]">
-        <p className="text-base font-semibold text-primary mb-[12px]">
-          누구에게 받은 편지인가요?
-        </p>
+        <p className="text-base font-semibold text-primary mb-[12px]">누구에게 받은 편지인가요?</p>
 
         <div
           role="button"
@@ -164,24 +160,16 @@ const formatDatePreview = (value: string) => {
           className="w-full h-[45px] border border-[#E7E8EB] rounded-xl px-4 text-sm font-medium flex items-center justify-between cursor-pointer"
         >
           {from ? (
-            <FromBadge
-              name={from.name}
-              bgColor={from.bgColor}
-              fontColor={from.fontColor}
-            />
+            <FromBadge name={from.name} bgColor={from.bgColor} fontColor={from.fontColor} />
           ) : (
-            <span className="text-[#C7C7CC]">
-              이름을 생성하거나 선택하세요
-            </span>
+            <span className="text-[#C7C7CC]">이름을 생성하거나 선택하세요</span>
           )}
           <img src={selectFrom} alt="" className="w-5 h-5" />
         </div>
       </div>
 
       <div className="mb-[24px]">
-        <p className="text-base font-semibold text-primary mb-[12px]">
-          언제 받은 편지인가요?
-        </p>
+        <p className="text-base font-semibold text-primary mb-[12px]">언제 받은 편지인가요?</p>
 
         <div className="flex items-center gap-4">
           <div
@@ -189,14 +177,14 @@ const formatDatePreview = (value: string) => {
             tabIndex={unknownDate ? -1 : 0}
             onClick={openDatePicker}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
+              if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 openDatePicker();
               }
             }}
             className={`
               relative flex-1 h-[45px]
-              ${unknownDate ? "cursor-default" : "cursor-pointer"}
+              ${unknownDate ? 'cursor-default' : 'cursor-pointer'}
             `}
           >
             <input
@@ -228,11 +216,11 @@ const formatDatePreview = (value: string) => {
                 px-4
                 text-sm font-medium
                 flex items-center
-                ${date ? "text-[#585A5F]" : "text-[#C7C7CC]"}
-                ${unknownDate ? "bg-[#F7F8F9]" : "bg-white"}
+                ${date ? 'text-[#585A5F]' : 'text-[#C7C7CC]'}
+                ${unknownDate ? 'bg-[#F7F8F9]' : 'bg-white'}
               `}
             >
-              {date ? formatDatePreview(date) : "YY-MM-DD"}
+              {date ? formatDatePreview(date) : 'YY-MM-DD'}
             </div>
           </div>
 
@@ -247,22 +235,19 @@ const formatDatePreview = (value: string) => {
                 onUnknownDateChange?.(checked);
 
                 if (checked) {
-                  setDate("");
-                  onDateChange?.("");
+                  setDate('');
+                  onDateChange?.('');
                 }
               }}
               className="checkbox-accent checkbox-custom"
             />
-
             날짜 모름
           </label>
         </div>
       </div>
 
       <div className="mb-[24px]">
-        <p className="text-base font-semibold text-primary mb-[12px]">
-          한 줄 요약
-        </p>
+        <p className="text-base font-semibold text-primary mb-[12px]">한 줄 요약</p>
         <div className="flex items-center gap-3 bg-[#F7F8F9] rounded-xl px-[14px] py-[12px] text-sm text-[#585A5F] leading-relaxed">
           <img src={aiSummary} alt="" className="w-[19px] h-[19px]" />
           <p>{aiResult.summary}</p>
@@ -270,11 +255,9 @@ const formatDatePreview = (value: string) => {
       </div>
 
       <div className="mb-[80px]">
-        <p className="text-base font-semibold text-primary mb-[12px]">
-          수집된 감정
-        </p>
+        <p className="text-base font-semibold text-primary mb-[12px]">수집된 감정</p>
         <div className="flex gap-2 flex-wrap">
-          {aiResult.emotions.map((emotion) => (                                                         
+          {aiResult.emotions.map((emotion) => (
             <EmotionTag
               key={emotion.emotionId}
               label={emotion.emotionName}

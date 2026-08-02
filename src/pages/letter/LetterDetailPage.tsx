@@ -1,10 +1,10 @@
-import { useNavigate, useParams } from "react-router-dom";
-import LetterDetailSection from "@/components/letter/LetterDetailSection";
-import LetterDetailSkeleton from "@/components/skeleton/LetterDetailSkeleton";
-import useToast from "@/hooks/useToast";
-import { useLetterDetail } from "@/hooks/queries/useLetterDetail";
-import { useDeleteLetter } from "@/hooks/mutations/useDeleteLetter";
-import { useLetterFolder } from "@/hooks/mutations/useLetterFolder";
+import { useNavigate, useParams } from 'react-router-dom';
+import LetterDetailSection from '@/components/letter/LetterDetailSection';
+import LetterDetailSkeleton from '@/components/skeleton/LetterDetailSkeleton';
+import useToast from '@/hooks/useToast';
+import { useLetterDetail } from '@/hooks/queries/useLetterDetail';
+import { useDeleteLetter } from '@/hooks/mutations/useDeleteLetter';
+import { useLetterFolder } from '@/hooks/mutations/useLetterFolder';
 
 export default function LetterDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -33,32 +33,35 @@ export default function LetterDetailPage() {
       isLiked={detail.isLiked ?? false}
       content={detail.content}
       aiResult={{
-        summary: detail.aiSummary ?? "",
+        summary: detail.aiSummary ?? '',
         emotions: detail.emotionTags ?? [],
       }}
       from={{
         fromId: detail.from?.fromId ?? 0,
-        name: detail.from?.name ?? "",
-        bgColor: detail.from?.bgColor ?? "#FFF",
-        fontColor: detail.from?.fontColor ?? "#000",
+        name: detail.from?.name ?? '',
+        bgColor: detail.from?.bgColor ?? '#FFF',
+        fontColor: detail.from?.fontColor ?? '#000',
       }}
       receivedAt={detail.receivedAt}
       folder={detail.folder ?? null}
       reply={detail.reply}
       onSave={() => {
-        console.log("편지 카드 저장");
+        console.log('편지 카드 저장');
       }}
-
       onAddToFolder={async (folderId) => {
-        if (addFolderMutation.isPending || detail.folder) return;
+        if (addFolderMutation.isPending || removeFolderMutation.isPending) return;
+        // 이미 같은 폴더면 무시
+        if (detail.folder?.folderId === folderId) return;
+        // 다른 폴더에 담겨 있으면 먼저 빼고 대상 폴더로 이동
+        if (detail.folder) {
+          await removeFolderMutation.mutateAsync(detail.folder.folderId);
+        }
         await addFolderMutation.mutateAsync(folderId);
       }}
-
       onRemoveFromFolder={async () => {
         if (removeFolderMutation.isPending || !detail.folder) return;
         await removeFolderMutation.mutateAsync(detail.folder.folderId);
       }}
-
       onEdit={() => {
         navigate(`/letter/${letterId}/edit`, {
           state: {
@@ -66,17 +69,14 @@ export default function LetterDetailPage() {
           },
         });
       }}
-
       onDeleteLetter={async () => {
         try {
           await deleteMutation.mutateAsync(letterId);
-          navigate("/letter", { replace: true });
+          navigate('/letter', { replace: true });
         } catch {
-          toast.show("편지 삭제 중 오류가 발생했어요.");
+          toast.show('편지 삭제 중 오류가 발생했어요.');
         }
       }}
     />
   );
 }
-
-

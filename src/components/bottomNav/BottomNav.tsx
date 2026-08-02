@@ -1,20 +1,14 @@
-import { NavLink } from "react-router-dom";
-import type { JSX } from "react";
-import HomeIcon from "../icons/HomeIcon";
-import LetterIcon from "../icons/LetterIcon";
-import ReportIcon from "../icons/ReportIcon";
-import MyIcon from "../icons/MyIcon";
+import { NavLink } from 'react-router-dom';
+import type { JSX } from 'react';
+import HomeIcon from '../icons/HomeIcon';
+import LetterIcon from '../icons/LetterIcon';
+import ReportIcon from '../icons/ReportIcon';
+import MyIcon from '../icons/MyIcon';
 
 type NavItemProps = {
   to: string;
   label: string;
-  Icon: ({
-    className,
-    active,
-  }: {
-    className?: string;
-    active?: boolean;
-  }) => JSX.Element;
+  Icon: ({ className, active }: { className?: string; active?: boolean }) => JSX.Element;
 };
 
 function NavItem({ to, label, Icon }: NavItemProps) {
@@ -22,9 +16,7 @@ function NavItem({ to, label, Icon }: NavItemProps) {
     <NavLink
       to={to}
       className={({ isActive }) =>
-        `flex-1 flex flex-col items-center gap-2 ${
-          isActive ? "text-primary" : "text-[#CACBD1]"
-        }`
+        `flex-1 flex flex-col items-center gap-2 ${isActive ? 'text-primary' : 'text-[#CACBD1]'}`
       }
     >
       {({ isActive }) => (
@@ -32,11 +24,7 @@ function NavItem({ to, label, Icon }: NavItemProps) {
           <div className="h-[18px] flex items-center justify-center">
             <Icon active={isActive} className="block" />
           </div>
-          <span
-            className={`text-xs ${
-              isActive ? "font-medium text-primary" : "text-[#CACBD1]"
-            }`}
-          >
+          <span className={`text-xs ${isActive ? 'font-medium text-primary' : 'text-[#CACBD1]'}`}>
             {label}
           </span>
         </>
@@ -47,7 +35,7 @@ function NavItem({ to, label, Icon }: NavItemProps) {
 
 export default function BottomNav() {
   return (
-      <div className="w-full h-[95px] bg-[#FFFFFF]">
+    <div className="w-full h-[95px] bg-[#FFFFFF]">
       <div className="flex h-full items-start pt-4 px-5 justify-between">
         <NavItem to="/" label="홈" Icon={HomeIcon} />
         <NavItem to="/letter" label="편지함" Icon={LetterIcon} />

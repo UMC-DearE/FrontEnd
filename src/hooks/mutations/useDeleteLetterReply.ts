@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteLetterReply } from "@/api/letter";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteLetterReply } from '@/api/letter';
 
 export function useDeleteLetterReply(letterId: number) {
   const qc = useQueryClient();
@@ -8,7 +8,7 @@ export function useDeleteLetterReply(letterId: number) {
     mutationFn: () => deleteLetterReply(letterId),
 
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["letter", letterId] });
+      qc.invalidateQueries({ queryKey: ['letter', letterId] });
     },
   });
 }

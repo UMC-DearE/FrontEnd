@@ -1,4 +1,4 @@
-import CheckCircle from "./CheckCircle";
+import CheckCircle from './CheckCircle';
 
 export default function TermsRow({
   checked,
@@ -19,10 +19,7 @@ export default function TermsRow({
         <CheckCircle checked={checked} onClick={onToggle} ariaLabel={title} />
 
         <p className="text-[14px] font-medium text-black truncate">
-          <span className="text-black">
-            [{required ? "필수" : "선택"}]
-          </span>{" "}
-          {title}
+          <span className="text-black">[{required ? '필수' : '선택'}]</span> {title}
         </p>
       </div>
 

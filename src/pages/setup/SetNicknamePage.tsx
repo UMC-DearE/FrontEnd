@@ -1,10 +1,10 @@
 // 닉네임 설정 페이지
 
-import { useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { BottomButton } from "@/components/common/BottomButton";
-import { postSignup, postJwtRefresh } from "@/api/authSignup";
-import { useAuthStore } from "@/stores/authStore";
+import { useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { BottomButton } from '@/components/common/BottomButton';
+import { postSignup, postJwtRefresh } from '@/api/authSignup';
+import { useAuthStore } from '@/stores/authStore';
 
 const NICKNAME_REGEX = /^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]+$/;
 
@@ -15,30 +15,30 @@ const SetNamePage = () => {
   const { state } = useLocation() as { state: LocationState | null };
   const termIds = state?.termIds ?? [];
 
-  const [nickname, setNickname] = useState("");
+  const [nickname, setNickname] = useState('');
   const [touched, setTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const setAuthStatus = useAuthStore.getState().setAuthStatus;
 
   const errorMessage = useMemo(() => {
-    if (!touched) return "";
+    if (!touched) return '';
 
     const value = nickname;
 
-    if (value.length === 0) return "";
+    if (value.length === 0) return '';
 
     // 길이 제한(10 초과)
-    if (value.length > 10) return "최대 10글자까지 설정이 가능해요.";
+    if (value.length > 10) return '최대 10글자까지 설정이 가능해요.';
 
     // 2 미만
-    if (value.length < 2) return "최소 2글자부터 설정이 가능해요.";
+    if (value.length < 2) return '최소 2글자부터 설정이 가능해요.';
 
     // 특수문자 포함(한글/영문/숫자만 허용)
     if (!NICKNAME_REGEX.test(value)) {
-      return "특수문자는 사용이 불가해요.";
+      return '특수문자는 사용이 불가해요.';
     }
 
-    return "";
+    return '';
   }, [nickname, touched]);
 
   const canProceed = useMemo(() => {
@@ -54,7 +54,7 @@ const SetNamePage = () => {
 
     if (termIds.length === 0) {
       // console.warn("[Signup] termIds missing → redirect to /auth/terms");
-      navigate("/auth/terms", { replace: true });
+      navigate('/auth/terms', { replace: true });
       return;
     }
 
@@ -69,14 +69,14 @@ const SetNamePage = () => {
 
       // JWT 쿠키/토큰 확정 (refresh token 쿠키 필요)
       await postJwtRefresh();
-      setAuthStatus("authenticated"); // 가입 완료 -> 인증 상태로 업데이트 -> 다시 terms로 안 가고 home으로
+      setAuthStatus('authenticated'); // 가입 완료 -> 인증 상태로 업데이트 -> 다시 terms로 안 가고 home으로
       // console.log("[Signup] /auth/jwt/refresh success:", refreshRes);
 
       // console.log("[Signup] signup flow completed");
-      navigate("/", { replace: true });
+      navigate('/', { replace: true });
     } catch (e) {
       console.error(e);
-      navigate("/login", { replace: true });
+      navigate('/login', { replace: true });
     } finally {
       setSubmitting(false);
     }
@@ -86,9 +86,7 @@ const SetNamePage = () => {
     <div>
       <main className="pt-[15px] pb-[110px]">
         <h2 className="text-[22px] font-semibold text-[#141517]">닉네임 설정</h2>
-        <p className="pt-[13px] text-[14px] text-[#6C6C6C]">
-          추후 프로필에서 변경이 가능해요
-        </p>
+        <p className="pt-[13px] text-[14px] text-[#6C6C6C]">추후 프로필에서 변경이 가능해요</p>
 
         <input
           value={nickname}
@@ -107,9 +105,7 @@ const SetNamePage = () => {
           `}
         />
         {errorMessage && (
-          <p className="mt-[10px] text-[12px] font-medium text-[#FF1D0D]">
-            {errorMessage}
-          </p>
+          <p className="mt-[10px] text-[12px] font-medium text-[#FF1D0D]">{errorMessage}</p>
         )}
       </main>
 

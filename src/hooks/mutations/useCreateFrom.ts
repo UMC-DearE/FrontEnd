@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createFrom } from "@/api/from";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createFrom } from '@/api/from';
 
 export function useCreateFrom() {
   const queryClient = useQueryClient();
@@ -11,4 +11,3 @@ export function useCreateFrom() {
     },
   });
 }
-

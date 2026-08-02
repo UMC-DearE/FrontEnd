@@ -21,7 +21,6 @@ type Props = {
   fromIndex?: number;
 };
 export default function FromEditPanel({ from, onCancel, onSave, onDelete, fromIndex }: Props) {
-
   const [name, setName] = useState(from.name);
   const [selectedColor, setSelectedColor] = useState(from.bgColor);
   const [showPicker, setShowPicker] = useState(false);
@@ -48,9 +47,7 @@ export default function FromEditPanel({ from, onCancel, onSave, onDelete, fromIn
 
   return (
     <div className="border border-[#E7E8EB] rounded-xl p-4 bg-white mb-4">
-      <div className="text-xs font-medium text-[#585A5F] mb-2">
-        이름 수정
-      </div>
+      <div className="text-xs font-medium text-[#585A5F] mb-2">이름 수정</div>
 
       <input
         value={name}
@@ -59,9 +56,7 @@ export default function FromEditPanel({ from, onCancel, onSave, onDelete, fromIn
         className="w-full h-[45px] border border-[#E7E8EB] rounded-xl px-4 text-sm mb-5 outline-none focus:ring-1 focus:ring-primary"
       />
 
-      <div className="text-xs font-medium text-[#A1A4AA] mb-2">
-        색상 선택
-      </div>
+      <div className="text-xs font-medium text-[#A1A4AA] mb-2">색상 선택</div>
 
       <div className="relative flex gap-2 mb-3">
         {['#FFE2DD', '#FFF3C4', '#EAF5FF', '#E4F7EB'].map((c) => (
@@ -83,11 +78,11 @@ export default function FromEditPanel({ from, onCancel, onSave, onDelete, fromIn
         </button>
 
         {showPicker && (
-        <div
-          className={`absolute left-1/2 -translate-x-1/2 z-40 ${
-            fromIndex !== undefined && fromIndex >= 3 ? 'bottom-full mb-3' : 'top-full mt-3'
-          }`}
-        >
+          <div
+            className={`absolute left-1/2 -translate-x-1/2 z-40 ${
+              fromIndex !== undefined && fromIndex >= 3 ? 'bottom-full mb-3' : 'top-full mt-3'
+            }`}
+          >
             <div className="bg-white rounded-lg p-3 shadow-lg">
               <HexColorPicker color={selectedColor} onChange={(c) => setSelectedColor(c)} />
               <div className="mt-2 flex items-center gap-2 justify-between">
@@ -126,30 +121,30 @@ export default function FromEditPanel({ from, onCancel, onSave, onDelete, fromIn
           삭제하기
         </button>
 
-      <div className="flex justify-end gap-[10px]">
-        <button
-          onClick={onCancel}
-          className="w-[44px] h-[25px] px-[11px] py-[5px] text-xs font-medium rounded-lg bg-[#E7E8EB] text-primary"
-        >
-          취소
-        </button>
-        <button
-          onClick={handleSave}
-          className="w-[44px] h-[25px] px-[11px] py-[5px] text-xs font-medium rounded-lg bg-primary text-white"
-        >
-          완료
-        </button>
-      </div>
-      <ConfirmModal
-        open={showConfirm}
-        title={`'${from.name}' 삭제`}
-        description={'이 사람에게 받은 모든 편지도 함께 삭제돼요\n정말로 삭제할까요?'}
-        cancelText="취소"
-        confirmText='확인'
-        onCancel={() => setShowConfirm(false)}
-        onConfirm={handleDeleteConfirm}
-        titleClassName="text-[#FF143B]"
-      />
+        <div className="flex justify-end gap-[10px]">
+          <button
+            onClick={onCancel}
+            className="w-[44px] h-[25px] px-[11px] py-[5px] text-xs font-medium rounded-lg bg-[#E7E8EB] text-primary"
+          >
+            취소
+          </button>
+          <button
+            onClick={handleSave}
+            className="w-[44px] h-[25px] px-[11px] py-[5px] text-xs font-medium rounded-lg bg-primary text-white"
+          >
+            완료
+          </button>
+        </div>
+        <ConfirmModal
+          open={showConfirm}
+          title={`'${from.name}' 삭제`}
+          description={'이 사람에게 받은 모든 편지도 함께 삭제돼요\n정말로 삭제할까요?'}
+          cancelText="취소"
+          confirmText="확인"
+          onCancel={() => setShowConfirm(false)}
+          onConfirm={handleDeleteConfirm}
+          titleClassName="text-[#FF143B]"
+        />
       </div>
     </div>
   );
