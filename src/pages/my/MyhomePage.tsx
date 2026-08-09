@@ -1,79 +1,70 @@
 // 마이페이지
 
-import { useState, useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import PlusModal from '@/components/my/PlusModal';
-import { PremiumBadge } from '@/components/common/PremiumBadge';
 import MenuItem from '@/components/my/MenuItem';
+import kakaoIcon from '@/assets/myPage/kakaoIcon.svg';
+import tagIcon from '@/assets/myPage/tagIcon.svg';
 import ChevronRightIcon from '@/components/icons/ChevronRightIcon';
 import ProfilePlaceholderIcon from '@/components/icons/ProfilePlaceholderIcon';
-import ConfirmModal from '@/components/common/ConfirmModal';
 import type { MyProfileSectionProps } from '@/components/my/types';
 
 import { useStyleStore } from '@/stores/styleStores';
-import { useMembershipStore } from '@/stores/membershipStores';
 import { useAuthStore } from '@/stores/authStore';
 
-import { FONT_LABEL } from '@/utils/fontLabelMap';
-import { logout } from '@/api/http';
-import { getMyMembership, payMyMembershipTemp } from '@/api/membership';
 import { getMyTheme, serverFontToClient } from '@/api/theme';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
 
-export function MyProfileSection({ nickname, profileImageUrl, isPlus }: MyProfileSectionProps) {
+const KAKAO_CHANNEL_URL = 'https://pf.kakao.com/_DIxexnX';
+
+function SectionLabel({ children }: { children: ReactNode }) {
+  return <p className="pb-[8px] font-semibold text-[13px] text-[#A1A4AA]">{children}</p>;
+}
+
+function Card({ children }: { children: ReactNode }) {
+  return <div className="bg-white rounded-[10px] overflow-hidden">{children}</div>;
+}
+
+export function MyProfileSection({ nickname, profileImageUrl }: MyProfileSectionProps) {
   const navigate = useNavigate();
 
   return (
-    <section
-      role="button"
-      tabIndex={0}
-      onClick={() => navigate('/my/profile')}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') navigate('/my/profile');
-      }}
-      className="
-        px-[22px] py-[20px]
-        border-b border-[#E6E7E9]
-        cursor-pointer
-        active:bg-[#F7F7F8]
-        focus:outline-none
-      "
-    >
-      <div className="flex items-center gap-[15px]">
-        <div className="w-[60px] h-[60px] rounded-full bg-[#F2F3F5] flex items-center justify-center overflow-hidden">
-          {profileImageUrl ? (
-            <img src={profileImageUrl} alt="프로필 이미지" className="w-full h-full object-cover" />
-          ) : (
-            <ProfilePlaceholderIcon size={28} />
-          )}
-        </div>
-
-        <div className="flex-1">
-          <div className="flex items-center gap-[10px]">
-            <span className="font-medium text-[16px] truncate">{nickname}</span>
-            {isPlus && <PremiumBadge label="Plus" />}
+    <Card>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => navigate('/my/profile')}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') navigate('/my/profile');
+        }}
+        className="px-[20px] py-[24px] cursor-pointer active:bg-[#F7F7F8] focus:outline-none"
+      >
+        <div className="flex items-center gap-[12px]">
+          <div className="w-[60px] h-[60px] rounded-full border-[1.7px] border-[#E6E7E9] shrink-0">
+            <div className="w-full h-full rounded-full bg-[#F2F3F5] flex items-center justify-center overflow-hidden">
+              {profileImageUrl ? (
+                <img src={profileImageUrl} alt="프로필 이미지" className="w-full h-full object-cover" />
+              ) : (
+                <ProfilePlaceholderIcon size={28} />
+              )}
+            </div>
           </div>
 
-          <p className="font-medium text-[12px] text-[#A1A4AA] mt-2">프로필 수정</p>
-        </div>
+          <div className="flex-1 min-w-0">
+            <span className="block font-semibold text-[15px] truncate">{nickname}</span>
+            <p className="font-medium text-[12px] text-[#A1A4AA] mt-[5px]">프로필 수정</p>
+          </div>
 
-        <ChevronRightIcon />
+          <ChevronRightIcon />
+        </div>
       </div>
-    </section>
+    </Card>
   );
 }
 
 export default function MyhomePage() {
-  const [isPlusModalOpen, setIsPlusModalOpen] = useState(false);
-  const [openLogoutModal, setOpenLogoutModal] = useState(false);
-
-  const font = useStyleStore((s) => s.font);
   const setFont = useStyleStore((s) => s.setFont);
-
-  const isPlus = useMembershipStore((s) => s.isPlus);
-  const setIsPlus = useMembershipStore((s) => s.setIsPlus);
-
   const setAuthStatus = useAuthStore((s) => s.setAuthStatus);
 
   const navigate = useNavigate();
@@ -85,11 +76,6 @@ export default function MyhomePage() {
 
     (async () => {
       try {
-        const membership = await getMyMembership();
-        if (!mounted) return;
-
-        setIsPlus(membership.isPlus);
-
         const theme = await getMyTheme();
         if (!mounted) return;
         setFont(serverFontToClient(theme.font));
@@ -101,7 +87,7 @@ export default function MyhomePage() {
     return () => {
       mounted = false;
     };
-  }, [navigate, setAuthStatus, setIsPlus, setFont]);
+  }, [navigate, setAuthStatus, setFont]);
 
   useEffect(() => {
     if (isMeError) {
@@ -110,130 +96,65 @@ export default function MyhomePage() {
     }
   }, [isMeError, navigate, setAuthStatus]);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } finally {
-      setOpenLogoutModal(false);
-      navigate('/login', { replace: true });
-    }
-  };
-
   return (
-    <>
-      <main className="bg-white -mt-[20px]">
-        <MyProfileSection
-          nickname={me?.nickname || '사용자'}
-          profileImageUrl={me?.profileImageUrl ?? null}
-          isPlus={isPlus}
-        />
+    <main
+      className="
+        w-full min-w-[320px] max-w-[440px]
+        min-h-[700px] h-auto
+        mx-auto
+        bg-[#F5F6F7]
+        px-[16px] pt-[8px] pb-[32px]
+        flex flex-col gap-[24px]
+      "
+    >
+      <section>
+        <SectionLabel>프로필</SectionLabel>
+        <MyProfileSection nickname={me?.nickname || '사용자'} profileImageUrl={me?.profileImageUrl ?? null} />
+      </section>
 
-        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#A1A4AA]">
-          설정
-        </div>
+      <section>
+        <SectionLabel>편지함 설정</SectionLabel>
+        <Card>
+          <MenuItem label="폰트 변경" onClick={() => navigate('/my/style')} />
+          <MenuItem label="From 관리" onClick={() => navigate('/my/from')} dividerClassName="" />
+        </Card>
+      </section>
 
-        <button
-          className="w-full px-[22px] pt-[18px] pb-[17px] flex justify-between items-center border-b border-[#E6E7E9]"
-          onClick={() => {
-            if (!isPlus) setIsPlusModalOpen(true);
-          }}
-        >
-          <span className="font-medium text-[16px]">Plus 멤버십</span>
-
-          {isPlus ? (
-            <div className="flex items-center gap-[9px]">
-              <span className="text-[12px] text-[#A1A4AA]">이용 중</span>
-              <ChevronRightIcon />
-            </div>
-          ) : (
-            <PremiumBadge />
-          )}
-        </button>
-
-        <MenuItem label="계정 관리" onClick={() => navigate('/my/account')} />
-        <MenuItem label="From 관리" onClick={() => navigate('/my/from')} />
-        <button
-          type="button"
-          onClick={() => setOpenLogoutModal(true)}
-          className="w-full px-[22px] pt-[18px] pb-[17px] flex justify-between items-center border-b border-[#E6E7E9]"
-        >
-          <span className="font-medium text-[16px]">로그아웃</span>
-        </button>
-
-        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#A1A4AA]">
-          테마
-        </div>
-        <button
-          className="w-full px-[22px] pt-[18px] pb-[17px] flex justify-between items-center border-b border-[#E6E7E9]"
-          onClick={() => {
-            if (isPlus) {
-              navigate('/my/style');
-            } else {
-              setIsPlusModalOpen(true);
+      <section>
+        <SectionLabel>계정 및 정보</SectionLabel>
+        <Card>
+          <MenuItem label="계정 관리" onClick={() => navigate('/my/account')} />
+          <MenuItem
+            label="문의하기"
+            onClick={() => window.open(KAKAO_CHANNEL_URL, '_blank', 'noopener,noreferrer')}
+            rightIcon={<img src={kakaoIcon} alt="" className="w-[22px] h-[22px]" />}
+          />
+          <MenuItem
+            label="서비스 이용약관"
+            onClick={() =>
+              window.open(
+                'https://www.notion.so/35b1829bd7ed807b8067ff1e134ad299?source=copy_link',
+                '_blank'
+              )
             }
-          }}
-        >
-          <span className="font-medium text-[16px]">스타일</span>
+          />
+          <MenuItem
+            label="개인정보 처리방침"
+            onClick={() =>
+              window.open(
+                'https://www.notion.so/35b1829bd7ed80699a43f1ac16fefc7f?source=copy_link',
+                '_blank'
+              )
+            }
+            dividerClassName=""
+          />
+        </Card>
+      </section>
 
-          {isPlus ? (
-            <div className="flex items-center gap-[9px]">
-              <span className="text-[12px] text-[#A1A4AA]">{FONT_LABEL[font]}</span>
-              <ChevronRightIcon />
-            </div>
-          ) : (
-            <PremiumBadge />
-          )}
-        </button>
-        <button className="w-full px-[22px] pt-[18px] pb-[17px] flex justify-between items-center border-b border-[#E6E7E9]">
-          <span className="font-medium text-[16px]">화면</span>
-          <div className="flex items-center gap-[9px]">
-            {isPlus && <span className="text-[12px] text-[#A1A4AA]">기본</span>}
-            <ChevronRightIcon />
-          </div>
-        </button>
-
-        <div className="bg-[#F7F7F7] px-[22px] pt-[25px] pb-[9px] font-medium text-[13px] text-[#A1A4AA]">
-          지원
-        </div>
-        <MenuItem
-          label="서비스 이용약관"
-          onClick={() =>
-            window.open(
-              'https://www.notion.so/35b1829bd7ed807b8067ff1e134ad299?source=copy_link',
-              '_blank'
-            )
-          }
-        />
-
-        <MenuItem
-          label="개인정보처리방침"
-          onClick={() =>
-            window.open(
-              'https://www.notion.so/35b1829bd7ed80699a43f1ac16fefc7f?source=copy_link',
-              '_blank'
-            )
-          }
-        />
-      </main>
-
-      <PlusModal
-        open={isPlusModalOpen}
-        onClose={() => setIsPlusModalOpen(false)}
-        onPay={async () => {
-          const paid = await payMyMembershipTemp();
-          setIsPlus(paid.isPlus); // true
-          setIsPlusModalOpen(false);
-        }}
-      />
-
-      <ConfirmModal
-        open={openLogoutModal}
-        title="로그아웃 할까요?"
-        cancelText="취소"
-        confirmText="확인"
-        onCancel={() => setOpenLogoutModal(false)}
-        onConfirm={handleLogout}
-      />
-    </>
+      <div className="flex gap-[4px]">
+        <img src={tagIcon} alt="" className="w-[16px] h-[16px]" />
+        <span className="font-medium text-[14px] text-[#A1A4AA]">v.1.0.0</span>
+      </div>
+    </main>
   );
 }
