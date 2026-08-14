@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import FolderSelect from '@/components/letter/FolderSelect';
-import FolderModal from '@/components/letterBox/letterFolder/FolderModal';
+import BottomSheet from '@/components/common/BottomSheet';
+import BottomSheetStepView from '@/components/common/BottomSheetStepView';
+import ConfirmModal from '@/components/common/ConfirmModal';
+import MoreView from '@/components/letter/views/MoreView';
+import FolderSelectView from '@/components/letter/views/FolderSelectView';
+import FolderSheetBody from '@/components/letter/views/FolderSheetBody';
+import FolderForm from '@/components/letterBox/letterFolder/FolderForm';
 import type { Folder } from '@/types/folder';
 import { createFolder, getFolderList } from '@/api/folder';
 import { uploadImage as uploadImageApi } from '@/api/upload';
@@ -11,7 +16,6 @@ import type { CreateFrom } from '@/types/from';
 import { EmotionTag } from '@/components/common/EmotionTag';
 import { BottomButton } from '@/components/common/BottomButton';
 import { FromBadge } from '@/components/common/FromBadge';
-import LetterDetailBottomSheet from './LetterDetailBottomSheet';
 import aiSummary from '@/assets/create/ai-summary.svg';
 import upBar from '@/assets/letter/up-bar.svg';
 import downBar from '@/assets/letter/down-bar.svg';
@@ -23,6 +27,8 @@ import { useFolderList } from '@/hooks/queries/useFolderList';
 import { useToggleLetterLike } from '@/hooks/mutations/useToggleLetterLike';
 import { usePatchLetterReply } from '@/hooks/mutations/usePatchLetterReply';
 import { useDeleteLetterReply } from '@/hooks/mutations/useDeleteLetterReply';
+
+type SheetStep = 'more' | 'folderSelect' | 'createFolder';
 
 type LayoutContext = {
   setFixedAction: (payload: { node: React.ReactNode; bgColor?: string } | null) => void;
@@ -94,9 +100,13 @@ export default function LetterDetailSection({
   const toast = useToast();
 
   const [openSummary, setOpenSummary] = useState(false);
-  const [openMore, setOpenMore] = useState(false);
-  const [openFolderSelect, setOpenFolderSelect] = useState(false);
-  const [openCreateFolder, setOpenCreateFolder] = useState(false);
+  // 더보기 / 폴더 이동은 한 시트 안에서 뷰만 교체
+  // 닫힐 때 내용이 되돌아가 보이지 않도록 open과 step을 분리해서 관리
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetStep, setSheetStep] = useState<SheetStep>('more');
+  const [sheetDirection, setSheetDirection] = useState<1 | -1>(1);
+  const [sheetSlide, setSheetSlide] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [folders, setFolders] = useState<Folder[]>([]);
   const queryClient = useQueryClient();
   const [savedReply, setSavedReply] = useState(initialReply ?? '');
@@ -108,12 +118,20 @@ export default function LetterDetailSection({
   const patchReplyMutation = usePatchLetterReply(letterId);
   const deleteReplyMutation = useDeleteLetterReply(letterId);
 
+  // slide=false면 높이 트랜지션 + 페이드, true면 좌우 슬라이드
+  const openSheet = useCallback((step: SheetStep, direction: 1 | -1 = 1, slide = false) => {
+    setSheetDirection(direction);
+    setSheetSlide(slide);
+    setSheetStep(step);
+    setSheetOpen(true);
+  }, []);
+
   // 헤더 더보기 버튼에서 이벤트로 열리는 구조
   useEffect(() => {
-    const handleOpen = () => setOpenMore(true);
+    const handleOpen = () => openSheet('more');
     window.addEventListener('open-letter-more', handleOpen as EventListener);
     return () => window.removeEventListener('open-letter-more', handleOpen as EventListener);
-  }, []);
+  }, [openSheet]);
 
   const [liked, setLiked] = useState(isLiked);
   const [likeLoading, setLikeLoading] = useState(false);
@@ -200,7 +218,7 @@ export default function LetterDetailSection({
   const handleOpenFolderSelect = () => {
     if (folderLoading) return;
     setFolders(folderData ?? []);
-    setOpenFolderSelect(true);
+    openSheet('folderSelect', 1);
   };
 
   const handleCreateFolder = async ({
@@ -215,8 +233,7 @@ export default function LetterDetailSection({
       queryClient.invalidateQueries({ queryKey: ['folders'] });
       const fresh = await getFolderList();
       setFolders(fresh);
-      setOpenCreateFolder(false);
-      setOpenFolderSelect(true);
+      openSheet('folderSelect', -1, true);
     } catch {
       toast.show('폴더를 만들지 못했어요.', 1200);
     }
@@ -477,51 +494,71 @@ export default function LetterDetailSection({
         )}
       </div>
 
-      {/* 바텀시트 / 폴더 */}
-      <LetterDetailBottomSheet
-        open={openMore}
-        onClose={() => setOpenMore(false)}
-        onAddToFolder={handleOpenFolderSelect}
-        onDeleteLetter={() => onDeleteLetter?.()}
-        onEdit={() => {
-          setOpenMore(false);
-          onEdit();
+      {/* 바텀시트 - 더보기 / 폴더 이동 / 새 폴더 만들기를 한 시트에서 뷰만 교체 */}
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} className="px-[20px]">
+        <BottomSheetStepView step={sheetStep} direction={sheetDirection} slide={sheetSlide}>
+          {sheetStep === 'more' ? (
+            <MoreView
+              onAddToFolder={handleOpenFolderSelect}
+              onEdit={() => {
+                setSheetOpen(false);
+                onEdit();
+              }}
+              onRequestDelete={() => setConfirmDelete(true)}
+            />
+          ) : (
+            <FolderSheetBody>
+              {sheetStep === 'folderSelect' ? (
+                <FolderSelectView
+                  folders={folders}
+                  selectedFolderId={folder?.folderId ?? null}
+                  onSelect={(folderId) => {
+                    setSheetOpen(false);
+                    onAddToFolder?.(folderId);
+                  }}
+                  onSelectNone={() => {
+                    setSheetOpen(false);
+                    onRemoveFromFolder?.();
+                  }}
+                  onCreateFolder={() => openSheet('createFolder', 1, true)}
+                />
+              ) : (
+                <FolderForm
+                  title="새 폴더 만들기"
+                  initialName=""
+                  initialImageUrl={null}
+                  initialImageId={null}
+                  onCancel={() => openSheet('folderSelect', -1, true)}
+                  onConfirm={handleCreateFolder}
+                  uploadImage={async (file) => {
+                    const res = await uploadImageApi(file, 'folder');
+                    if (!res.success) {
+                      throw new Error(res.message || '이미지 업로드 실패');
+                    }
+                    return { imageId: res.data.imageId, url: res.data.url };
+                  }}
+                />
+              )}
+            </FolderSheetBody>
+          )}
+        </BottomSheetStepView>
+      </BottomSheet>
+
+      {/* 편지 삭제 확인 모달 */}
+      <ConfirmModal
+        open={confirmDelete}
+        title="편지 삭제"
+        titleClassName="text-[#FF143B]"
+        description={'편지를 삭제할 경우 되돌릴 수 없어요\n정말 삭제할까요?'}
+        cancelText="취소"
+        confirmText="삭제"
+        onCancel={() => setConfirmDelete(false)}
+        onConfirm={() => {
+          setConfirmDelete(false);
+          setSheetOpen(false);
+          onDeleteLetter?.();
         }}
       />
-
-      <FolderSelect
-        open={openFolderSelect}
-        folders={folders}
-        selectedFolderId={folder?.folderId ?? null}
-        onClose={() => setOpenFolderSelect(false)}
-        onSelect={(folderId) => onAddToFolder?.(folderId)}
-        onSelectNone={() => onRemoveFromFolder?.()}
-        onCreateFolder={() => {
-          setOpenFolderSelect(false);
-          setOpenCreateFolder(true);
-        }}
-      />
-
-      {openCreateFolder && (
-        <FolderModal
-          title="새 폴더 만들기"
-          initialName=""
-          initialImageUrl={null}
-          initialImageId={null}
-          onCancel={() => {
-            setOpenCreateFolder(false);
-            setOpenFolderSelect(true);
-          }}
-          onConfirm={handleCreateFolder}
-          uploadImage={async (file) => {
-            const res = await uploadImageApi(file, 'folder');
-            if (!res.success) {
-              throw new Error(res.message || '이미지 업로드 실패');
-            }
-            return { imageId: res.data.imageId, url: res.data.url };
-          }}
-        />
-      )}
     </div>
   );
 }

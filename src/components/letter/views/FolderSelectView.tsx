@@ -1,7 +1,5 @@
-// 편지 상세 - 폴더로 편지 이동 바텀 시트
-
+// 편지 상세 - 폴더 이동 시트 내부 뷰
 import type { Folder } from '@/types/folder';
-import BottomSheet from '@/components/common/BottomSheet';
 import allFolderIcon from '@/assets/letterPage/allFolderIcon.svg';
 import newFolderIcon from '@/assets/letterPage/newFolderIcon.svg';
 import defaultFolderIcon from '@/assets/letterPage/default-folder.svg';
@@ -9,10 +7,8 @@ import selectFilledIcon from '@/assets/letter/select-filled.svg';
 import selectOutlineIcon from '@/assets/letter/select-outline.svg';
 
 interface Props {
-  open: boolean;
   folders: Folder[];
   selectedFolderId: number | null;
-  onClose: () => void;
   onSelect: (folderId: number) => void;
   onSelectNone: () => void;
   onCreateFolder: () => void;
@@ -28,25 +24,19 @@ function SelectRadio({ selected }: { selected: boolean }) {
   );
 }
 
-export default function FolderSelect({
-  open,
+export default function FolderSelectView({
   folders,
   selectedFolderId,
-  onClose,
   onSelect,
   onSelectNone,
   onCreateFolder,
 }: Props) {
   return (
-    <BottomSheet open={open} onClose={onClose} className="max-h-[369px] px-[20px]">
-      <div className="mt-[20px] flex w-full flex-col overflow-y-auto">
-        {/* 선택 없음(전체) */}
+    <div className="flex w-full flex-col pt-[20px]">
+      <div className="flex max-h-[274px] w-full flex-col overflow-y-auto">
         <button
           type="button"
-          onClick={() => {
-            onSelectNone();
-            onClose();
-          }}
+          onClick={onSelectNone}
           className="flex w-full items-center gap-[12px] px-[20px] py-[10px]"
         >
           <img src={allFolderIcon} alt="" className="h-[40px] w-[40px] shrink-0" />
@@ -54,15 +44,11 @@ export default function FolderSelect({
           <SelectRadio selected={selectedFolderId == null} />
         </button>
 
-        {/* 폴더 목록 */}
         {folders.map((f) => (
           <button
             key={f.id}
             type="button"
-            onClick={() => {
-              onSelect(f.id);
-              onClose();
-            }}
+            onClick={() => onSelect(f.id)}
             className="flex w-full items-center gap-[12px] px-[20px] py-[10px]"
           >
             <img
@@ -75,7 +61,6 @@ export default function FolderSelect({
           </button>
         ))}
 
-        {/* 새 폴더 만들기 */}
         {folders.length < 3 && (
           <button
             type="button"
@@ -87,6 +72,6 @@ export default function FolderSelect({
           </button>
         )}
       </div>
-    </BottomSheet>
+    </div>
   );
 }

@@ -9,6 +9,7 @@ import LetterCard, { type HomeCardLetter } from '@/components/home/LetterCard';
 import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import CustomResetSheet from '@/components/home/CustomResetSheet';
+import FriendInviteSheet from '@/components/common/FriendInviteSheet';
 import CustomizingHeader from '@/components/header/CustomizingHeader';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import { uploadImage } from '@/api/upload';
@@ -18,7 +19,6 @@ import { useRandomLetterQuery } from '@/hooks/queries/useRandomLetterQuery';
 import { useLetterLists } from '@/hooks/queries/useLetterList';
 import { usePinLetter } from '@/hooks/mutations/usePinLetter';
 import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
-import { useMyMembership } from '@/hooks/queries/useMyMembership';
 import useToast from '@/hooks/useToast';
 import closeIcon from '@/assets/homePage/closeIcon.svg';
 import PwaRecommendSheet from '@/components/pwa/PwaRecommendSheet';
@@ -99,6 +99,7 @@ export default function HomePage() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [showResetSheet, setShowResetSheet] = useState(false);
+  const [showInviteSheet, setShowInviteSheet] = useState(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   // 스티커 이동 범위 제한
@@ -262,21 +263,17 @@ export default function HomePage() {
           scale: s.scale,
         })),
       });
+
+      // 초대 여부 API 연동 후 아직 친구를 초대하지 않은 사용자에게만 노출
+      setShowInviteSheet(true);
     } catch (e) {
       console.error(e);
     }
   };
 
-  const { data: membership } = useMyMembership();
   const toast = useToast();
 
   const addStickerFromFile = async (file: File) => {
-    if (!membership?.isPlus && draftStickers.length >= 3) {
-      toast.show(
-        '스티커는 최대 3개까지 추가할 수 있어요. PLUS 멤버십을 구독하면 무제한으로 사용할 수 있어요.'
-      );
-      return;
-    }
     const rect = containerRef.current?.getBoundingClientRect();
     const cx = rect ? rect.width / 2 : 196;
     const cy = rect ? rect.height / 2 : 320;
@@ -477,6 +474,14 @@ export default function HomePage() {
           onResetAll={handleResetAll}
         />
       )}
+      <FriendInviteSheet
+        open={showInviteSheet}
+        onClose={() => setShowInviteSheet(false)}
+        onInvite={() => {
+          // 초대 링크 API 연동 후 클립보드 복사 처리
+          setShowInviteSheet(false);
+        }}
+      />
       <LetterCard
         letter={letter}
         isPinned={letter?.id === pinnedLetterId}
