@@ -7,7 +7,7 @@ export type { FolderModalResult } from './FolderForm';
 
 export default function FolderModal(props: FolderFormProps) {
   return (
-    <BottomSheet open onClose={props.onCancel} className="px-[20px]" contentClassName="gap-[20px]">
+    <BottomSheet open onClose={props.onCancel} className="px-[20px]">
       <FolderForm {...props} />
     </BottomSheet>
   );

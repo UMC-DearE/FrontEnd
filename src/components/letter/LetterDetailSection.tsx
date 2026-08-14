@@ -5,7 +5,8 @@ import BottomSheetStepView from '@/components/common/BottomSheetStepView';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import MoreView from '@/components/letter/views/MoreView';
 import FolderSelectView from '@/components/letter/views/FolderSelectView';
-import FolderModal from '@/components/letterBox/letterFolder/FolderModal';
+import FolderSheetBody from '@/components/letter/views/FolderSheetBody';
+import FolderForm from '@/components/letterBox/letterFolder/FolderForm';
 import type { Folder } from '@/types/folder';
 import { createFolder, getFolderList } from '@/api/folder';
 import { uploadImage as uploadImageApi } from '@/api/upload';
@@ -27,7 +28,7 @@ import { useToggleLetterLike } from '@/hooks/mutations/useToggleLetterLike';
 import { usePatchLetterReply } from '@/hooks/mutations/usePatchLetterReply';
 import { useDeleteLetterReply } from '@/hooks/mutations/useDeleteLetterReply';
 
-type SheetStep = 'more' | 'folderSelect';
+type SheetStep = 'more' | 'folderSelect' | 'createFolder';
 
 type LayoutContext = {
   setFixedAction: (payload: { node: React.ReactNode; bgColor?: string } | null) => void;
@@ -104,8 +105,8 @@ export default function LetterDetailSection({
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetStep, setSheetStep] = useState<SheetStep>('more');
   const [sheetDirection, setSheetDirection] = useState<1 | -1>(1);
+  const [sheetSlide, setSheetSlide] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [openCreateFolder, setOpenCreateFolder] = useState(false);
   const [folders, setFolders] = useState<Folder[]>([]);
   const queryClient = useQueryClient();
   const [savedReply, setSavedReply] = useState(initialReply ?? '');
@@ -117,8 +118,10 @@ export default function LetterDetailSection({
   const patchReplyMutation = usePatchLetterReply(letterId);
   const deleteReplyMutation = useDeleteLetterReply(letterId);
 
-  const openSheet = useCallback((step: SheetStep, direction: 1 | -1 = 1) => {
+  // slide=false면 높이 트랜지션 + 페이드, true면 좌우 슬라이드
+  const openSheet = useCallback((step: SheetStep, direction: 1 | -1 = 1, slide = false) => {
     setSheetDirection(direction);
+    setSheetSlide(slide);
     setSheetStep(step);
     setSheetOpen(true);
   }, []);
@@ -230,8 +233,7 @@ export default function LetterDetailSection({
       queryClient.invalidateQueries({ queryKey: ['folders'] });
       const fresh = await getFolderList();
       setFolders(fresh);
-      setOpenCreateFolder(false);
-      openSheet('folderSelect', -1);
+      openSheet('folderSelect', -1, true);
     } catch {
       toast.show('폴더를 만들지 못했어요.', 1200);
     }
@@ -492,9 +494,9 @@ export default function LetterDetailSection({
         )}
       </div>
 
-      {/* 바텀시트 - 더보기 / 폴더 이동을 한 시트에서 뷰만 교체 */}
+      {/* 바텀시트 - 더보기 / 폴더 이동 / 새 폴더 만들기를 한 시트에서 뷰만 교체 */}
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} className="px-[20px]">
-        <BottomSheetStepView step={sheetStep} direction={sheetDirection} slide={false}>
+        <BottomSheetStepView step={sheetStep} direction={sheetDirection} slide={sheetSlide}>
           {sheetStep === 'more' ? (
             <MoreView
               onAddToFolder={handleOpenFolderSelect}
@@ -505,22 +507,39 @@ export default function LetterDetailSection({
               onRequestDelete={() => setConfirmDelete(true)}
             />
           ) : (
-            <FolderSelectView
-              folders={folders}
-              selectedFolderId={folder?.folderId ?? null}
-              onSelect={(folderId) => {
-                setSheetOpen(false);
-                onAddToFolder?.(folderId);
-              }}
-              onSelectNone={() => {
-                setSheetOpen(false);
-                onRemoveFromFolder?.();
-              }}
-              onCreateFolder={() => {
-                setSheetOpen(false);
-                setOpenCreateFolder(true);
-              }}
-            />
+            <FolderSheetBody>
+              {sheetStep === 'folderSelect' ? (
+                <FolderSelectView
+                  folders={folders}
+                  selectedFolderId={folder?.folderId ?? null}
+                  onSelect={(folderId) => {
+                    setSheetOpen(false);
+                    onAddToFolder?.(folderId);
+                  }}
+                  onSelectNone={() => {
+                    setSheetOpen(false);
+                    onRemoveFromFolder?.();
+                  }}
+                  onCreateFolder={() => openSheet('createFolder', 1, true)}
+                />
+              ) : (
+                <FolderForm
+                  title="새 폴더 만들기"
+                  initialName=""
+                  initialImageUrl={null}
+                  initialImageId={null}
+                  onCancel={() => openSheet('folderSelect', -1, true)}
+                  onConfirm={handleCreateFolder}
+                  uploadImage={async (file) => {
+                    const res = await uploadImageApi(file, 'folder');
+                    if (!res.success) {
+                      throw new Error(res.message || '이미지 업로드 실패');
+                    }
+                    return { imageId: res.data.imageId, url: res.data.url };
+                  }}
+                />
+              )}
+            </FolderSheetBody>
           )}
         </BottomSheetStepView>
       </BottomSheet>
@@ -540,27 +559,6 @@ export default function LetterDetailSection({
           onDeleteLetter?.();
         }}
       />
-
-      {openCreateFolder && (
-        <FolderModal
-          title="새 폴더 만들기"
-          initialName=""
-          initialImageUrl={null}
-          initialImageId={null}
-          onCancel={() => {
-            setOpenCreateFolder(false);
-            openSheet('folderSelect', -1);
-          }}
-          onConfirm={handleCreateFolder}
-          uploadImage={async (file) => {
-            const res = await uploadImageApi(file, 'folder');
-            if (!res.success) {
-              throw new Error(res.message || '이미지 업로드 실패');
-            }
-            return { imageId: res.data.imageId, url: res.data.url };
-          }}
-        />
-      )}
     </div>
   );
 }

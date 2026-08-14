@@ -23,7 +23,7 @@ export default function MoreView({ onAddToFolder, onEdit, onRequestDelete }: Pro
       </button>
       <button
         onClick={onRequestDelete}
-        className="flex h-[60px] w-full items-center justify-center text-[16px] font-medium text-[#FF143B]"
+        className="flex h-[60px] w-full items-center justify-center text-[16px] font-medium text-[#F02E2E]"
       >
         편지 삭제
       </button>

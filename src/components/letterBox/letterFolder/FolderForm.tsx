@@ -1,4 +1,4 @@
-// 폴더 생성/수정 폼 (바텀 시트 껍데기 없는 순수 뷰)
+// 폴더 생성/수정 폼
 
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import type { FolderImageAction } from '@/types/folder';
@@ -101,9 +101,9 @@ export default function FolderForm({
   const isFormValid = folderName.trim().length > 0 && !isUploading;
 
   return (
-    <div className="flex w-full flex-col gap-[20px]">
+    <div className="flex w-full flex-col gap-[20px] pt-[24px]">
       <div className="flex flex-col items-center gap-[28px]">
-        <p className="text-[16px] font-medium text-[#121212]">{title}</p>
+        <p className="text-[16px] leading-[18px] font-medium text-[#121212]">{title}</p>
 
         <div className="flex flex-col items-center gap-[8px]">
           <label className="cursor-pointer">
@@ -165,7 +165,7 @@ export default function FolderForm({
             className={`h-[50px] flex-1 rounded-[10px] text-[16px] font-medium transition-colors ${
               isFormValid
                 ? 'cursor-pointer bg-[#121212] text-white'
-                : 'cursor-not-allowed bg-[#E7E8EB] text-[#FFFFFF]'
+                : 'cursor-not-allowed bg-[#E7E8EB] text-[#A1A4AA]'
             }`}
           >
             {isUploading ? '업로드중' : '완료'}
