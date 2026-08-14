@@ -72,7 +72,10 @@ export default function BottomSheetStepView({
           // 나가는 뷰와 들어오는 뷰가 겹치도록 둘 다 absolute, 높이는 컨테이너가 소유
           className="absolute top-0 left-0 w-full"
         >
-          <div ref={viewRef}>{children}</div>
+          {/* flow-root: 자식의 margin이 밖으로 새어나가 offsetHeight가 작게 측정되는 것 방지 */}
+          <div ref={viewRef} className="flow-root">
+            {children}
+          </div>
         </motion.div>
       </AnimatePresence>
     </motion.div>
