@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import BottomSheet from '@/components/common/BottomSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
+import MoreView from '@/components/letter/views/MoreView';
 
 interface Props {
   open: boolean;
@@ -23,41 +24,18 @@ export default function LetterDetailBottomSheet({
 
   return (
     <>
-      <BottomSheet
-        open={open}
-        onClose={onClose}
-        className="px-[20px]"
-        contentClassName="gap-[12px]"
-      >
-        <div className="flex w-full flex-col items-center">
-          {/* 폴더 이동으로 통일 (폴더에서 삭제는 이동 시트의 '선택 없음(전체)'로 처리) */}
-          <button
-            onClick={() => {
-              onClose();
-              onAddToFolder();
-            }}
-            className="flex h-[60px] w-full items-center justify-center text-[16px] font-medium text-[#121212]"
-          >
-            폴더 이동
-          </button>
-
-          <button
-            onClick={() => {
-              onClose();
-              onEdit();
-            }}
-            className="flex h-[56px] w-full items-center justify-center text-[16px] font-medium text-[#121212]"
-          >
-            편지 수정
-          </button>
-
-          <button
-            className="flex h-[60px] w-full items-center justify-center text-[16px] font-medium text-[#FF143B]"
-            onClick={() => setConfirmDelete(true)}
-          >
-            편지 삭제
-          </button>
-        </div>
+      <BottomSheet open={open} onClose={onClose} className="px-[20px]">
+        <MoreView
+          onAddToFolder={() => {
+            onClose();
+            onAddToFolder();
+          }}
+          onEdit={() => {
+            onClose();
+            onEdit();
+          }}
+          onRequestDelete={() => setConfirmDelete(true)}
+        />
       </BottomSheet>
 
       {/* 편지 삭제 확인 모달 */}
