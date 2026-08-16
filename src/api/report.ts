@@ -1,29 +1,14 @@
 import { api } from '@/api/http';
+import type { ReportResponse, ReanalyzeReportResponse } from '@/types/report';
 
-export type ReportTop3FromItem = {
-  rank: number;
-  name: string;
-  count: number;
+export const getReport = async () => {
+  const { data } = await api.get<ReportResponse>('/reports');
+
+  return data.data;
 };
 
-export type ReportEmotionDistributionItem = {
-  emotion: string;
-  percent: number;
-};
+export const reanalyzeReport = async () => {
+  const { data } = await api.post<ReanalyzeReportResponse>('/reports/reanalysis');
 
-export type GetReportsResponse = {
-  success: boolean;
-  code: string;
-  message: string;
-  data: {
-    top3From: ReportTop3FromItem[];
-    topPhrases: string[];
-    emotionDistribution: ReportEmotionDistributionItem[];
-    dummy?: boolean;
-  };
-};
-
-export const getReports = async () => {
-  const res = await api.get<GetReportsResponse>('/reports');
-  return res.data;
+  return data.data;
 };
