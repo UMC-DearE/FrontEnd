@@ -1,4 +1,7 @@
+import { useState } from 'react';
+
 import type { ReportAnalysis } from '@/types/report';
+import ConfirmModal from '@/components/common/ConfirmModal';
 import ReanalyzeButton from './ReanalyzeButton';
 
 interface ReanalysisSectionProps {
@@ -14,6 +17,8 @@ export default function ReanalysisSection({
   isPending = false,
   onReanalyze,
 }: ReanalysisSectionProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const requiredLetterCount = 3;
 
   const remainingCount = analysis
@@ -44,6 +49,11 @@ export default function ReanalysisSection({
 
   const canReanalyze = analysis?.canReanalyze ?? false;
 
+  const handleConfirm = () => {
+    setIsModalOpen(false);
+    onReanalyze();
+  };
+
   return (
     <div className="relative flex items-center justify-end">
       {guideMessage && (
@@ -52,7 +62,20 @@ export default function ReanalysisSection({
         </p>
       )}
 
-      <ReanalyzeButton disabled={!canReanalyze} isPending={isPending} onClick={onReanalyze} />
+      <ReanalyzeButton
+        disabled={!canReanalyze}
+        isPending={isPending}
+        onClick={() => setIsModalOpen(true)}
+      />
+      <ConfirmModal
+        open={isModalOpen}
+        title="다시 분석할까요?"
+        description="이전 분석 내용은 저장되지 않아요"
+        cancelText="취소"
+        confirmText="분석하기"
+        onCancel={() => setIsModalOpen(false)}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }
