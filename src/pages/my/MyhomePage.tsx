@@ -10,10 +10,8 @@ import ChevronRightIcon from '@/components/icons/ChevronRightIcon';
 import ProfilePlaceholderIcon from '@/components/icons/ProfilePlaceholderIcon';
 import type { MyProfileSectionProps } from '@/components/my/types';
 
-import { useStyleStore } from '@/stores/styleStores';
 import { useAuthStore } from '@/stores/authStore';
 
-import { getMyTheme, serverFontToClient } from '@/api/theme';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
 
 const KAKAO_CHANNEL_URL = 'https://pf.kakao.com/_DIxexnX';
@@ -64,30 +62,11 @@ export function MyProfileSection({ nickname, profileImageUrl }: MyProfileSection
 }
 
 export default function MyhomePage() {
-  const setFont = useStyleStore((s) => s.setFont);
   const setAuthStatus = useAuthStore((s) => s.setAuthStatus);
 
   const navigate = useNavigate();
 
   const { data: me, isError: isMeError } = useMeQuery();
-
-  useEffect(() => {
-    let mounted = true;
-
-    (async () => {
-      try {
-        const theme = await getMyTheme();
-        if (!mounted) return;
-        setFont(serverFontToClient(theme.font));
-      } catch {
-        setAuthStatus('unauthenticated');
-        navigate('/login', { replace: true });
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [navigate, setAuthStatus, setFont]);
 
   useEffect(() => {
     if (isMeError) {
