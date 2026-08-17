@@ -45,6 +45,7 @@ export function AppLayout() {
     pathname.startsWith('/my/style') ||
     pathname.startsWith('/my/from') ||
     pathname.startsWith('/login') ||
+    pathname.startsWith('/invite') ||
     isLetterDetail ||
     pathname.startsWith('/create');
 
