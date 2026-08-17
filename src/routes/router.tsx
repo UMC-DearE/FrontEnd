@@ -10,7 +10,7 @@ import OAuthCallbackPage from '@/pages/onboarding/OAuthCallbackPage';
 import TermsPage from '@/pages/setup/TermsPage';
 import ServicePage from '@/pages/setup/ServicePage';
 import PrivacyPage from '@/pages/setup/PrivacyPage';
-import SetNickamePage from '@/pages/setup/SetNicknamePage';
+import SetNicknamePage from '@/pages/setup/SetNicknamePage';
 
 import HomePage from '@/pages/home/HomePage';
 
@@ -34,6 +34,8 @@ import ThemePage from '@/pages/my/ThemePage';
 import EditLetterPage from '@/pages/letter/EditLetterPage';
 import AuthGuard from '@/routes/AuthGuard';
 import LetterSelectPage from '@/pages/letter/LetterSelectPage';
+import InvalidInvitePage from '@/pages/invite/InvalidInvitePage';
+import InviteWelcomeSheet from '@/components/common/InviteWelcomeSheet';
 
 const router = createBrowserRouter([
   {
@@ -47,13 +49,21 @@ const router = createBrowserRouter([
           { path: 'login', element: <LoginPage /> },
           { path: 'auth/oauth2/:provider/callback', element: <OAuthCallbackPage /> },
 
+          // 초대 링크
+          { path: 'invite/invalid', element: <InvalidInvitePage /> },
+          // 초대 가입 환영 시트 확인용 - 임시
+          {
+            path: 'invite/welcome-preview',
+            element: <InviteWelcomeSheet open onClose={() => {}} onGoCustomize={() => {}} />,
+          },
+
           {
             path: 'auth',
             children: [
               { path: 'terms', element: <TermsPage /> },
               { path: 'terms/service', element: <ServicePage /> },
               { path: 'terms/privacy', element: <PrivacyPage /> },
-              { path: 'signup', element: <SetNickamePage /> },
+              { path: 'signup', element: <SetNicknamePage /> },
             ],
           },
         ],
