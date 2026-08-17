@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '@/api/http';
-import GoogleIcon from '@/assets/myPage/GoogleIcon.svg';
-import KakaoIcon from '@/assets/myPage/KakaoIcon.svg';
+import GoogleIcon from '@/assets/myPage/googleIcon.svg';
+import KakaoIcon from '@/assets/myPage/kakaoIcon.svg';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
 import { useDeleteMe } from '@/hooks/mutations/useDeleteMe';
