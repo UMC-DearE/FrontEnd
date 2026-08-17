@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type FontKey = 'pretendard' | 'cafe24' | 'lee';
+export type FontKey = 'pretendard' | 'cafe24' | 'lee' | 'okdandan';
 
 interface StyleState {
   font: FontKey;

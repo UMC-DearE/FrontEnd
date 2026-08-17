@@ -29,7 +29,6 @@ import AccountPage from '@/pages/my/AccountPage';
 import FromPage from '@/pages/my/FromPage';
 import FromCreatePage from '@/pages/my/FromCreatePage';
 import StylePage from '@/pages/my/StylePage';
-import ThemePage from '@/pages/my/ThemePage';
 // import PrivacyPage from '@/pages/my/PrivacyPage';
 import EditLetterPage from '@/pages/letter/EditLetterPage';
 import AuthGuard from '@/routes/AuthGuard';
@@ -101,7 +100,6 @@ const router = createBrowserRouter([
                     ],
                   },
                   { path: 'style', element: <StylePage /> },
-                  { path: 'theme', element: <ThemePage /> },
                   // { path: 'terms', element: <MyTermsPage /> },
                   // { path: 'privacy', element: <PrivacyPage /> },
                 ],

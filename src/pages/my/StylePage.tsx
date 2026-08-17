@@ -93,6 +93,7 @@ export default function StylePage() {
                 fontFamily={opt.fontFamily}
                 onClick={() => {
                   if (locked) return;
+                  console.log('clicked', opt.key, locked);
                   setPendingFont(opt.key);
                 }}
               />
