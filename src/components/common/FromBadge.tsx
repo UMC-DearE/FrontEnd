@@ -14,7 +14,7 @@ export function FromBadge({ name, bgColor, fontColor, size = 'md' }: FromBadgePr
       text: 'flex items-center text-[13px] font-semibold whitespace-nowrap',
     },
     lg: {
-      outer: 'inline-flex px-[14px] py-[6px] rounded-[6px]',
+      outer: 'inline-flex px-[12px] py-[6px] rounded-[6px]',
       text: 'flex items-center text-[14px] font-semibold whitespace-nowrap',
     },
     xl: {
