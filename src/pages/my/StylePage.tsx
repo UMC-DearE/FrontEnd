@@ -12,7 +12,7 @@ import { patchMyFont, serverFontToClient } from '@/api/theme';
 export default function StylePage() {
   const navigate = useNavigate();
 
-  const isPlus = true;
+  // const isPlus = true;
 
   const font = useStyleStore((s) => s.font);
   const setFont = useStyleStore((s) => s.setFont);
@@ -81,7 +81,7 @@ export default function StylePage() {
 
         <div className="flex flex-col gap-[12px]">
           {FONT_OPTIONS.map((opt) => {
-            const locked = !!opt.isPlus && !isPlus;
+            // const locked = !!opt.isPlus && !isPlus;
 
             return (
               <FontRow
@@ -92,7 +92,7 @@ export default function StylePage() {
                 preview={opt.preview}
                 fontFamily={opt.fontFamily}
                 onClick={() => {
-                  if (locked) return;
+                  // if (locked) return;
                   setPendingFont(opt.key);
                 }}
               />
