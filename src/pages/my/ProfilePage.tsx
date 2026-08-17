@@ -4,7 +4,7 @@ import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { BottomButton } from '@/components/common/BottomButton';
 import ProfilePlaceholderIcon from '@/components/icons/ProfilePlaceholderIcon';
-import CameraIcon from '@/assets/myPage/CameraIcon.svg';
+import CameraIcon from '@/assets/myPage/cameraIcon.svg';
 import { uploadImage } from '@/api/upload';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
 import { useUpdateMe } from '@/hooks/mutations/useUpdateMe';
