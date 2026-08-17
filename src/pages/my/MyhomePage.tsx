@@ -130,22 +130,10 @@ export default function MyhomePage() {
             rightIcon={<img src={kakaoIcon} alt="" className="w-[22px] h-[22px]" />}
           />
           <MenuItem
-            label="서비스 이용약관"
-            onClick={() =>
-              window.open(
-                'https://www.notion.so/35b1829bd7ed807b8067ff1e134ad299?source=copy_link',
-                '_blank'
-              )
-            }
+            label="서비스 이용약관" onClick={() => navigate('/my/service')}
           />
           <MenuItem
-            label="개인정보 처리방침"
-            onClick={() =>
-              window.open(
-                'https://www.notion.so/35b1829bd7ed80699a43f1ac16fefc7f?source=copy_link',
-                '_blank'
-              )
-            }
+            label="개인정보 처리방침" onClick={() => navigate('/my/privacy')}
             dividerClassName=""
           />
         </Card>

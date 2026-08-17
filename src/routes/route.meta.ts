@@ -42,13 +42,13 @@ export const ROUTE_META: Array<{
     match: (pathname) => pathname === '/auth/terms/service',
     header: 'BACK_TITLE',
     title: '서비스 이용 약관',
-    bg: 'white',
+    bg: 'gray',
   },
   {
     match: (pathname) => pathname === '/auth/terms/privacy',
     header: 'BACK_TITLE',
     title: '개인정보처리방침',
-    bg: 'white',
+    bg: 'gray',
   },
 
   // 홈
