@@ -1,25 +1,25 @@
-import type { EmotionCategory } from "@/types/create";
+import type { EmotionCategory } from '@/types/create';
 
 interface EmotionTagProps {
   label?: string;
   category?: EmotionCategory;
-  variant?: "gratitude" | "joy" | "comfort" | "longing" | "worry";
+  variant?: 'gratitude' | 'joy' | 'comfort' | 'longing' | 'worry';
 }
 
 const LEGACY_STYLE = {
-  gratitude: "bg-[#FFE0D8] text-[#F57542]",
-  joy: "bg-[#FFF0BA] text-[#FFB245]",
-  comfort: "bg-[#E6FECB] text-[#62BA65]",
-  longing: "bg-[#F5E0F9] text-[#D572B7]",
-  worry: "bg-[#D7E2F9] text-[#6B80B5]",
+  gratitude: 'bg-[#FFE0D8] text-[#F57542]',
+  joy: 'bg-[#FFF0BA] text-[#FFB245]',
+  comfort: 'bg-[#E6FECB] text-[#62BA65]',
+  longing: 'bg-[#F5E0F9] text-[#D572B7]',
+  worry: 'bg-[#D7E2F9] text-[#6B80B5]',
 } as const;
 
 export function EmotionTag({ label, category, variant }: EmotionTagProps) {
-  const displayLabel = label ?? category?.categoryType ?? "";
+  const displayLabel = label ?? category?.categoryType ?? '';
 
   const normalizeColor = (value?: string) => {
     if (!value) return undefined;
-    return value.startsWith("#") ? value : `#${value}`;
+    return value.startsWith('#') ? value : `#${value}`;
   };
 
   const style = category
@@ -34,7 +34,7 @@ export function EmotionTag({ label, category, variant }: EmotionTagProps) {
   return (
     <span
       className={`inline-flex items-center justify-center h-[26px] px-[11px] py-[5px] rounded-[13px] text-[13px] font-medium ${
-        legacyClass ?? ""
+        legacyClass ?? ''
       }`}
       style={style}
       role="status"

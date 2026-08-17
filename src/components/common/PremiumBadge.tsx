@@ -3,7 +3,7 @@ interface PremiumBadgeProps {
   className?: string;
 }
 
-export function PremiumBadge({ label = "UPGRADE", className = "", }: PremiumBadgeProps) {
+export function PremiumBadge({ label = 'UPGRADE', className = '' }: PremiumBadgeProps) {
   return (
     <span
       className={[
@@ -16,10 +16,9 @@ export function PremiumBadge({ label = "UPGRADE", className = "", }: PremiumBadg
         bg-gradient-to-r from-[#5B53F1] to-[#FB49A6]
         `,
         className,
-      ].join(" ")}
+      ].join(' ')}
     >
       {label}
     </span>
   );
 }
-

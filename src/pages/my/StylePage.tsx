@@ -1,18 +1,18 @@
 // 마이페이지-스타일 수정 페이지
 
-import { useMemo, useState, useEffect, useCallback } from "react";
-import { useOutletContext } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { FontRow } from "@/components/my/FontRow";
-import { FONT_OPTIONS } from "@/utils/fontOptions";
-import { useStyleStore } from "@/stores/styleStores";
-import { BottomButton } from "@/components/common/BottomButton";
-import { patchMyFont, serverFontToClient } from "@/api/theme";
+import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useOutletContext } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { FontRow } from '@/components/my/FontRow';
+import { FONT_OPTIONS } from '@/utils/fontOptions';
+import { useStyleStore } from '@/stores/styleStores';
+import { BottomButton } from '@/components/common/BottomButton';
+import { patchMyFont, serverFontToClient } from '@/api/theme';
 
 export default function StylePage() {
   const navigate = useNavigate();
 
-  const isPlus = true;
+  // const isPlus = true;
 
   const font = useStyleStore((s) => s.font);
   const setFont = useStyleStore((s) => s.setFont);
@@ -40,7 +40,6 @@ export default function StylePage() {
     navigate(-1);
   }, [pendingFont, font, setFont, navigate]);
 
-
   useEffect(() => {
     if (!setFixedAction) return;
 
@@ -50,6 +49,7 @@ export default function StylePage() {
           변경
         </BottomButton>
       ),
+      bgColor: '#F7F8F9',
     });
 
     return () => setFixedAction(null);
@@ -58,14 +58,12 @@ export default function StylePage() {
   return (
     <div className="min-h-full pb-[52px]">
       <div>
-        <div className="text-[14px] text-[#9D9D9F] mt-[4px] mb-[16px]">
-          미리보기
-        </div>
+        <div className="text-[14px] text-[#9D9D9F] mt-[4px] mb-[16px]">미리보기</div>
 
         <div
-          className="rounded-[15px] w-[361px] h-[175px] shadow-[0_0_2px_rgba(0,0,0,0.08)] py-[40px] bg-white"
+          className="rounded-[15px] w-full h-auto min-h-[175px] shadow-[0_0_2px_rgba(0,0,0,0.08)] py-[40px] px-[16px] bg-white"
           style={{ fontFamily: current.fontFamily }}
-          >
+        >
           <div className="text-center text-[18px] font-medium leading-[1.5] text-[#141517]">
             “너는 충분히 잘하고 있어.
             <br />
@@ -79,13 +77,11 @@ export default function StylePage() {
           </div>
         </div>
 
-        <div className="text-[14px] text-[#9D9D9F] mt-[30px] mb-[16px]">
-          글꼴선택
-        </div>
+        <div className="text-[14px] text-[#9D9D9F] mt-[30px] mb-[16px]">글꼴선택</div>
 
         <div className="flex flex-col gap-[12px]">
           {FONT_OPTIONS.map((opt) => {
-            const locked = !!opt.isPlus && !isPlus;
+            // const locked = !!opt.isPlus && !isPlus;
 
             return (
               <FontRow
@@ -96,8 +92,7 @@ export default function StylePage() {
                 preview={opt.preview}
                 fontFamily={opt.fontFamily}
                 onClick={() => {
-                  if (locked)
-                    return;
+                  // if (locked) return;
                   setPendingFont(opt.key);
                 }}
               />

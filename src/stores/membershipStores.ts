@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 type MembershipState = {
   isPlus: boolean;
@@ -12,6 +12,6 @@ export const useMembershipStore = create<MembershipState>()(
       isPlus: false,
       setIsPlus: (v) => set({ isPlus: v }),
     }),
-    { name: "deare-membership" }
+    { name: 'deare-membership' }
   )
 );

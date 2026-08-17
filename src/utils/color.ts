@@ -1,5 +1,7 @@
 export function getHarmoniousTextColor(bgHex: string): string {
-  let r = 0, g = 0, b = 0;
+  let r = 0,
+    g = 0,
+    b = 0;
 
   if (bgHex.length === 4) {
     r = parseInt(bgHex[1] + bgHex[1], 16);
@@ -46,7 +48,7 @@ export function getHarmoniousTextColor(bgHex: string): string {
 
   // 어두운 배경 → 흰색
   if (lightnessPct <= 55) {
-    return "#ffffff";
+    return '#ffffff';
   }
 
   // 밝은 배경 → 톤온톤 (hex로 변환!)
@@ -67,19 +69,34 @@ function hslToHex(h: number, s: number, l: number): string {
   let b = 0;
 
   if (h >= 0 && h < 60) {
-    r = c; g = x; b = 0;
+    r = c;
+    g = x;
+    b = 0;
   } else if (h >= 60 && h < 120) {
-    r = x; g = c; b = 0;
+    r = x;
+    g = c;
+    b = 0;
   } else if (h >= 120 && h < 180) {
-    r = 0; g = c; b = x;
+    r = 0;
+    g = c;
+    b = x;
   } else if (h >= 180 && h < 240) {
-    r = 0; g = x; b = c;
+    r = 0;
+    g = x;
+    b = c;
   } else if (h >= 240 && h < 300) {
-    r = x; g = 0; b = c;
+    r = x;
+    g = 0;
+    b = c;
   } else if (h >= 300 && h < 360) {
-    r = c; g = 0; b = x;
+    r = c;
+    g = 0;
+    b = x;
   }
 
-  const toHex = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, "0");
+  const toHex = (v: number) =>
+    Math.round((v + m) * 255)
+      .toString(16)
+      .padStart(2, '0');
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }

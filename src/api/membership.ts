@@ -1,4 +1,4 @@
-import { api } from "@/api/http";
+import { api } from '@/api/http';
 
 type ApiResponse<T> = {
   success: boolean;
@@ -7,7 +7,7 @@ type ApiResponse<T> = {
   data: T;
 };
 
-export type MembershipPlan = "FREE" | "PLUS";
+export type MembershipPlan = 'FREE' | 'PLUS';
 
 export type MembershipStatusData = {
   membershipPlan: MembershipPlan;
@@ -21,15 +21,11 @@ export type MembershipPayData = {
 };
 
 export async function getMyMembership() {
-  const res = await api.get<ApiResponse<MembershipStatusData>>(
-    "/users/me/membership"
-  );
+  const res = await api.get<ApiResponse<MembershipStatusData>>('/users/me/membership');
   return res.data.data;
 }
 
 export async function payMyMembershipTemp() {
-  const res = await api.post<ApiResponse<MembershipPayData>>(
-    "/users/me/membership"
-  );
+  const res = await api.post<ApiResponse<MembershipPayData>>('/users/me/membership');
   return res.data.data;
 }

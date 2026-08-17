@@ -1,7 +1,8 @@
 // 이미지 크게 보기 뷰어 + 모바일 스와이프, 확대 및 축소
 
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import useObjectUrl from '@/hooks/useObjectUrl';
 
 type ImageSource = File | string;
 
@@ -15,7 +16,6 @@ export function ImageViewer({
   onClose: () => void;
 }) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const [url, setUrl] = useState("");
 
   const [scale, setScale] = useState(1);
 
@@ -23,30 +23,20 @@ export function ImageViewer({
   const lastDistance = useRef<number | null>(null);
 
   const source = images[currentIndex];
-
-   useEffect(() => {
-    if (typeof source === "string") {
-      setUrl(source);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(source);
-    setUrl(objectUrl);
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [source]);
+  const url = useObjectUrl(source);
 
   if (!url) return null;
 
   type TouchPoint = {
-  clientX: number;
-  clientY: number;
-};
+    clientX: number;
+    clientY: number;
+  };
 
-const getDistance = (t1: TouchPoint, t2: TouchPoint) => {
-  const dx = t1.clientX - t2.clientX;
-  const dy = t1.clientY - t2.clientY;
-  return Math.sqrt(dx * dx + dy * dy);
-};
+  const getDistance = (t1: TouchPoint, t2: TouchPoint) => {
+    const dx = t1.clientX - t2.clientX;
+    const dy = t1.clientY - t2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     if (e.touches.length === 1) {
@@ -72,9 +62,7 @@ const getDistance = (t1: TouchPoint, t2: TouchPoint) => {
       const newDistance = getDistance(t1, t2);
       const ratio = newDistance / lastDistance.current;
 
-      setScale((prev) =>
-        Math.min(Math.max(prev * ratio, 1), 3)
-      );
+      setScale((prev) => Math.min(Math.max(prev * ratio, 1), 3));
 
       lastDistance.current = newDistance;
     }
@@ -108,7 +96,7 @@ const getDistance = (t1: TouchPoint, t2: TouchPoint) => {
 
   if (!url) return null;
 
-  const container = document.getElementById("app-frame");
+  const container = document.getElementById('app-frame');
   if (!container) return null;
 
   return createPortal(
@@ -141,8 +129,3 @@ const getDistance = (t1: TouchPoint, t2: TouchPoint) => {
 }
 
 export default ImageViewer;
-
-
-
-
-

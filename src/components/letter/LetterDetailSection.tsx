@@ -1,29 +1,37 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import { useOutletContext } from "react-router-dom";
-import FolderSelect from "@/components/letter/FolderSelect";
-import type { Folder } from "@/types/folder";
-import useToast from "@/hooks/useToast";
-import type { CreateFrom } from "@/types/from";
-import { EmotionTag } from "@/components/common/EmotionTag";
-import { BottomButton } from "@/components/common/BottomButton";
-import { FromBadge } from "@/components/common/FromBadge";
-import LetterDetailBottomSheet from "./LetterDetailBottomSheet";
-import aiSummary from "@/assets/create/ai-summary.svg";
-import upBar from "@/assets/letter/up-bar.svg";
-import downBar from "@/assets/letter/down-bar.svg";
-import HeartFilledIcon from "@/components/icons/HeartFilledIcon";
-import HeartOutlineIcon from "@/components/icons/HeartOutlineIcon";
-import html2canvas from "html2canvas";
-import type { AnalyzeLetterResponse } from "@/types/create";
-import { useFolderList } from "@/hooks/queries/useFolderList";
-import { useToggleLetterLike } from "@/hooks/mutations/useToggleLetterLike";
-import { usePatchLetterReply } from "@/hooks/mutations/usePatchLetterReply";
-import { useDeleteLetterReply } from "@/hooks/mutations/useDeleteLetterReply";
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { useOutletContext } from 'react-router-dom';
+import BottomSheet from '@/components/common/BottomSheet';
+import BottomSheetStepView from '@/components/common/BottomSheetStepView';
+import ConfirmModal from '@/components/common/ConfirmModal';
+import MoreView from '@/components/letter/views/MoreView';
+import FolderSelectView from '@/components/letter/views/FolderSelectView';
+import FolderSheetBody from '@/components/letter/views/FolderSheetBody';
+import FolderForm from '@/components/letterBox/letterFolder/FolderForm';
+import type { Folder } from '@/types/folder';
+import { createFolder, getFolderList } from '@/api/folder';
+import { uploadImage as uploadImageApi } from '@/api/upload';
+import { useQueryClient } from '@tanstack/react-query';
+import useToast from '@/hooks/useToast';
+import type { CreateFrom } from '@/types/from';
+import { EmotionTag } from '@/components/common/EmotionTag';
+import { BottomButton } from '@/components/common/BottomButton';
+import { FromBadge } from '@/components/common/FromBadge';
+import aiSummary from '@/assets/create/ai-summary.svg';
+import upBar from '@/assets/letter/up-bar.svg';
+import downBar from '@/assets/letter/down-bar.svg';
+import HeartFilledIcon from '@/components/icons/HeartFilledIcon';
+import HeartOutlineIcon from '@/components/icons/HeartOutlineIcon';
+import html2canvas from 'html2canvas';
+import type { AnalyzeLetterResponse } from '@/types/create';
+import { useFolderList } from '@/hooks/queries/useFolderList';
+import { useToggleLetterLike } from '@/hooks/mutations/useToggleLetterLike';
+import { usePatchLetterReply } from '@/hooks/mutations/usePatchLetterReply';
+import { useDeleteLetterReply } from '@/hooks/mutations/useDeleteLetterReply';
+
+type SheetStep = 'more' | 'folderSelect' | 'createFolder';
 
 type LayoutContext = {
-  setFixedAction: (
-    payload: { node: React.ReactNode; bgColor?: string } | null
-  ) => void;
+  setFixedAction: (payload: { node: React.ReactNode; bgColor?: string } | null) => void;
 };
 
 interface Props {
@@ -44,11 +52,11 @@ interface Props {
 
 // 캡처한 편지 카드를 둥근 모서리로 자르는 함수
 function roundCanvas(source: HTMLCanvasElement, radius = 16) {
-  const canvas = document.createElement("canvas");
+  const canvas = document.createElement('canvas');
   canvas.width = source.width;
   canvas.height = source.height;
 
-  const ctx = canvas.getContext("2d")!;
+  const ctx = canvas.getContext('2d')!;
   ctx.imageSmoothingEnabled = true;
 
   ctx.beginPath();
@@ -56,12 +64,7 @@ function roundCanvas(source: HTMLCanvasElement, radius = 16) {
   ctx.lineTo(canvas.width - radius, 0);
   ctx.quadraticCurveTo(canvas.width, 0, canvas.width, radius);
   ctx.lineTo(canvas.width, canvas.height - radius);
-  ctx.quadraticCurveTo(
-    canvas.width,
-    canvas.height,
-    canvas.width - radius,
-    canvas.height
-  );
+  ctx.quadraticCurveTo(canvas.width, canvas.height, canvas.width - radius, canvas.height);
   ctx.lineTo(radius, canvas.height);
   ctx.quadraticCurveTo(0, canvas.height, 0, canvas.height - radius);
   ctx.lineTo(0, radius);
@@ -69,7 +72,7 @@ function roundCanvas(source: HTMLCanvasElement, radius = 16) {
   ctx.closePath();
   ctx.clip();
 
-  ctx.fillStyle = "#FFFFFF";
+  ctx.fillStyle = '#FFFFFF';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(source, 0, 0);
 
@@ -82,7 +85,7 @@ export default function LetterDetailSection({
   content,
   aiResult,
   from,
-  receivedAt = "2025.06.02",
+  receivedAt,
   folder = null,
   reply: initialReply,
   onSave,
@@ -97,11 +100,17 @@ export default function LetterDetailSection({
   const toast = useToast();
 
   const [openSummary, setOpenSummary] = useState(false);
-  const [openMore, setOpenMore] = useState(false);
-  const [openFolderSelect, setOpenFolderSelect] = useState(false);
+  // 더보기 / 폴더 이동은 한 시트 안에서 뷰만 교체
+  // 닫힐 때 내용이 되돌아가 보이지 않도록 open과 step을 분리해서 관리
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetStep, setSheetStep] = useState<SheetStep>('more');
+  const [sheetDirection, setSheetDirection] = useState<1 | -1>(1);
+  const [sheetSlide, setSheetSlide] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [folders, setFolders] = useState<Folder[]>([]);
-  const [savedReply, setSavedReply] = useState(initialReply ?? "");
-  const [draftReply, setDraftReply] = useState("");
+  const queryClient = useQueryClient();
+  const [savedReply, setSavedReply] = useState(initialReply ?? '');
+  const [draftReply, setDraftReply] = useState('');
   const [isEditingReply, setIsEditingReply] = useState(false);
   const [replyLoading, setReplyLoading] = useState(false);
   const { data: folderData = [], isLoading: folderLoading } = useFolderList();
@@ -109,13 +118,20 @@ export default function LetterDetailSection({
   const patchReplyMutation = usePatchLetterReply(letterId);
   const deleteReplyMutation = useDeleteLetterReply(letterId);
 
+  // slide=false면 높이 트랜지션 + 페이드, true면 좌우 슬라이드
+  const openSheet = useCallback((step: SheetStep, direction: 1 | -1 = 1, slide = false) => {
+    setSheetDirection(direction);
+    setSheetSlide(slide);
+    setSheetStep(step);
+    setSheetOpen(true);
+  }, []);
+
   // 헤더 더보기 버튼에서 이벤트로 열리는 구조
   useEffect(() => {
-  const handleOpen = () => setOpenMore(true);
-  window.addEventListener("open-letter-more", handleOpen as EventListener);
-  return () =>
-    window.removeEventListener("open-letter-more", handleOpen as EventListener);
-    }, []);
+    const handleOpen = () => openSheet('more');
+    window.addEventListener('open-letter-more', handleOpen as EventListener);
+    return () => window.removeEventListener('open-letter-more', handleOpen as EventListener);
+  }, [openSheet]);
 
   const [liked, setLiked] = useState(isLiked);
   const [likeLoading, setLikeLoading] = useState(false);
@@ -125,7 +141,7 @@ export default function LetterDetailSection({
   useEffect(() => {
     setLiked(isLiked);
   }, [isLiked]);
-  
+
   const handleSaveCard = useCallback(async () => {
     if (onSave) onSave();
 
@@ -136,53 +152,50 @@ export default function LetterDetailSection({
     const captureScale = Math.min(3, devicePixelRatio);
 
     const originalCanvas = await html2canvas(el, {
-      backgroundColor: "#FFFFFF",
+      backgroundColor: '#FFFFFF',
       scale: captureScale,
       useCORS: true,
       onclone: (doc) => {
-        const clonedEl = doc.querySelector(
-          "[data-letter-card]"
-        ) as HTMLElement | null;
+        const clonedEl = doc.querySelector('[data-letter-card]') as HTMLElement | null;
 
         if (!clonedEl) return;
 
         // 기존 shadow 제거해야지 안에 회색 비침 현상 방지
-        clonedEl.style.boxShadow = "none";
-        (clonedEl.style as any).webkitBoxShadow = "none";
+        clonedEl.style.boxShadow = 'none';
+        (clonedEl.style as unknown as Record<string, string>).webkitBoxShadow = 'none';
 
         // 전체 overflow visible로 변경(캡쳐할 때만)
-        clonedEl.style.overflow = "visible";
+        clonedEl.style.overflow = 'visible';
 
-        clonedEl.querySelectorAll("[data-from-badge-text]").forEach((el) => {
-        const text = el as HTMLElement;
+        clonedEl.querySelectorAll('[data-from-badge-text]').forEach((el) => {
+          const text = el as HTMLElement;
 
-        // glyph 기준선 보정 - 프롬 뱃지 정렬 맞추기
-        text.style.transform = "translateY(-5px)";
-        text.style.lineHeight = "1";
-      });
+          // glyph 기준선 보정 - 프롬 뱃지 정렬 맞추기
+          text.style.transform = 'translateY(-5px)';
+          text.style.lineHeight = '1';
+        });
 
-        const scrollArea = clonedEl.querySelector(
-          ".thin-scrollbar"
-        ) as HTMLElement | null;
+        const scrollArea = clonedEl.querySelector('.thin-scrollbar') as HTMLElement | null;
 
         if (scrollArea) {
-          scrollArea.style.maxHeight = "none";
-          scrollArea.style.overflow = "visible";
+          scrollArea.style.maxHeight = 'none';
+          scrollArea.style.overflow = 'visible';
         }
 
         // 내부의 배경을 모두 흰색으로 강제하되 FromBadge는 유지
-        const all = Array.from(clonedEl.querySelectorAll<HTMLElement>("*"));
+        const all = Array.from(clonedEl.querySelectorAll<HTMLElement>('*'));
         for (const ch of all) {
           try {
-            if (ch.closest("[data-from-badge]")) continue;
+            if (ch.closest('[data-from-badge]')) continue;
 
-            ch.style.background = "#FFFFFF";
-            ch.style.backgroundColor = "#FFFFFF";
-            ch.style.backgroundImage = "none";
-            ch.style.boxShadow = "none";
-            (ch.style as any).webkitBoxShadow = "none";
-            if (!ch.style.borderColor) ch.style.borderColor = "#E7E8EB";
-          } catch (e) {
+            ch.style.background = '#FFFFFF';
+            ch.style.backgroundColor = '#FFFFFF';
+            ch.style.backgroundImage = 'none';
+            ch.style.boxShadow = 'none';
+            (ch.style as unknown as Record<string, string>).webkitBoxShadow = 'none';
+            if (!ch.style.borderColor) ch.style.borderColor = '#E7E8EB';
+          } catch {
+            // 일부 요소는 스타일 접근이 실패할 수 있어 무시한다
           }
         }
       },
@@ -193,39 +206,43 @@ export default function LetterDetailSection({
     roundedCanvas.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
-      a.download = "letter-card.png";
+      a.download = 'letter-card.png';
       a.click();
       URL.revokeObjectURL(url);
     });
   }, [onSave]);
 
   // 폴더 목록 불러오기 - 폴더 없을 경우 토스트 띄우기(부모 컴포넌트에서 미리 폴더 불러오기 - 폴더 선택 모달에 넘겨줌)
-  const handleOpenFolderSelect = async () => {
+  const handleOpenFolderSelect = () => {
     if (folderLoading) return;
+    setFolders(folderData ?? []);
+    openSheet('folderSelect', 1);
+  };
 
+  const handleCreateFolder = async ({
+    folder_name,
+    imageId,
+  }: {
+    folder_name: string;
+    imageId: number | null;
+  }) => {
     try {
-      const list = folderData;
-      if (!list || list.length === 0) {
-        toast.show("생성된 폴더가 없습니다.", 1200);
-        return;
-      }
-      setFolders(list);
-      setOpenFolderSelect(true);
+      await createFolder(folder_name, imageId);
+      queryClient.invalidateQueries({ queryKey: ['folders'] });
+      const fresh = await getFolderList();
+      setFolders(fresh);
+      openSheet('folderSelect', -1, true);
     } catch {
-      toast.show("폴더 목록을 불러오지 못했어요.", 1200);
+      toast.show('폴더를 만들지 못했어요.', 1200);
     }
   };
 
   useEffect(() => {
     setFixedAction({
-      node: (
-        <BottomButton onClick={handleSaveCard}>
-          편지 카드 저장
-        </BottomButton>
-      ),
-      bgColor: "#F8F8F8",
+      node: <BottomButton onClick={handleSaveCard}>편지 카드 저장</BottomButton>,
+      bgColor: '#F7F8F9',
     });
 
     return () => {
@@ -234,17 +251,16 @@ export default function LetterDetailSection({
   }, [setFixedAction, handleSaveCard]);
 
   const displayReceivedAt = (() => {
-    if (receivedAt === null) return "-";
+    if (receivedAt === null) return '-';
     if (!receivedAt) return receivedAt;
-    let value = receivedAt.replace(/\./g, "-");
-    const parts = value.split("-");
+    const value = receivedAt.replace(/\./g, '-');
+    const parts = value.split('-');
     if (parts.length !== 3) return value;
     const [year, month, day] = parts;
     if (!year || !month || !day) return value;
     if (year.length !== 4 || month.length !== 2 || day.length !== 2) return value;
     return `${year.slice(2)}-${month}-${day}`;
   })();
-
 
   return (
     <div className="flex flex-col pt-1">
@@ -254,37 +270,33 @@ export default function LetterDetailSection({
         className="mb-6 rounded-xl border border-[#E7E8EB] bg-white p-4 text-sm text-[#585A5F] shadow-[0_0_6px_rgba(0,0,0,0.05)]"
       >
         <div className="mb-3 flex items-center justify-between border-b border-[#E7E8EB] pb-3">
-          <FromBadge
-            name={from.name}
-            bgColor={from.bgColor}
-            fontColor={from.fontColor}
-          />
-            <button
-              type="button"
-              onClick={async () => {
-                if (likeLoading || toggleLikeMutation.isPending || !letterId) return;
-                const next = !liked;
-                setLikeLoading(true);
-                setLiked(next);
-                try {
-                  await toggleLikeMutation.mutateAsync(next);
-                } catch {
-                  setLiked(!next);
-                  toast.show("좋아요 처리에 실패했습니다.", 1200);
-                } finally {
-                  setLikeLoading(false);
-                }
-              }}
-              className="w-[13px] h-4 cursor-pointer"
-              aria-pressed={liked}
-              disabled={likeLoading || toggleLikeMutation.isPending}
-            >
-              {liked ? (
-                <HeartFilledIcon className="w-[15px] h-[16px]" />
-              ) : (
-                <HeartOutlineIcon className="w-[15px] h-[16px]" />
-              )}
-            </button>
+          <FromBadge name={from.name} bgColor={from.bgColor} fontColor={from.fontColor} />
+          <button
+            type="button"
+            onClick={async () => {
+              if (likeLoading || toggleLikeMutation.isPending || !letterId) return;
+              const next = !liked;
+              setLikeLoading(true);
+              setLiked(next);
+              try {
+                await toggleLikeMutation.mutateAsync(next);
+              } catch {
+                setLiked(!next);
+                toast.show('좋아요 처리에 실패했습니다.', 1200);
+              } finally {
+                setLikeLoading(false);
+              }
+            }}
+            className="w-[13px] h-4 cursor-pointer"
+            aria-pressed={liked}
+            disabled={likeLoading || toggleLikeMutation.isPending}
+          >
+            {liked ? (
+              <HeartFilledIcon className="w-[15px] h-[16px]" />
+            ) : (
+              <HeartOutlineIcon className="w-[15px] h-[16px]" />
+            )}
+          </button>
         </div>
 
         <div className="max-h-[250px] overflow-y-auto pr-2 thin-scrollbar">
@@ -294,9 +306,7 @@ export default function LetterDetailSection({
         </div>
 
         <div className="mt-2 flex justify-end">
-          <span className="text-xs font-medium text-[#A1A4AA]">
-            {displayReceivedAt}
-          </span>
+          <span className="text-xs font-medium text-[#A1A4AA]">{displayReceivedAt}</span>
         </div>
       </div>
 
@@ -306,7 +316,7 @@ export default function LetterDetailSection({
           className="mb-2 flex w-full items-center justify-between text-base font-semibold text-primary"
         >
           한 줄 요약
-          <img src={openSummary ? upBar : downBar} alt={openSummary ? "열림" : "닫힘"} />
+          <img src={openSummary ? upBar : downBar} alt={openSummary ? '열림' : '닫힘'} />
         </button>
 
         {openSummary && (
@@ -318,9 +328,7 @@ export default function LetterDetailSection({
       </div>
 
       <div className="mb-6">
-        <p className="mb-2 text-base font-semibold text-primary">
-          수집된 감정
-        </p>
+        <p className="mb-2 text-base font-semibold text-primary">수집된 감정</p>
         <div className="flex flex-wrap gap-2">
           {aiResult.emotions.map((emotion) => (
             <EmotionTag
@@ -348,12 +356,12 @@ export default function LetterDetailSection({
                 requestAnimationFrame(() => {
                   const el = replyTextareaRef.current;
                   if (!el) return;
-                  el.style.height = "auto";
+                  el.style.height = 'auto';
                   el.style.height = `${el.scrollHeight}px`;
                 });
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
+                if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   setDraftReply(savedReply);
                   setIsEditingReply(true);
@@ -373,11 +381,11 @@ export default function LetterDetailSection({
                   setReplyLoading(true);
                   try {
                     await deleteReplyMutation.mutateAsync();
-                    setSavedReply("");
-                    setDraftReply("");
+                    setSavedReply('');
+                    setDraftReply('');
                     setIsEditingReply(false);
                   } catch {
-                    toast.show("답장 삭제 중 오류가 발생했습니다.");
+                    toast.show('답장 삭제 중 오류가 발생했습니다.');
                   } finally {
                     setReplyLoading(false);
                   }
@@ -393,57 +401,57 @@ export default function LetterDetailSection({
           <>
             <div className="relative">
               <textarea
-              ref={replyTextareaRef}
-              value={draftReply}
-              onChange={(e) => setDraftReply(e.target.value)}
-              maxLength={100}
-              rows={1}
-              onInput={(e) => {
-                const target = e.currentTarget;
-                target.style.height = "auto";
-                target.style.height = `${target.scrollHeight}px`;
-              }}
-              onBlur={async () => {
-                if (replyBlurBlockRef.current) {
-                  replyBlurBlockRef.current = false;
-                  return;
-                }
-
-                const trimmed = draftReply.trim();
-                // 아무 것도 없으면 서버 전송 없이 초기화만
-                if (!trimmed) {
-                  if (savedReply) {
-                    setDraftReply(savedReply);
-                    setIsEditingReply(false);
-                  }
-                  return;
-                }
-
-                // 기존 답장이 있고 내용 변경이 없으면 저장 없이 편집만 종료
-                if (savedReply && isEditingReply && trimmed === savedReply) {
-                  setIsEditingReply(false);
-                  return;
-                }
-
-                if (replyLoading || patchReplyMutation.isPending) return;
-
-                setReplyLoading(true);
-                try {
-                  const res = await patchReplyMutation.mutateAsync(trimmed);
-                  if (!res.success) {
-                    toast.show(res.message || "답장 전송에 실패했습니다.");
+                ref={replyTextareaRef}
+                value={draftReply}
+                onChange={(e) => setDraftReply(e.target.value)}
+                maxLength={100}
+                rows={1}
+                onInput={(e) => {
+                  const target = e.currentTarget;
+                  target.style.height = 'auto';
+                  target.style.height = `${target.scrollHeight}px`;
+                }}
+                onBlur={async () => {
+                  if (replyBlurBlockRef.current) {
+                    replyBlurBlockRef.current = false;
                     return;
                   }
-                  setSavedReply(trimmed);
-                  setIsEditingReply(false);
-                } catch {
-                  toast.show("답장 전송 중 오류가 발생했습니다.");
-                } finally {
-                  setReplyLoading(false);
-                }
-              }}
-              placeholder="답장을 적어보세요"
-              className={`
+
+                  const trimmed = draftReply.trim();
+                  // 아무 것도 없으면 서버 전송 없이 초기화만
+                  if (!trimmed) {
+                    if (savedReply) {
+                      setDraftReply(savedReply);
+                      setIsEditingReply(false);
+                    }
+                    return;
+                  }
+
+                  // 기존 답장이 있고 내용 변경이 없으면 저장 없이 편집만 종료
+                  if (savedReply && isEditingReply && trimmed === savedReply) {
+                    setIsEditingReply(false);
+                    return;
+                  }
+
+                  if (replyLoading || patchReplyMutation.isPending) return;
+
+                  setReplyLoading(true);
+                  try {
+                    const res = await patchReplyMutation.mutateAsync(trimmed);
+                    if (!res.success) {
+                      toast.show(res.message || '답장 전송에 실패했습니다.');
+                      return;
+                    }
+                    setSavedReply(trimmed);
+                    setIsEditingReply(false);
+                  } catch {
+                    toast.show('답장 전송 중 오류가 발생했습니다.');
+                  } finally {
+                    setReplyLoading(false);
+                  }
+                }}
+                placeholder="답장을 적어보세요"
+                className={`
                 w-full
                 border border-[#E7E8EB]
                 rounded-xl px-4 py-[10px]
@@ -453,7 +461,7 @@ export default function LetterDetailSection({
                 resize-none
                 overflow-y-hidden
               `}
-            />
+              />
             </div>
             {savedReply && (
               <div className="mt-1 flex justify-end">
@@ -466,11 +474,11 @@ export default function LetterDetailSection({
                     setReplyLoading(true);
                     try {
                       await deleteReplyMutation.mutateAsync();
-                      setSavedReply("");
-                      setDraftReply("");
+                      setSavedReply('');
+                      setDraftReply('');
                       setIsEditingReply(false);
                     } catch {
-                      toast.show("답장 삭제 중 오류가 발생했습니다.");
+                      toast.show('답장 삭제 중 오류가 발생했습니다.');
                     } finally {
                       setReplyLoading(false);
                     }
@@ -486,27 +494,71 @@ export default function LetterDetailSection({
         )}
       </div>
 
-      {/* 바텀시트 / 폴더 */}
-      <LetterDetailBottomSheet
-        open={openMore}
-        folder={folder}
-        onClose={() => setOpenMore(false)}
-        onAddToFolder={handleOpenFolderSelect}
-        onRemoveFromFolder={() => onRemoveFromFolder?.()}
-        onDeleteLetter={() => onDeleteLetter?.()}
-        onEdit={() => {
-          setOpenMore(false);
-          onEdit();
-        }}
-      />
+      {/* 바텀시트 - 더보기 / 폴더 이동 / 새 폴더 만들기를 한 시트에서 뷰만 교체 */}
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} className="px-[20px]">
+        <BottomSheetStepView step={sheetStep} direction={sheetDirection} slide={sheetSlide}>
+          {sheetStep === 'more' ? (
+            <MoreView
+              onAddToFolder={handleOpenFolderSelect}
+              onEdit={() => {
+                setSheetOpen(false);
+                onEdit();
+              }}
+              onRequestDelete={() => setConfirmDelete(true)}
+            />
+          ) : (
+            <FolderSheetBody>
+              {sheetStep === 'folderSelect' ? (
+                <FolderSelectView
+                  folders={folders}
+                  selectedFolderId={folder?.folderId ?? null}
+                  onSelect={(folderId) => {
+                    setSheetOpen(false);
+                    onAddToFolder?.(folderId);
+                  }}
+                  onSelectNone={() => {
+                    setSheetOpen(false);
+                    onRemoveFromFolder?.();
+                  }}
+                  onCreateFolder={() => openSheet('createFolder', 1, true)}
+                />
+              ) : (
+                <FolderForm
+                  title="새 폴더 만들기"
+                  initialName=""
+                  initialImageUrl={null}
+                  initialImageId={null}
+                  onCancel={() => openSheet('folderSelect', -1, true)}
+                  onConfirm={handleCreateFolder}
+                  uploadImage={async (file) => {
+                    const res = await uploadImageApi(file, 'folder');
+                    if (!res.success) {
+                      throw new Error(res.message || '이미지 업로드 실패');
+                    }
+                    return { imageId: res.data.imageId, url: res.data.url };
+                  }}
+                />
+              )}
+            </FolderSheetBody>
+          )}
+        </BottomSheetStepView>
+      </BottomSheet>
 
-      <FolderSelect
-        open={openFolderSelect}
-        folders={folders}
-        onClose={() => setOpenFolderSelect(false)}
-        onSelect={(folderId) => onAddToFolder?.(folderId)}
+      {/* 편지 삭제 확인 모달 */}
+      <ConfirmModal
+        open={confirmDelete}
+        title="편지 삭제"
+        titleClassName="text-[#FF143B]"
+        description={'편지를 삭제할 경우 되돌릴 수 없어요\n정말 삭제할까요?'}
+        cancelText="취소"
+        confirmText="삭제"
+        onCancel={() => setConfirmDelete(false)}
+        onConfirm={() => {
+          setConfirmDelete(false);
+          setSheetOpen(false);
+          onDeleteLetter?.();
+        }}
       />
     </div>
   );
 }
-

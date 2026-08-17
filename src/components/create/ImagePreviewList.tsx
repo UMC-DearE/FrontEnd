@@ -5,18 +5,14 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  horizontalListSortingStrategy,
-  arrayMove,
-} from "@dnd-kit/sortable";
-import { useRef, useState } from "react";
+} from '@dnd-kit/core';
+import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import { useRef, useState } from 'react';
 
-import ImagePreviewItem from "./ImagePreviewItem";
-import uploadImage from "@/assets/create/image-upload.svg";
-import { ImageViewer } from "../common/ImageViewer";
-import useToast from "@/hooks/useToast";
+import ImagePreviewItem from './ImagePreviewItem';
+import uploadImage from '@/assets/create/image-upload.svg';
+import { ImageViewer } from '../common/ImageViewer';
+import useToast from '@/hooks/useToast';
 
 interface Props {
   images: File[];
@@ -42,20 +38,14 @@ export default function ImagePreviewList({ images, setImages }: Props) {
     if (!over || active.id === over.id) return;
 
     setImages((prev) => {
-      const oldIndex = prev.findIndex(
-        (_, i) => i.toString() === active.id
-      );
-      const newIndex = prev.findIndex(
-        (_, i) => i.toString() === over.id
-      );
+      const oldIndex = prev.findIndex((_, i) => i.toString() === active.id);
+      const newIndex = prev.findIndex((_, i) => i.toString() === over.id);
 
       return arrayMove(prev, oldIndex, newIndex);
     });
   };
 
-  const handleSelectImages = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleSelectImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
     const files = Array.from(e.target.files);
@@ -63,13 +53,11 @@ export default function ImagePreviewList({ images, setImages }: Props) {
     setImages((prev) => {
       const remain = 10 - prev.length;
       if (remain <= 0) {
-        toast.show("이미지는 최대 10장까지 업로드할 수 있어요.");
+        toast.show('이미지는 최대 10장까지 업로드할 수 있어요.');
         return prev;
       }
 
-      const existingKeySet = new Set(
-        prev.map((f) => `${f.name}_${f.size}_${f.lastModified}`)
-      );
+      const existingKeySet = new Set(prev.map((f) => `${f.name}_${f.size}_${f.lastModified}`));
 
       const uniqueNewFiles: File[] = [];
       let hasDuplicate = false;
@@ -85,7 +73,7 @@ export default function ImagePreviewList({ images, setImages }: Props) {
       }
 
       if (hasDuplicate) {
-        toast.show("중복된 이미지입니다.");
+        toast.show('중복된 이미지입니다.');
       }
 
       if (uniqueNewFiles.length === 0) {
@@ -95,7 +83,7 @@ export default function ImagePreviewList({ images, setImages }: Props) {
       return [...prev, ...uniqueNewFiles.slice(0, remain)];
     });
 
-    e.target.value = ""; // 같은 파일 다시 선택 가능
+    e.target.value = ''; // 같은 파일 다시 선택 가능
   };
 
   return (
@@ -109,11 +97,7 @@ export default function ImagePreviewList({ images, setImages }: Props) {
         onChange={handleSelectImages}
       />
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext
           items={images.map((_, i) => i.toString())}
           strategy={horizontalListSortingStrategy}
@@ -136,17 +120,13 @@ export default function ImagePreviewList({ images, setImages }: Props) {
                 /10
               </div>
             </button>
-            
+
             {images.map((file, index) => (
               <ImagePreviewItem
                 key={index}
                 id={index.toString()}
                 file={file}
-                onDelete={() =>
-                  setImages((prev) =>
-                    prev.filter((_, i) => i !== index)
-                  )
-                }
+                onDelete={() => setImages((prev) => prev.filter((_, i) => i !== index))}
                 onPreview={() => setPreviewIndex(index)}
               />
             ))}
@@ -158,11 +138,9 @@ export default function ImagePreviewList({ images, setImages }: Props) {
                 onClose={() => setPreviewIndex(null)}
               />
             )}
-
           </div>
         </SortableContext>
       </DndContext>
     </>
   );
 }
-

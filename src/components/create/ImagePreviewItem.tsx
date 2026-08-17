@@ -1,7 +1,7 @@
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import closebtn from "@/assets/create/closebtn.svg";
-import { useEffect, useState } from "react";
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import closebtn from '@/assets/create/closebtn.svg';
+import useObjectUrl from '@/hooks/useObjectUrl';
 
 interface Props {
   id: string;
@@ -10,20 +10,10 @@ interface Props {
   onPreview: (file: File) => void;
 }
 
-export default function ImagePreviewItem({
-  id,
-  file,
-  onDelete,
-  onPreview,
-}: Props) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+export default function ImagePreviewItem({ id, file, onDelete, onPreview }: Props) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -31,16 +21,7 @@ export default function ImagePreviewItem({
     opacity: isDragging ? 0.6 : 1,
   };
 
-  const [url, setUrl] = useState("");
-
-  useEffect(() => {
-    const objectUrl = URL.createObjectURL(file);
-    setUrl(objectUrl);
-
-    return () => {
-      URL.revokeObjectURL(objectUrl);
-    };
-  }, [file]);
+  const url = useObjectUrl(file);
 
   if (!url) return null;
 
@@ -50,7 +31,7 @@ export default function ImagePreviewItem({
       style={style}
       {...attributes}
       {...listeners}
-      onClick={() => onPreview(file)} 
+      onClick={() => onPreview(file)}
       className="relative shrink-0 cursor-grab active:cursor-grabbing rounded-sm overflow-hidden"
     >
       <img src={url} alt="이미지 미리보기" className="w-[76px] h-[76px] object-cover" />
@@ -68,4 +49,3 @@ export default function ImagePreviewItem({
     </div>
   );
 }
-

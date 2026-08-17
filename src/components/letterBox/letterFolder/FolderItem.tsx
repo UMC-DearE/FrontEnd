@@ -35,9 +35,7 @@ export default function FolderItem({
             ? isSelected
               ? 'shadow-[0px_3px_4px_0px_rgba(0,0,0,0.15)]'
               : 'bg-white border-[#E6E7E9] border-[1.2px]'
-            : isSelected
-              ? 'bg-black shadow-[0px_3px_4px_0px_rgba(0,0,0,0.15)]'
-              : 'bg-white border-[#E6E7E9] border-[1.2px]'
+            : '' // 디폴트 폴더: 배경 박스 없이 asset만 노출
         }`}
       >
         {hasFolderImage ? (
@@ -48,7 +46,7 @@ export default function FolderItem({
             onError={() => setBrokenUrl(url)}
           />
         ) : (
-          <DefaultFolder alt={folder.name} />
+          <DefaultFolder alt={folder.name} selected={isSelected} />
         )}
 
         {isSelected && (

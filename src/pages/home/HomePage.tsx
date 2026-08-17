@@ -1,24 +1,24 @@
+// 홈 화면
 import { useMemo, useRef, useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
 import ProfileCard from '@/components/home/ProfileCard';
+import ProfileSettingSheet from '@/components/home/ProfileSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import LetterCard, { type HomeCardLetter } from '@/components/home/LetterCard';
 import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import CustomResetSheet from '@/components/home/CustomResetSheet';
+import FriendInviteSheet from '@/components/common/FriendInviteSheet';
 import CustomizingHeader from '@/components/header/CustomizingHeader';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import { uploadImage } from '@/api/upload';
 import { useHomeQuery } from '@/hooks/queries/useHomeQuery';
-import { useUpdateHomeColor } from '@/hooks/mutations/useUpdateHomeColor';
+import { useUpdateHome } from '@/hooks/mutations/useUpdateHome';
 import { useRandomLetterQuery } from '@/hooks/queries/useRandomLetterQuery';
+import { useLetterLists } from '@/hooks/queries/useLetterList';
 import { usePinLetter } from '@/hooks/mutations/usePinLetter';
 import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
-import { useCreateSticker } from '@/hooks/mutations/useCreateSticker';
-import { useUpdateSticker } from '@/hooks/mutations/useUpdateSticker';
-import { useDeleteSticker } from '@/hooks/mutations/useDeleteSticker';
-import { useMyMembership } from '@/hooks/queries/useMyMembership';
 import useToast from '@/hooks/useToast';
 import closeIcon from '@/assets/homePage/closeIcon.svg';
 import PwaRecommendSheet from '@/components/pwa/PwaRecommendSheet';
@@ -41,22 +41,33 @@ const fitToMaxSide = (w: number, h: number, maxSide: number) => {
 const cloneStickers = (arr: StickerItem[]) => arr.map((s) => ({ ...s }));
 
 export default function HomePage() {
+  const navigate = useNavigate();
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
   const { data: home, isLoading: homeLoading, isError: homeError } = useHomeQuery();
-  const updateHomeColorMutation = useUpdateHomeColor();
+  const updateHomeMutation = useUpdateHome();
 
   const { data: randomData, isLoading: randomLoading } = useRandomLetterQuery();
+  // 편지 보유 여부에 따라 안내 문구 렌더링
+  // 1 -> 매일 자정에 초기화되는...
+  // 0 -> 아직 추가한 편지가 없어요
+  const { data: letterListData, isLoading: letterListLoading } = useLetterLists({
+    page: 0,
+    size: 1,
+  });
+
+  const hasAnyLetter = (letterListData?.data.totalElements ?? 0) > 0;
+
+  const showRandom = !!randomData?.hasLetter;
+  // 편지는 있는데 랜덤 편지가 없는 상태
+  const isRandomWaiting = hasAnyLetter && !showRandom;
+
   const pinMutation = usePinLetter();
   const unpinMutation = useUnpinLetter();
-
-  const createStickerMutation = useCreateSticker();
-  const updateStickerMutation = useUpdateSticker();
-  const deleteStickerMutation = useDeleteSticker();
 
   const letter: HomeCardLetter | null = useMemo(() => {
     if (!randomData) return null;
 
-    if (!randomData.hasLetter) {
+    if (!showRandom) {
       return {
         id: 0,
         excerpt: '',
@@ -66,6 +77,7 @@ export default function HomePage() {
       };
     }
 
+    // 랜덤 편지
     return {
       id: randomData.letterId,
       excerpt: randomData.randomPhrase,
@@ -73,22 +85,26 @@ export default function HomePage() {
       day: randomData.date.day,
       dayOfWeek: randomData.date.dayOfWeek,
     };
-  }, [randomData]);
+  }, [randomData, showRandom]);
 
   const pinnedLetterId = useMemo(() => {
-    if (!randomData) return null;
-    if (!randomData.hasLetter) return null;
+    if (!randomData || !showRandom) return null;
     return randomData.isPinned ? randomData.letterId : null;
-  }, [randomData]);
+  }, [randomData, showRandom]);
 
   const [pendingUnpinId, setPendingUnpinId] = useState<number | null>(null);
 
   const [openSheet, setOpenSheet] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [showResetSheet, setShowResetSheet] = useState(false);
+  const [showInviteSheet, setShowInviteSheet] = useState(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // 스티커 이동 범위 제한
+  const topBarRef = useRef<HTMLDivElement | null>(null);
+  const bottomBarRef = useRef<HTMLDivElement | null>(null);
 
   const [draftStickers, setDraftStickers] = useState<StickerItem[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -210,29 +226,9 @@ export default function HomePage() {
   };
 
   const handleCompleteCustomizing = async () => {
-    const draftIds = new Set(draftStickers.map((s) => s.id));
-    const baseById = new Map(baseStickers.map((s) => [s.id, s]));
-
-    const deleted = baseStickers.filter((s) => s.id > 0 && !draftIds.has(s.id));
-
-    const added = draftStickers.filter(
-      (s) => !baseById.has(s.id) && s.imageId !== null && s.imageId !== undefined
-    );
-
-    const updated = draftStickers.filter((d) => {
-      if (d.id <= 0) return false;
-      const b = baseById.get(d.id);
-      if (!b) return false;
-      return (
-        b.x !== d.x ||
-        b.y !== d.y ||
-        b.z !== d.z ||
-        b.rotation !== d.rotation ||
-        b.scale !== d.scale
-      );
-    });
-
-    const bgChanged = bgColorBackup !== null && homeBgColor !== bgColorBackup;
+    // 통합 API가 스티커 전체를 덮어쓰므로 추가/수정/삭제를 구분하지 않고 draft를 그대로 전송
+    const saved = draftStickers.filter((s) => s.imageId !== null && s.imageId !== undefined);
+    const droppedCount = draftStickers.length - saved.length;
 
     setOpenSheet(false);
     setSelectedId(null);
@@ -241,51 +237,43 @@ export default function HomePage() {
     setBgColorBackup(null);
 
     try {
-      await Promise.all([
-        ...deleted.map((s) => deleteStickerMutation.mutateAsync({ stickerId: s.id })),
-        ...added.map((s) =>
-          createStickerMutation.mutateAsync({
-            request: {
-              imageId: s.imageId as number,
-              posX: s.x,
-              posY: s.y,
-              posZ: s.z,
-              rotation: s.rotation,
-              scale: s.scale,
-            },
-            imageUrl: s.src,
-            clientStickerId: s.id,
-          })
-        ),
-        ...updated.map((s) =>
-          updateStickerMutation.mutateAsync({
-            stickerId: s.id,
-            body: {
-              posX: s.x,
-              posY: s.y,
-              posZ: s.z,
-              rotation: s.rotation,
-              scale: s.scale,
-            },
-          })
-        ),
-        bgChanged ? updateHomeColorMutation.mutateAsync(homeBgColor) : Promise.resolve(),
-      ]);
+      if (droppedCount > 0) {
+        toast.show(`이미지 업로드에 실패한 스티커 ${droppedCount}개는 저장되지 않았어요.`);
+      }
+      await updateHomeMutation.mutateAsync({
+        request: {
+          homeColor: homeBgColor,
+          stickers: saved.map((s) => ({
+            imageId: s.imageId as number,
+            posX: s.x,
+            posY: s.y,
+            posZ: s.z,
+            rotation: s.rotation,
+            scale: s.scale,
+          })),
+        },
+        optimisticStickers: saved.map((s) => ({
+          stickerId: s.id,
+          imageId: s.imageId as number,
+          imageUrl: s.src,
+          posX: s.x,
+          posY: s.y,
+          posZ: s.z,
+          rotation: s.rotation,
+          scale: s.scale,
+        })),
+      });
+
+      // 초대 여부 API 연동 후 아직 친구를 초대하지 않은 사용자에게만 노출
+      setShowInviteSheet(true);
     } catch (e) {
       console.error(e);
     }
   };
 
-  const { data: membership } = useMyMembership();
   const toast = useToast();
 
   const addStickerFromFile = async (file: File) => {
-    if (!membership?.isPlus && draftStickers.length >= 3) {
-      toast.show(
-        '스티커는 최대 3개까지 추가할 수 있어요. PLUS 멤버십을 구독하면 무제한으로 사용할 수 있어요.'
-      );
-      return;
-    }
     const rect = containerRef.current?.getBoundingClientRect();
     const cx = rect ? rect.width / 2 : 196;
     const cy = rect ? rect.height / 2 : 320;
@@ -389,13 +377,13 @@ export default function HomePage() {
     setShowPwaSheet(false);
   };
 
-  if (homeLoading || randomLoading) return <div>로딩 중...</div>;
+  if (homeLoading || randomLoading || letterListLoading) return <div>로딩 중...</div>;
   if (homeError || !home) return <div>에러</div>;
 
   return (
     <div ref={containerRef} style={{ backgroundColor: homeBgColor }}>
       {openSheet && (
-        <div className="fixed top-0 left-0 right-0 z-[55] flex justify-center">
+        <div ref={topBarRef} className="fixed top-0 left-0 right-0 z-[55] flex justify-center">
           <div className="w-full max-w-[440px]">
             <CustomizingHeader
               title="홈 편집"
@@ -422,7 +410,7 @@ export default function HomePage() {
           </div>
         </div>
       )}
-      <div className={openSheet ? 'relative' : 'relative z-40'}>
+      <div className="relative z-30">
         <StickerLayer
           enabled={enabled}
           containerRef={containerRef}
@@ -439,16 +427,31 @@ export default function HomePage() {
           onChange={onChangeStickers}
           onDelete={onDeleteSticker}
           onCommit={onCommitSticker}
+          topBoundRef={topBarRef}
+          bottomBoundRef={bottomBarRef}
         />
       </div>
       <ProfileCard
         nickname={home.user.nickname}
         bio={home.user.intro}
         imgUrl={home.user.imgUrl}
-        onClickSettings={openEditor}
+        onClickSettings={() => setProfileMenuOpen(true)}
+      />
+      <ProfileSettingSheet
+        open={profileMenuOpen}
+        onClose={() => setProfileMenuOpen(false)}
+        onSelect={(type) => {
+          setProfileMenuOpen(false);
+          if (type === 'editProfile') {
+            navigate('/my/profile');
+          } else {
+            openEditor();
+          }
+        }}
       />
       <ProfileCustomSheet
         open={openSheet}
+        bottomBarRef={bottomBarRef}
         bgColor={homeBgColor}
         onChangeBgColor={setHomeBgColor}
         onPickerStateChange={setPickerOpen}
@@ -471,11 +474,20 @@ export default function HomePage() {
           onResetAll={handleResetAll}
         />
       )}
+      <FriendInviteSheet
+        open={showInviteSheet}
+        onClose={() => setShowInviteSheet(false)}
+        onInvite={() => {
+          // 초대 링크 API 연동 후 클립보드 복사 처리
+          setShowInviteSheet(false);
+        }}
+      />
       <LetterCard
         letter={letter}
         isPinned={letter?.id === pinnedLetterId}
         onPin={handlePin}
         onRequestUnpin={handleRequestUnpin}
+        waiting={isRandomWaiting}
       />
       <ConfirmModal
         open={pendingUnpinId !== null}

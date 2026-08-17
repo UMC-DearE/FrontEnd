@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteMe } from "@/api/http";
-import { meQueryKey } from "@/hooks/queries/userKeys";
-import { homeQueryKey } from "../queries/homeKeys";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteMe } from '@/api/http';
+import { meQueryKey } from '@/hooks/queries/userKeys';
+import { homeQueryKey } from '../queries/homeKeys';
 
 export function useDeleteMe() {
   const queryClient = useQueryClient();

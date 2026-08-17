@@ -1,8 +1,8 @@
-import type { CreateFrom } from "./from";
-import type { AnalyzeLetterResponse } from "./create";
+import type { CreateFrom } from './from';
+import type { AnalyzeLetterResponse } from './create';
 
 export interface LetterFormProps {
-  mode: "create" | "edit";
+  mode: 'create' | 'edit';
   content: string;
   aiResult: AnalyzeLetterResponse;
   from?: CreateFrom;

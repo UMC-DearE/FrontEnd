@@ -1,10 +1,10 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
 interface ButtonProps {
   children: ReactNode;
   onClick?: () => void;
   disabled?: boolean;
-  type?: "button" | "submit";
+  type?: 'button' | 'submit';
   className?: string; // 필요하면 추가 커스터마이징
 }
 
@@ -12,8 +12,8 @@ export function Button({
   children,
   onClick,
   disabled = false,
-  type = "button",
-  className = "",
+  type = 'button',
+  className = '',
 }: ButtonProps) {
   return (
     <button
@@ -26,11 +26,7 @@ export function Button({
         rounded-lg
         text-[14px] font-medium
         transition-colors
-        ${
-          disabled
-            ? "bg-[#DCDCDCCC] text-[#A1A4AA]"
-            : "bg-primary text-white"
-        }
+        ${disabled ? 'bg-[#DCDCDCCC] text-[#A1A4AA]' : 'bg-primary text-white'}
         disabled:cursor-not-allowed
         ${className}
       `}
@@ -39,4 +35,3 @@ export function Button({
     </button>
   );
 }
-

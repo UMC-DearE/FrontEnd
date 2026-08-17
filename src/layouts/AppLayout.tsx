@@ -9,6 +9,7 @@ import { FONT_FAMILY } from '@/utils/fontMap';
 export type AppLayoutContext = {
   homeBgColor: string;
   setHomeBgColor: (color: string) => void;
+  setFixedAction: (action: { node: React.ReactNode; bgColor?: string } | null) => void;
 };
 
 export function AppLayout() {
@@ -44,6 +45,7 @@ export function AppLayout() {
     pathname.startsWith('/my/style') ||
     pathname.startsWith('/my/from') ||
     pathname.startsWith('/login') ||
+    pathname.startsWith('/invite') ||
     isLetterDetail ||
     pathname.startsWith('/create');
 

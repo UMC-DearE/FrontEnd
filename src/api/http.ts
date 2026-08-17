@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/stores/authStore';
-import { useStyleStore } from "@/stores/styleStores";
+import { useStyleStore } from '@/stores/styleStores';
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 import type { UserProfile, UpdateMeRequest, UpdateMeResponse } from '@/types/user';
 import { normalizeImageUrl } from './upload';
@@ -14,6 +14,15 @@ export const api = axios.create({
 const refreshApi = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   withCredentials: true,
+});
+
+// 로그인 여부와 무관하게 항상 "인증 헤더 없이" 호출해야 하는 공개 API 전용
+// (예: /auth/terms - 가입 전/후 상관없이 순수 조회용)
+// api.defaults.headers.common.Authorization 이 전역으로 박제되는 영향을 받지 않음
+export const publicApi = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  withCredentials: true,
+  headers: { accept: '*/*' },
 });
 
 let isRefreshing = false;
@@ -93,7 +102,7 @@ api.interceptors.response.use(
       return api(originalRequest);
     } catch (refreshError) {
       delete api.defaults.headers.common.Authorization;
-      useAuthStore.getState().setAuthStatus("unauthenticated");
+      useAuthStore.getState().setAuthStatus('unauthenticated');
 
       return Promise.reject(refreshError);
     } finally {
@@ -105,14 +114,14 @@ api.interceptors.response.use(
 export async function logout() {
   try {
     // 서버: Redis refresh 삭제 + 쿠키 만료
-    await api.post("/auth/logout");
+    await api.post('/auth/logout');
   } finally {
     // 프론트: 메모리 access 토큰 제거 + 인증 상태 초기화
     delete api.defaults.headers.common.Authorization;
-    useAuthStore.getState().setAuthStatus("unauthenticated");
+    useAuthStore.getState().setAuthStatus('unauthenticated');
 
     useStyleStore.getState().resetStyle();
-    localStorage.removeItem("deare-style");
+    localStorage.removeItem('deare-style');
   }
 }
 
@@ -139,5 +148,5 @@ export async function updateMe(payload: UpdateMeRequest): Promise<UpdateMeRespon
 }
 
 export async function deleteMe(): Promise<void> {
-  await api.delete("/users/me");
+  await api.delete('/users/me');
 }

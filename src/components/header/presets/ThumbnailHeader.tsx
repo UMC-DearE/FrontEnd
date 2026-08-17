@@ -1,9 +1,9 @@
-import { useState } from "react";
-import TopSection from "../TopSection";
-import CancelButton from "@/components/common/header/CancelButton";
-import LetterThumbnail from "@/components/common/header/LetterThumbnail";
-import ConfirmModal from "@/components/common/ConfirmModal";
-import ImageViewer from "@/components/common/ImageViewer";
+import { useState } from 'react';
+import TopSection from '../TopSection';
+import CancelButton from '@/components/common/header/CancelButton';
+import LetterThumbnail from '@/components/common/header/LetterThumbnail';
+import ConfirmModal from '@/components/common/ConfirmModal';
+import ImageViewer from '@/components/common/ImageViewer';
 
 type ImageSource = File | string;
 
@@ -31,22 +31,15 @@ export default function ThumbnailHeader({
         left={<CancelButton onClick={() => setOpenConfirm(true)} />}
         center={<div className="text-lg font-semibold">{title}</div>}
         right={
-        images && images.length > 0 ? (
-          <LetterThumbnail
-            source={images[0]}
-            onClick={() => setOpenViewer(true)}
-          />
-        ) : null
-      } // 이미지 썸네일 조건부 렌더링 - 텍스트 모드인 경우 null
-            />
+          images && images.length > 0 ? (
+            <LetterThumbnail source={images[0]} onClick={() => setOpenViewer(true)} />
+          ) : null
+        } // 이미지 썸네일 조건부 렌더링 - 텍스트 모드인 경우 null
+      />
 
       {openViewer && images && (
-      <ImageViewer
-        images={images}
-        initialIndex={0}
-        onClose={() => setOpenViewer(false)}
-      />
-    )}
+        <ImageViewer images={images} initialIndex={0} onClose={() => setOpenViewer(false)} />
+      )}
 
       <ConfirmModal
         open={openConfirm}

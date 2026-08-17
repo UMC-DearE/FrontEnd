@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateLetterPinned } from '@/api/letter';
-import { randomLetterKey, writeRandomLetterCache } from '@/hooks/queries/useRandomLetterQuery';
+import { randomLetterKey } from '@/hooks/queries/useRandomLetterQuery';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
 import type { RandomLetterData } from '@/types/letter';
 
@@ -20,9 +20,7 @@ export function usePinLetter() {
         if (!prev) return prev;
         if (!prev.hasLetter) return prev;
         if (prev.letterId !== letterId) return prev;
-        const next = { ...prev, isPinned: true };
-        writeRandomLetterCache(userId, next);
-        return next;
+        return { ...prev, isPinned: true };
       });
     },
   });

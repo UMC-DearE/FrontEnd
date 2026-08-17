@@ -1,16 +1,16 @@
-// 서버 응답 X - goBackWithDraft로 상태 전달하여 이전 페이지에서 처리
-
-import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import type { CreateResultPayload } from '@/types/create';
-import type { CreateFrom } from '@/types/from';
+import type { CreateFrom, From } from '@/types/from';
 import { FromBadge } from '@/components/common/FromBadge';
 import { InputField } from '@/components/common/InputField';
 import FromCreator from '@/components/common/FromCreator';
+import { BottomButton } from '@/components/common/BottomButton';
 import erasebtn from '@/assets/create/erasebtn.svg';
-import type { From } from '@/types/from';
-import { useFromList } from '@/hooks/queries/useFromList';
 import { hangulIncludes } from '@/utils/hangulSearch';
+import { useFromDraftForm } from '@/hooks/useFromDraftForm';
+import type { AppLayoutContext } from '@/layouts/AppLayout';
+import { FROM_NAME_MAX_LENGTH } from '@/constants/from';
 
 type FromItem = From;
 
@@ -32,12 +32,20 @@ type SetFromPageState =
 export default function SetFromPage() {
   const [tab, setTab] = useState<'select' | 'add'>('select');
   const [searchInput, setSearchInput] = useState('');
-  const [addInput, setAddInput] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as SetFromPageState;
+  const { setFixedAction } = useOutletContext<AppLayoutContext>();
 
-  const { data: fromList = [] } = useFromList();
+  const {
+    name: addInput,
+    setName: setAddInput,
+    selectedColor,
+    setSelectedColor,
+    createFromAndGetDraft,
+    fromList,
+    isCreating,
+  } = useFromDraftForm();
 
   const goBackWithDraft = (draft: CreateFrom) => {
     if (state && 'mode' in state && state.mode === 'edit') {
@@ -60,6 +68,12 @@ export default function SetFromPage() {
     });
   };
 
+  const handleDraftCreate = async () => {
+    const draft = await createFromAndGetDraft();
+    if (!draft) return;
+    goBackWithDraft(draft);
+  };
+
   const handleSelect = (from: FromItem) => {
     goBackWithDraft({
       fromId: from.fromId,
@@ -69,23 +83,45 @@ export default function SetFromPage() {
     });
   };
 
+  // 새로 추가 탭일 때만 하단 버튼
+  useEffect(() => {
+    if (tab !== 'add') {
+      setFixedAction(null);
+      return;
+    }
+
+    setFixedAction({
+      node: (
+        <BottomButton disabled={!addInput.trim() || isCreating} onClick={handleDraftCreate}>
+          추가하기
+        </BottomButton>
+      ),
+    });
+
+    return () => setFixedAction(null);
+  }, [tab, addInput, selectedColor, fromList, isCreating]);
+
   return (
     <div className="flex flex-col h-full">
       {/* 상단 탭 */}
       <div className="flex mt-1 gap-[20px] w-full px-3">
         <button
-          className={"flex-1 flex items-center justify-center bg-transparent"}
-          onClick={() => setTab('select')}>
+          className={'flex-1 flex items-center justify-center bg-transparent'}
+          onClick={() => setTab('select')}
+        >
           <span
-            className={`w-full h-[40px] flex items-center justify-center text-base border-b-[3px] transition-colors duration-150 ${tab === 'select' ? 'text-primary border-primary font-semibold' : 'text-[#A1A4AA] border-transparent font-normal'}`}>
+            className={`w-full h-[40px] flex items-center justify-center text-base border-b-[3px] transition-colors duration-150 ${tab === 'select' ? 'text-primary border-primary font-semibold' : 'text-[#A1A4AA] border-transparent font-normal'}`}
+          >
             기존에서 선택
           </span>
         </button>
         <button
-          className={"flex-1 flex items-center justify-center bg-transparent"}
-          onClick={() => setTab('add')}>
+          className={'flex-1 flex items-center justify-center bg-transparent'}
+          onClick={() => setTab('add')}
+        >
           <span
-            className={`w-full h-[40px] flex items-center justify-center text-base border-b-[3px] transition-colors duration-150 ${tab === 'add' ? 'text-primary border-primary font-semibold' : 'text-[#A1A4AA] border-transparent font-normal'}`}>
+            className={`w-full h-[40px] flex items-center justify-center text-base border-b-[3px] transition-colors duration-150 ${tab === 'add' ? 'text-primary border-primary font-semibold' : 'text-[#A1A4AA] border-transparent font-normal'}`}
+          >
             새로 추가
           </span>
         </button>
@@ -99,7 +135,7 @@ export default function SetFromPage() {
               onChange={setSearchInput}
               placeholder="이름 검색"
               useGrayWhenBlurred
-              maxLength={9}
+              maxLength={FROM_NAME_MAX_LENGTH}
               inputClassName="h-[50px] rounded-xl px-4 text-base font-medium outline-none cursor-text focus:bg-white focus:ring-1 focus:ring-primary mb-4"
               rightElement={
                 searchInput ? (
@@ -112,28 +148,23 @@ export default function SetFromPage() {
                 ) : undefined
               }
             />
-            <div className="flex flex-col gap-[24px] mt-2 justify-center">
+            <div className="flex flex-col gap-[24px] mt-2 justify-center mb-5">
               {fromList.length === 0 ? (
                 <div className="w-full flex flex-col items-center justify-center gap-[16px] min-h-[320px]">
-                <p className="font-normal text-[15px] text-[#A1A4AA]">
-                  추가된 From이 없어요
-                </p>
+                  <p className="font-normal text-[15px] text-[#A1A4AA]">추가된 From이 없어요</p>
 
-                <button
-                  className="w-[125px] h-[38px] bg-[#ffffff] text-[#585A5F] border-[1.2px] border-[#E7E8EB] rounded-lg text-sm font-medium"
-                  onClick={() => setTab('add')}
-                >
-                  새로 추가
-                </button>
-              </div>
+                  <button
+                    className="w-[125px] h-[38px] bg-[#ffffff] text-[#585A5F] border-[1.2px] border-[#E7E8EB] rounded-lg text-sm font-medium"
+                    onClick={() => setTab('add')}
+                  >
+                    새로 추가
+                  </button>
+                </div>
               ) : (
                 fromList
                   .filter((from) => hangulIncludes(from.name, searchInput))
                   .map((from) => (
-                    <div
-                      key={from.fromId}
-                      className="flex items-center justify-between"
-                    >
+                    <div key={from.fromId} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <FromBadge
                           size="lg"
@@ -144,7 +175,7 @@ export default function SetFromPage() {
                       </div>
                       <button
                         onClick={() => handleSelect(from)}
-                        className="text-[13px] font-normal text-[#A1A4AA] border border-[#CACBD1] rounded-lg px-[12px] py-[5px]"
+                        className="text-[13px] font-normal text-[#A1A4AA] bg-[#F7F8F9] border border-[#CACBD1] rounded-lg px-[12px] py-[5px]"
                       >
                         선택
                       </button>
@@ -158,17 +189,19 @@ export default function SetFromPage() {
 
       {tab === 'add' && (
         <div className="flex flex-col h-full mt-5">
-          <div className="flex mb-4 justify-between">
+          <div className="flex mb-3 justify-between">
             <div className="text-sm font-medium text-[#A1A4AA]">이름 입력</div>
-            <div className="text-sm font-medium text-[#CACBD1]">{addInput.length}/10</div>
+            <div className="text-sm font-medium text-[#A1A4AA]">
+              {addInput.length}/{FROM_NAME_MAX_LENGTH}
+            </div>
           </div>
           <InputField
             value={addInput}
             onChange={setAddInput}
             placeholder="편지를 준 사람의 이름"
             useGrayWhenBlurred
-            maxLength={9}
-            inputClassName="h-[50px] rounded-xl px-4 text-base font-medium outline-none cursor-text focus:bg-white focus:ring-1 focus:ring-primary mb-4"
+            maxLength={FROM_NAME_MAX_LENGTH}
+            inputClassName="h-[50px] rounded-xl px-4 text-base font-medium outline-none cursor-text focus:bg-white focus:ring-1 focus:ring-primary"
             rightElement={
               addInput ? (
                 <button
@@ -181,10 +214,9 @@ export default function SetFromPage() {
             }
           />
           <FromCreator
-            onDraftCreate={goBackWithDraft}
             name={addInput}
-            onNameChange={setAddInput}
-            fromCount={fromList.length}
+            selectedColor={selectedColor}
+            onColorChange={setSelectedColor}
           />
         </div>
       )}

@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createLetter } from "@/api/create";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createLetter } from '@/api/create';
 
 export function useCreateLetter() {
   const qc = useQueryClient();
@@ -8,7 +8,7 @@ export function useCreateLetter() {
     mutationFn: createLetter,
     onSuccess: (res) => {
       if (res.success) {
-        qc.invalidateQueries({ queryKey: ["letters"] });
+        qc.invalidateQueries({ queryKey: ['letters'] });
       }
     },
   });

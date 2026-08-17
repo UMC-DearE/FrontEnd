@@ -24,10 +24,7 @@ export default function ReportSkeleton() {
         <div className="h-5 w-32 rounded-md bg-[#F4F5F6] animate-pulse" />
         <div className="flex gap-[8px] flex-wrap">
           {Array.from({ length: 3 }).map((_, index) => (
-            <div
-              key={index}
-              className="w-24 h-8 rounded-[18.5px] bg-[#F4F5F6] animate-pulse"
-            />
+            <div key={index} className="w-24 h-8 rounded-[18.5px] bg-[#F4F5F6] animate-pulse" />
           ))}
         </div>
       </div>

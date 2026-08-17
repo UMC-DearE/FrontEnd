@@ -3,7 +3,8 @@ import FolderList from '@/components/letterBox/letterFolder/FolderList';
 import FolderSettingSheet from '@/components/letterBox/letterFolder/FolderSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import FolderModal from '@/components/letterBox/letterFolder/FolderModal';
-import type { Folder } from '@/types/folder';
+import type { Folder, UpdateFolderRequest } from '@/types/folder';
+import type { FolderModalResult } from '@/components/letterBox/letterFolder/FolderModal';
 import type { Letter } from '@/types/letter';
 import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
@@ -181,17 +182,20 @@ export default function LetterBoxPage() {
     return folders.find((f) => f.id === editingFolderId) ?? null;
   }, [folders, editingFolderId]);
 
-  const handleConfirmUpsertFolder = async (data: {
-    folder_name: string;
-    imageId: number | null;
-  }) => {
+  const handleConfirmUpsertFolder = async (data: FolderModalResult) => {
     if (editingFolderId == null) {
       await createFolder(data.folder_name, data.imageId);
     } else {
-      await updateFolder(editingFolderId, {
-        name: data.folder_name,
-        imageId: data.imageId ?? null,
-      });
+      const body: UpdateFolderRequest = { name: data.folder_name };
+
+      if (data.imageAction === 'CHANGE' && data.imageId != null) {
+        body.imageAction = 'CHANGE';
+        body.imageId = data.imageId;
+      } else if (data.imageAction === 'DELETE') {
+        body.imageAction = 'DELETE';
+      }
+
+      await updateFolder(editingFolderId, body);
     }
 
     const next = await getFolderList();
@@ -199,22 +203,6 @@ export default function LetterBoxPage() {
 
     setIsModalOpen(false);
     setEditingFolderId(null);
-  };
-
-  const handleImageDelete = async (folderId: number | null) => {
-    if (folderId == null) return;
-
-    try {
-      const folder = folders.find((f) => f.id === folderId);
-      if (!folder) return;
-
-      await updateFolder(folderId, { name: folder.name, imageId: null });
-
-      const next = await getFolderList();
-      setFolders([...next].sort((a, b) => a.folderOrder - b.folderOrder));
-    } catch (err) {
-      console.error('이미지 삭제 실패:', err);
-    }
   };
 
   const persistOrder = async (next: Folder[]) => {
@@ -459,9 +447,6 @@ export default function LetterBoxPage() {
               throw new Error(res.message || '이미지 업로드 실패');
             }
             return { imageId: res.data.imageId, url: res.data.url };
-          }}
-          onImageDelete={async () => {
-            await handleImageDelete(editingFolderId);
           }}
         />
       )}

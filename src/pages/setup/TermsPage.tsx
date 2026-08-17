@@ -1,11 +1,11 @@
-import { useMemo, useState, useEffect } from "react";
-import TermsRow from "@/components/terms/TermsRow";
-import CheckCircle from "@/components/terms/CheckCircle";
-import { BottomButton } from "@/components/common/BottomButton";
-import type { TermsKey, TermsState } from "@/types/terms";
-import { useNavigate } from "react-router-dom";
-import { getSignupTerms, type ApiTerm } from "@/api/authSignup";
-import { termTypeToKey } from "@/utils/terms";
+import { useMemo, useState, useEffect } from 'react';
+import TermsRow from '@/components/terms/TermsRow';
+import CheckCircle from '@/components/terms/CheckCircle';
+import { BottomButton } from '@/components/common/BottomButton';
+import type { TermsKey, TermsState } from '@/types/terms';
+import { useNavigate } from 'react-router-dom';
+import { getSignupTerms, type ApiTerm } from '@/api/authSignup';
+import { termTypeToKey } from '@/utils/terms';
 
 type Clause = {
   clauseTitle: string;
@@ -55,7 +55,7 @@ export default function TermsPage() {
             clauses: t.clauses,
           };
         });
-      
+
       // console.log("next:", next);
 
       setMetaMap(next);
@@ -65,13 +65,12 @@ export default function TermsPage() {
     run().catch((e) => {
       console.error(e);
       setLoading(false);
-      navigate("/login", { replace: true });
+      navigate('/login', { replace: true });
     });
-    
   }, [navigate]);
 
   const items = useMemo(() => {
-    const order: TermsKey[] = ["service", "privacy"];
+    const order: TermsKey[] = ['service', 'privacy'];
     return order
       .map((key) => {
         const m = metaMap[key];
@@ -113,7 +112,7 @@ export default function TermsPage() {
       .filter((item) => terms[item.key])
       .map((item) => metaMap[item.key]!.termId);
 
-    navigate("/auth/signup", { state: { termIds }, replace: true });
+    navigate('/auth/signup', { state: { termIds }, replace: true });
   };
 
   if (loading) return <div className="p-4">약관 불러오는 중...</div>;
@@ -124,15 +123,9 @@ export default function TermsPage() {
         className="flex items-center gap-3 pt-[19px] pb-[15px] px-[13px] cursor-pointer"
         onClick={toggleAll}
       >
-        <CheckCircle
-          checked={allChecked}
-          onClick={toggleAll}
-          ariaLabel="약관 전체 동의"
-        />
+        <CheckCircle checked={allChecked} onClick={toggleAll} ariaLabel="약관 전체 동의" />
         <div>
-          <p className="text-[16px] font-semibold text-black">
-            약관 전체 동의
-          </p>
+          <p className="text-[16px] font-semibold text-black">약관 전체 동의</p>
         </div>
       </div>
 
@@ -147,12 +140,13 @@ export default function TermsPage() {
             title={item.title}
             required={item.required}
             onView={() =>
-            navigate(`/auth/terms/${item.key}`, {
-              state: {
-                title: metaMap[item.key]?.title,
-                clauses: metaMap[item.key]?.clauses,
-              }
-            })}
+              navigate(`/auth/terms/${item.key}`, {
+                state: {
+                  title: metaMap[item.key]?.title,
+                  clauses: metaMap[item.key]?.clauses,
+                },
+              })
+            }
           />
         ))}
       </div>

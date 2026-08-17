@@ -1,7 +1,7 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-export type FontKey = "pretendard" | "cafe24" | "lee";
+export type FontKey = 'pretendard' | 'cafe24' | 'lee' | 'okdandan';
 
 interface StyleState {
   font: FontKey;
@@ -9,7 +9,7 @@ interface StyleState {
   resetStyle: () => void;
 }
 
-const DEFAULT_FONT: FontKey = "pretendard";
+const DEFAULT_FONT: FontKey = 'pretendard';
 
 export const useStyleStore = create<StyleState>()(
   persist(
@@ -18,6 +18,6 @@ export const useStyleStore = create<StyleState>()(
       setFont: (font) => set({ font }),
       resetStyle: () => set({ font: DEFAULT_FONT }),
     }),
-    { name: "deare-style" }
+    { name: 'deare-style' }
   )
 );

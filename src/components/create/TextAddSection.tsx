@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 const INITIAL_HEIGHT = 253;
 const MAX_LINES = 20;
@@ -15,30 +15,27 @@ interface Props {
 export default function TextAddSection({ value, onChange }: Props) {
   const ref = useRef<HTMLTextAreaElement>(null);
 
-useEffect(() => {
-  if (!ref.current) return;
+  useEffect(() => {
+    if (!ref.current) return;
 
-  const textarea = ref.current;
+    const textarea = ref.current;
 
-  textarea.style.height = "auto";
+    textarea.style.height = 'auto';
 
-  const nextHeight = Math.max(
-    INITIAL_HEIGHT,
-    Math.min(textarea.scrollHeight, MAX_HEIGHT)
-  );
+    const nextHeight = Math.max(INITIAL_HEIGHT, Math.min(textarea.scrollHeight, MAX_HEIGHT));
 
-  textarea.style.height = `${nextHeight}px`;
+    textarea.style.height = `${nextHeight}px`;
 
-  textarea.style.overflowY =
-    textarea.scrollHeight > MAX_HEIGHT ? "auto" : "hidden";
-}, [value]);
-
+    textarea.style.overflowY = textarea.scrollHeight > MAX_HEIGHT ? 'auto' : 'hidden';
+  }, [value]);
 
   return (
     <div className="relative">
       {!value && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none mb-13">
-          <div className="text-[#A1A4AA] text-sm font-medium">받은 편지를 복사 후 붙여넣기 하세요</div>
+          <div className="text-[#A1A4AA] text-sm font-medium">
+            받은 편지를 복사 후 붙여넣기 하세요
+          </div>
         </div>
       )}
 
@@ -63,7 +60,6 @@ useEffect(() => {
           maxHeight: MAX_HEIGHT,
         }}
       />
-
-</div>
+    </div>
   );
 }

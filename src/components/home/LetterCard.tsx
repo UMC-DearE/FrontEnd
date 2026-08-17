@@ -16,9 +16,17 @@ interface LetterCardProps {
   isPinned: boolean;
   onPin: (letterId: number) => void;
   onRequestUnpin: (letterId: number) => void;
+  // 편지는 있지만 자정이 지나지 않아 오늘의 랜덤 편지가 아직 준비되지 않은 상태
+  waiting?: boolean;
 }
 
-export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: LetterCardProps) {
+export default function LetterCard({
+  letter,
+  isPinned,
+  onPin,
+  onRequestUnpin,
+  waiting = false,
+}: LetterCardProps) {
   const isEmpty = !letter || !letter.excerpt;
   const letterId = letter?.id ?? null;
 
@@ -43,11 +51,19 @@ export default function LetterCard({ letter, isPinned, onPin, onRequestUnpin }: 
       {/* 편지 내용 */}
       <div className="flex-1 pr-8 py-4 w-[226px] text-[13px] leading-[20px]">
         {isEmpty ? (
-          <p className="break-keep text-[#A1A4AA]">
-            아직 추가한 편지가 없어요.
-            <br />
-            하단 편지 추가 버튼을 눌러 편지를 추가해 보세요!
-          </p>
+          waiting ? (
+            <p className="break-keep text-[#A1A4AA]">
+              매일 자정에 초기화되는 랜덤 편지를 불러오고 있어요.
+              <br />
+              잠시만 기다려 주세요!
+            </p>
+          ) : (
+            <p className="break-keep text-[#A1A4AA]">
+              아직 추가한 편지가 없어요.
+              <br />
+              하단 편지 추가 버튼을 눌러 편지를 추가해 보세요!
+            </p>
+          )
         ) : (
           <p className="line-clamp-2 break-all font-medium text-[#585A5F]">{letter.excerpt}</p>
         )}

@@ -1,4 +1,4 @@
-export type FontKey = "pretendard" | "cafe24" | "lee";
+export type FontKey = 'pretendard' | 'cafe24' | 'lee' | 'okdandan';
 
 export type FontOption = {
   key: FontKey;

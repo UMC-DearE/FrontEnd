@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import BackArrowIcon from "@/assets/header/back-arrow.svg";
+import { useNavigate } from 'react-router-dom';
+import BackArrowIcon from '@/assets/header/back-arrow.svg';
 
 type BackButtonProps = {
   to?: string | number;
@@ -13,9 +13,9 @@ export default function BackButton({ to, replace, onClick }: BackButtonProps) {
   function handleClick() {
     if (onClick) return onClick();
 
-    if (typeof to === "number") {
+    if (typeof to === 'number') {
       navigate(to);
-    } else if (typeof to === "string") {
+    } else if (typeof to === 'string') {
       navigate(to, { replace: Boolean(replace) });
     } else {
       navigate(-1);
@@ -27,9 +27,9 @@ export default function BackButton({ to, replace, onClick }: BackButtonProps) {
       type="button"
       onClick={handleClick}
       aria-label="back"
-      className="w-6 h-6 flex items-center justify-center text-primary">
+      className="w-6 h-6 flex items-center justify-center text-primary"
+    >
       <img src={BackArrowIcon} alt="back" className="w-[9px] h-[16px]" />
     </button>
   );
 }
-

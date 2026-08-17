@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import AutoCarousel from "./AutoCarousel";
-import { onboardingAssets } from "./assets";
+import { useMemo } from 'react';
+import AutoCarousel from './AutoCarousel';
+import { onboardingAssets } from './assets';
 
 export default function PageArchive({ active }: { active: boolean }) {
   const archiveSlides = useMemo(
@@ -30,11 +30,7 @@ export default function PageArchive({ active }: { active: boolean }) {
 
       <div className="mt-[42px] flex w-full justify-center min-w-0">
         <div className="w-full max-w-[176px] min-w-0">
-          <AutoCarousel
-            items={archiveSlides}
-            autoplayMs={1800}
-            enabled={active}
-          />
+          <AutoCarousel items={archiveSlides} autoplayMs={1800} enabled={active} />
         </div>
       </div>
     </div>
