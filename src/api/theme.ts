@@ -8,7 +8,7 @@ type ApiResponse<T> = {
   data: T;
 };
 
-export type ServerFont = 'PRETENDARD' | 'CAFE24' | 'LEE';
+export type ServerFont = 'PRETENDARD' | 'CAFE24' | 'LEE' | 'OKDANDAN';
 
 export type MyThemeData = {
   theme: 'LIGHT' | 'DARK';
@@ -23,6 +23,8 @@ export function serverFontToClient(font: ServerFont): FontKey {
       return 'cafe24';
     case 'LEE':
       return 'lee';
+    case 'OKDANDAN':
+      return 'okdandan';
     default:
       return 'pretendard';
   }
@@ -36,6 +38,8 @@ export function clientFontToServer(font: FontKey): ServerFont {
       return 'CAFE24';
     case 'lee':
       return 'LEE';
+    case 'okdandan':
+      return 'OKDANDAN';
     default:
       return 'PRETENDARD';
   }

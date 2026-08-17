@@ -24,4 +24,12 @@ export const FONT_OPTIONS: FontOption[] = [
     fontFamily: 'LeeSeoYoon',
     isPlus: true,
   },
+  {
+    key: 'okdandan',
+    title: 'ok 단단체',
+    desc: '삐뚤빼뚤 위트 있는 네모 손글씨',
+    preview: '가나다',
+    fontFamily: 'okdandan',
+    isPlus: true,
+  }
 ];

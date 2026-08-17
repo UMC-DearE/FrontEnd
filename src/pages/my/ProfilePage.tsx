@@ -4,6 +4,7 @@ import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { BottomButton } from '@/components/common/BottomButton';
 import ProfilePlaceholderIcon from '@/components/icons/ProfilePlaceholderIcon';
+import CameraIcon from '@/assets/myPage/cameraIcon.svg';
 import { uploadImage } from '@/api/upload';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
 import { useUpdateMe } from '@/hooks/mutations/useUpdateMe';
@@ -15,7 +16,9 @@ const NICKNAME_REGEX = /^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]+$/;
 export default function ProfilePage() {
   const navigate = useNavigate();
   const fileRef = useRef<HTMLInputElement | null>(null);
+  const nicknameRef = useRef<HTMLInputElement | null>(null);
   const [touched, setTouched] = useState(false);
+  const [isNicknameFocused, setIsNicknameFocused] = useState(false);
 
   const [nickname, setNickname] = useState('');
   const [intro, setIntro] = useState('');
@@ -111,20 +114,20 @@ export default function ProfilePage() {
     const value = nickname;
 
     if (value.length === 0) return '';
-    // 길이 제한(10 초과)
-    if (value.length > 10) return '최대 10글자까지 설정이 가능해요.';
-    // 2 미만
-    if (value.length < 2) return '최소 2글자부터 설정이 가능해요.';
     // 특수문자 포함(한글/영문/숫자만 허용)
     if (!NICKNAME_REGEX.test(value)) {
       return '특수문자는 사용이 불가해요.';
     }
+    // 2 미만
+    if (value.length < 2) return '최소 2글자부터 설정이 가능해요.';
+    // 길이 제한(10 초과)
+    if (value.length > 10) return '최대 10자까지 입력 가능해요.';
     return '';
   }, [nickname, touched]);
 
   const introError = useMemo(() => {
     if (!intro) return '';
-    if (intro.length > MAX_INTRO) return `소개는 띄어쓰기 포함 최대 ${MAX_INTRO}자까지입니다.`;
+    if (intro.length > MAX_INTRO) return '최대 20자까지 입력이 가능해요.';
     return '';
   }, [intro]);
 
@@ -267,22 +270,25 @@ export default function ProfilePage() {
         </div>
       )}
       <div>
-        <div className="flex flex-col items-center">
-          <div className="h-[80px] w-[80px] rounded-full bg-[#F2F3F5] flex items-center justify-center overflow-hidden">
-            {shownImage ? (
-              <img src={shownImage} alt="profile" className="h-full w-full object-cover" />
-            ) : (
-              <ProfilePlaceholderIcon size={34} />
-            )}
-          </div>
+        <div className="flex flex-col items-center pt-[30px]">
+          <div className="relative h-[80px] w-[80px]">
+            <div className="h-[80px] w-[80px] rounded-full bg-[#F2F3F5] flex items-center justify-center overflow-hidden border-[1.7px] border-[#E6E7E9]">
+              {shownImage ? (
+                <img src={shownImage} alt="profile" className="h-full w-full object-cover" />
+              ) : (
+                <ProfilePlaceholderIcon size={28} />
+              )}
+            </div>
 
-          <button
-            type="button"
-            onClick={onPickImage}
-            className="mt-[15px] h-[25px] px-2 rounded-[4px] bg-[#555557] text-white text-[12px] font-medium"
-          >
-            이미지 업로드
-          </button>
+            <button
+              type="button"
+              onClick={onPickImage}
+              aria-label="프로필 이미지 업로드"
+              className="absolute bottom-0 right-0 rounded-full leading-none"
+            >
+              <img src={CameraIcon} alt="" className="h-[28px] w-[28px]" />
+            </button>
+          </div>
 
           <input
             ref={fileRef}
@@ -295,25 +301,60 @@ export default function ProfilePage() {
 
         <div className="mt-[31px] space-y-[30px]">
           <div>
-            <label className="block text-[12px] font-medium text-[#555557] mb-[10px]">닉네임</label>
-            <input
-              value={nickname}
-              onChange={(e) => {
-                if (!touched) setTouched(true);
-                setNickname(e.target.value);
-              }}
-              onBlur={() => setTouched(true)}
-              placeholder="닉네임 입력 (띄어쓰기 제외 2~10자)"
-              className={[
-                'h-[50px] w-full rounded-[12px] border-[1.2px]',
-                'px-4 text-[16px] text-[#141517]',
-                'placeholder:text-[#C2C4C7]',
-                'border-[#C2C4C7]',
-                'focus:border-[#141517]',
-                'focus:outline-none',
-              ].join(' ')}
-            />
-            <div className="mt-[6px] h-[14px]">
+            <label className="block text-[14px] font-medium text-[#A1A4AA] mb-[10px]">닉네임</label>
+            <div className="relative">
+              <input
+                ref={nicknameRef}
+                value={nickname}
+                onChange={(e) => {
+                  if (!touched) setTouched(true);
+                  setNickname(e.target.value);
+                }}
+                onFocus={() => setIsNicknameFocused(true)}
+                onBlur={() => {
+                  setTouched(true);
+                  setIsNicknameFocused(false);
+                }}
+                placeholder="닉네임 입력 (띄어쓰기 제외 2~10자)"
+                className={[
+                  'h-[49px] w-full rounded-[12px] border-[1.2px]',
+                  'px-4 text-[16px] text-[#141517]',
+                  'placeholder:text-[#CACBD1]',
+                  'border-[#C2C4C7]',
+                  'focus:border-[#141517]',
+                  'focus:outline-none',
+                  nickname ? 'pr-10' : '',
+                ].join(' ')}
+              />
+              {isNicknameFocused && nickname.length > 0 && (
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    setNickname('');
+                    setTouched(true);
+                    nicknameRef.current?.focus();
+                  }}
+                  aria-label="닉네임 지우기"
+                  className={[
+                    'absolute right-4 top-1/2 -translate-y-1/2',
+                    'h-[20px] w-[20px] rounded-full',
+                    'bg-[#C2C4C7]',
+                    'flex items-center justify-center',
+                  ].join(' ')}
+                >
+                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M1 1L11 11M11 1L1 11"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+            <div className="mt-[10px] h-[14px]">
               {errorMessage && (
                 <p className="text-[12px] font-medium text-[#FF1D0D]">{errorMessage}</p>
               )}
@@ -321,21 +362,21 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-[#555557] mb-[10px]">소개</label>
+            <label className="block text-[14px] font-medium text-[#A1A4AA] mb-[10px]">소개</label>
             <input
               value={intro}
               onChange={(e) => setIntro(e.target.value)}
               placeholder="소개를 입력해 주세요"
               className={[
-                'h-[50px] w-full rounded-[12px] border-[1.2px]',
+                'h-[49px] w-full rounded-[12px] border-[1.2px]',
                 'px-4 text-[16px] text-[#141517]',
-                'placeholder:text-[#C2C4C7]',
+                'placeholder:text-[#CACBD1]',
                 'border-[#C2C4C7]',
                 'focus:border-[#141517]',
                 'focus:outline-none',
               ].join(' ')}
             />
-            <div className="mt-[6px] h-[14px]">
+            <div className="mt-[10px] h-[14px]">
               {introError && <p className="text-[12px] font-medium text-[#FF1D0D]">{introError}</p>}
             </div>
           </div>

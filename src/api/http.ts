@@ -16,6 +16,15 @@ const refreshApi = axios.create({
   withCredentials: true,
 });
 
+// 로그인 여부와 무관하게 항상 "인증 헤더 없이" 호출해야 하는 공개 API 전용
+// (예: /auth/terms - 가입 전/후 상관없이 순수 조회용)
+// api.defaults.headers.common.Authorization 이 전역으로 박제되는 영향을 받지 않음
+export const publicApi = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  withCredentials: true,
+  headers: { accept: '*/*' },
+});
+
 let isRefreshing = false;
 let refreshSubscribers: Array<(token: string) => void> = [];
 
