@@ -62,9 +62,10 @@ export default function CreateFrom({ name, selectedColor, onColorChange }: Props
         )}
       </div>
 
-      <div className="w-full rounded-2xl bg-[#F7F8F9] border border-dashed border-[#CACBD1] px-[125px] py-[24px] flex flex-col items-center justify-center gap-3">
+      <div className="flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[#CACBD1] bg-[#F7F8F9] px-4 py-6">
         <p className="text-[13px] font-normal text-[#A1A4AA]">이렇게 만들어져요 👀</p>
-        <div className="shadow-[0px_0px_4px_0px_rgba(0,0,0,0.12)] rounded-[6px]">
+
+        <div className="max-w-full rounded-[6px] shadow-[0px_0px_4px_0px_rgba(0,0,0,0.12)]">
           <FromBadge
             size="xl"
             name={name || '이름'}

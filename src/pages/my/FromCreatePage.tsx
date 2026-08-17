@@ -46,7 +46,7 @@ export default function FromCreatePage() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex mb-3 justify-between mt-1">
+      <div className="flex mb-3 justify-between mt-3">
         <div className="text-sm font-medium text-[#A1A4AA]">이름 입력</div>
         <div className="text-sm font-medium text-[#A1A4AA]">
           {input.length}/{FROM_NAME_MAX_LENGTH}
