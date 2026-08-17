@@ -5,6 +5,7 @@ interface ConfirmModalProps {
   cancelText?: string;
   confirmText?: string;
   titleClassName?: string;
+  confirmButtonClassName?: string;
   onCancel: () => void;
   onConfirm: () => void;
 }
@@ -16,6 +17,7 @@ export default function ConfirmModal({
   cancelText = '취소',
   confirmText = '확인',
   titleClassName,
+  confirmButtonClassName,
   onCancel,
   onConfirm,
 }: ConfirmModalProps) {
@@ -58,7 +60,9 @@ export default function ConfirmModal({
               <button
                 type="button"
                 onClick={onConfirm}
-                className="h-[38px] w-[122px] rounded-lg bg-[#111111] text-[15px] font-medium text-white cursor-pointer"
+                className={`h-[38px] w-[122px] rounded-lg text-[15px] font-medium cursor-pointer ${
+                  confirmButtonClassName ?? 'bg-[#111111] text-white'
+                }`}
               >
                 {confirmText}
               </button>
