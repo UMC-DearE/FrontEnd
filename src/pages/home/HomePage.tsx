@@ -23,9 +23,8 @@ import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
 import useToast from '@/hooks/useToast';
 import closeIcon from '@/assets/homePage/closeIcon.svg';
 import PwaRecommendSheet from '@/components/pwa/PwaRecommendSheet';
-import { useInviteLink } from '@/hooks/queries/useInviteLink';
-import { buildInviteShareText } from '@/constants/invite';
-import { copyToClipboard } from '@/utils/clipboard';
+import { useInviteLinkCopy } from '@/hooks/useInviteLinkCopy';
+import { useMyMembership } from '@/hooks/queries/useMyMembership';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -106,7 +105,11 @@ export default function HomePage() {
   const [showInviteSheet, setShowInviteSheet] = useState(false);
 
   // 시트가 열릴 때 미리 초대 링크를 받아 둠 (복사 시 지연/실패 방지)
-  const { data: inviteLink, refetch: refetchInviteLink } = useInviteLink(showInviteSheet);
+  const copyInviteLink = useInviteLinkCopy(showInviteSheet);
+
+  // 잠금 해제 여부
+  const { data: membership } = useMyMembership();
+  const isUnlocked = !!membership?.isPlus;
 
   // 초대 링크로 가입 완료 -> 환영 시트 노출
   const location = useLocation();
@@ -245,6 +248,13 @@ export default function HomePage() {
   };
 
   const handleCompleteCustomizing = async () => {
+    // 잠금 해제 전에는 저장할 수 없음
+    // 편집 상태를 그대로 둔 채 초대 시트만 띄움 -> 변경 사항은 저장 X
+    if (!isUnlocked) {
+      setShowInviteSheet(true);
+      return;
+    }
+
     // 통합 API가 스티커 전체를 덮어쓰므로 추가/수정/삭제를 구분하지 않고 draft를 그대로 전송
     const saved = draftStickers.filter((s) => s.imageId !== null && s.imageId !== undefined);
     const droppedCount = draftStickers.length - saved.length;
@@ -282,9 +292,6 @@ export default function HomePage() {
           scale: s.scale,
         })),
       });
-
-      // 초대 여부 API 연동 후 아직 친구를 초대하지 않은 사용자에게만 노출
-      setShowInviteSheet(true);
     } catch (e) {
       console.error(e);
     }
@@ -294,18 +301,8 @@ export default function HomePage() {
 
   // 초대 링크 복사
   const handleCopyInviteLink = async () => {
-    // 시트 열릴 때 미리 받아 둔 링크를 우선 사용, 아직 없으면 이 시점에 요청
-    const url = inviteLink?.inviteUrl ?? (await refetchInviteLink()).data?.inviteUrl;
-
-    if (!url) {
-      toast.show('초대 링크를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.');
-      return;
-    }
-
-    const copied = await copyToClipboard(buildInviteShareText(url));
-
+    await copyInviteLink();
     setShowInviteSheet(false);
-    toast.show(copied ? '초대 링크를 복사했어요' : '초대 링크 복사에 실패했어요');
   };
 
   const addStickerFromFile = async (file: File) => {

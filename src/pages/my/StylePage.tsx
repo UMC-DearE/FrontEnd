@@ -8,11 +8,19 @@ import { FONT_OPTIONS } from '@/utils/fontOptions';
 import { useStyleStore } from '@/stores/styleStores';
 import { BottomButton } from '@/components/common/BottomButton';
 import { patchMyFont, serverFontToClient } from '@/api/theme';
+import FriendInviteSheet from '@/components/common/FriendInviteSheet';
+import { useMyMembership } from '@/hooks/queries/useMyMembership';
+import { useInviteLinkCopy } from '@/hooks/useInviteLinkCopy';
 
 export default function StylePage() {
   const navigate = useNavigate();
 
-  // const isPlus = true;
+  // 잠금 해제 여부 (초대 성공 시 서버가 isPlus를 켜 줌)
+  const { data: membership } = useMyMembership();
+  const isUnlocked = !!membership?.isPlus;
+
+  const [showInviteSheet, setShowInviteSheet] = useState(false);
+  const copyInviteLink = useInviteLinkCopy(showInviteSheet);
 
   const font = useStyleStore((s) => s.font);
   const setFont = useStyleStore((s) => s.setFont);
@@ -35,10 +43,16 @@ export default function StylePage() {
   const onSubmit = useCallback(async () => {
     if (pendingFont === font) return;
 
+    // 잠금 해제 전에는 저장할 수 없음 (선택 상태는 유지한 채 초대 시트만 노출)
+    if (!isUnlocked) {
+      setShowInviteSheet(true);
+      return;
+    }
+
     const res = await patchMyFont(pendingFont);
     setFont(serverFontToClient(res.font));
     navigate(-1);
-  }, [pendingFont, font, setFont, navigate]);
+  }, [pendingFont, font, isUnlocked, setFont, navigate]);
 
   useEffect(() => {
     if (!setFixedAction) return;
@@ -100,6 +114,15 @@ export default function StylePage() {
           })}
         </div>
       </div>
+
+      <FriendInviteSheet
+        open={showInviteSheet}
+        onClose={() => setShowInviteSheet(false)}
+        onInvite={async () => {
+          await copyInviteLink();
+          setShowInviteSheet(false);
+        }}
+      />
     </div>
   );
 }
