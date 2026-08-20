@@ -22,6 +22,9 @@ import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
 import useToast from '@/hooks/useToast';
 import closeIcon from '@/assets/homePage/closeIcon.svg';
 import PwaRecommendSheet from '@/components/pwa/PwaRecommendSheet';
+import { useInviteLink } from '@/hooks/queries/useInviteLink';
+import { buildInviteShareText } from '@/constants/invite';
+import { copyToClipboard } from '@/utils/clipboard';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -100,6 +103,9 @@ export default function HomePage() {
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [showResetSheet, setShowResetSheet] = useState(false);
   const [showInviteSheet, setShowInviteSheet] = useState(false);
+
+  // 시트가 열릴 때 미리 초대 링크를 받아 둠 (복사 시 지연/실패 방지)
+  const { data: inviteLink, refetch: refetchInviteLink } = useInviteLink(showInviteSheet);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   // 스티커 이동 범위 제한
@@ -272,6 +278,22 @@ export default function HomePage() {
   };
 
   const toast = useToast();
+
+  // 초대 링크 복사
+  const handleCopyInviteLink = async () => {
+    // 시트 열릴 때 미리 받아 둔 링크를 우선 사용, 아직 없으면 이 시점에 요청
+    const url = inviteLink?.inviteUrl ?? (await refetchInviteLink()).data?.inviteUrl;
+
+    if (!url) {
+      toast.show('초대 링크를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.');
+      return;
+    }
+
+    const copied = await copyToClipboard(buildInviteShareText(url));
+
+    setShowInviteSheet(false);
+    toast.show(copied ? '초대 링크를 복사했어요' : '초대 링크 복사에 실패했어요');
+  };
 
   const addStickerFromFile = async (file: File) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -477,10 +499,7 @@ export default function HomePage() {
       <FriendInviteSheet
         open={showInviteSheet}
         onClose={() => setShowInviteSheet(false)}
-        onInvite={() => {
-          // 초대 링크 API 연동 후 클립보드 복사 처리
-          setShowInviteSheet(false);
-        }}
+        onInvite={handleCopyInviteLink}
       />
       <LetterCard
         letter={letter}

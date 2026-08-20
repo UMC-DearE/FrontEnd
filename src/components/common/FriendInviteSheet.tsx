@@ -25,7 +25,7 @@ export default function FriendInviteSheet({ open, onClose, onInvite }: FriendInv
 
             <div className="flex flex-col gap-[8px] text-[14px] font-medium text-[#585A5F]">
               <p>초대 링크를 통해 1명만 가입해도</p>
-              <p>테마·스티커·폰트를 마음껏 이용할 수 있어요!</p>
+              <p>친구와, 나 둘 다 꾸미기 기능을 마음껏 이용할 수 있어요!</p>
             </div>
           </div>
         </div>
