@@ -43,6 +43,14 @@ const fitToMaxSide = (w: number, h: number, maxSide: number) => {
 
 const cloneStickers = (arr: StickerItem[]) => arr.map((s) => ({ ...s }));
 
+// 변경 여부 비교용
+const stickerSignature = (arr: StickerItem[]) =>
+  JSON.stringify(
+    arr
+      .map((s) => [s.id, s.imageId, s.x, s.y, s.z, s.rotation, s.scale])
+      .sort((a, b) => Number(a[0]) - Number(b[0]))
+  );
+
 export default function HomePage() {
   const navigate = useNavigate();
   const { homeBgColor, setHomeBgColor } = useOutletContext<AppLayoutContext>();
@@ -247,7 +255,24 @@ export default function HomePage() {
     setBgColorBackup(null);
   };
 
+  const closeEditor = () => {
+    setOpenSheet(false);
+    setSelectedId(null);
+    setPickerOpen(false);
+    setShowResetSheet(false);
+    setBgColorBackup(null);
+  };
+
   const handleCompleteCustomizing = async () => {
+    const bgChanged = bgColorBackup !== null && homeBgColor !== bgColorBackup;
+    const stickersChanged = stickerSignature(draftStickers) !== stickerSignature(baseStickers);
+
+    // 변경 사항 없으면 저장, 바텀 시트 X
+    if (!bgChanged && !stickersChanged) {
+      closeEditor();
+      return;
+    }
+
     // 잠금 해제 전에는 저장할 수 없음
     // 편집 상태를 그대로 둔 채 초대 시트만 띄움 -> 변경 사항은 저장 X
     if (!isUnlocked) {
@@ -259,11 +284,7 @@ export default function HomePage() {
     const saved = draftStickers.filter((s) => s.imageId !== null && s.imageId !== undefined);
     const droppedCount = draftStickers.length - saved.length;
 
-    setOpenSheet(false);
-    setSelectedId(null);
-    setPickerOpen(false);
-    setShowResetSheet(false);
-    setBgColorBackup(null);
+    closeEditor();
 
     try {
       if (droppedCount > 0) {
