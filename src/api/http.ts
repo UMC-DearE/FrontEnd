@@ -3,6 +3,7 @@ import { useStyleStore } from '@/stores/styleStores';
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 import type { UserProfile, UpdateMeRequest, UpdateMeResponse } from '@/types/user';
 import { normalizeImageUrl } from './upload';
+import { clearQueryCacheOnAuthChange } from './queryClient';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -103,6 +104,7 @@ api.interceptors.response.use(
     } catch (refreshError) {
       delete api.defaults.headers.common.Authorization;
       useAuthStore.getState().setAuthStatus('unauthenticated');
+      clearQueryCacheOnAuthChange();
 
       return Promise.reject(refreshError);
     } finally {
@@ -122,6 +124,9 @@ export async function logout() {
 
     useStyleStore.getState().resetStyle();
     localStorage.removeItem('deare-style');
+
+    // 다음 계정이 이전 계정의 캐시(me, inviteLink 등)를 읽지 않도록 전부 폐기
+    clearQueryCacheOnAuthChange();
   }
 }
 
