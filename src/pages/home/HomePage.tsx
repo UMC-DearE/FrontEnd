@@ -1,6 +1,6 @@
 // 홈 화면
 import { useMemo, useRef, useState, useEffect } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext, useNavigate, useLocation } from 'react-router-dom';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
 import ProfileCard from '@/components/home/ProfileCard';
 import ProfileSettingSheet from '@/components/home/ProfileSettingSheet';
@@ -10,6 +10,7 @@ import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import CustomResetSheet from '@/components/home/CustomResetSheet';
 import FriendInviteSheet from '@/components/common/FriendInviteSheet';
+import InviteWelcomeSheet from '@/components/common/InviteWelcomeSheet';
 import CustomizingHeader from '@/components/header/CustomizingHeader';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import { uploadImage } from '@/api/upload';
@@ -106,6 +107,18 @@ export default function HomePage() {
 
   // 시트가 열릴 때 미리 초대 링크를 받아 둠 (복사 시 지연/실패 방지)
   const { data: inviteLink, refetch: refetchInviteLink } = useInviteLink(showInviteSheet);
+
+  // 초대 링크로 가입 완료 -> 환영 시트 노출
+  const location = useLocation();
+  const [showInviteWelcome, setShowInviteWelcome] = useState(
+    () => !!(location.state as { invitedSignup?: boolean } | null)?.invitedSignup
+  );
+
+  useEffect(() => {
+    if (!showInviteWelcome) return;
+    // 새로고침, 뒤로가기로 다시 뜨지 않도록 라우터 state 소비 후 제거
+    navigate('.', { replace: true, state: null });
+  }, [showInviteWelcome, navigate]);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   // 스티커 이동 범위 제한
@@ -500,6 +513,14 @@ export default function HomePage() {
         open={showInviteSheet}
         onClose={() => setShowInviteSheet(false)}
         onInvite={handleCopyInviteLink}
+      />
+      <InviteWelcomeSheet
+        open={showInviteWelcome}
+        onClose={() => setShowInviteWelcome(false)}
+        onGoCustomize={() => {
+          setShowInviteWelcome(false);
+          openEditor();
+        }}
       />
       <LetterCard
         letter={letter}

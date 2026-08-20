@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { BottomButton } from '@/components/common/BottomButton';
 import { postSignup, postJwtRefresh } from '@/api/authSignup';
 import { useAuthStore } from '@/stores/authStore';
+import { clearPendingInviteCode, readPendingInviteCode } from '@/utils/inviteCode';
 
 const NICKNAME_REGEX = /^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]+$/;
 
@@ -72,8 +73,12 @@ const SetNamePage = () => {
       setAuthStatus('authenticated'); // 가입 완료 -> 인증 상태로 업데이트 -> 다시 terms로 안 가고 home으로
       // console.log("[Signup] /auth/jwt/refresh success:", refreshRes);
 
+      // 초대 링크를 타고 들어와 가입한 경우 홈에서 환영 시트를 띄움
+      const invitedSignup = !!readPendingInviteCode();
+      clearPendingInviteCode();
+
       // console.log("[Signup] signup flow completed");
-      navigate('/', { replace: true });
+      navigate('/', { replace: true, state: invitedSignup ? { invitedSignup: true } : null });
     } catch (e) {
       console.error(e);
       navigate('/login', { replace: true });
