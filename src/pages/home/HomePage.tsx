@@ -1,6 +1,6 @@
 // 홈 화면
 import { useMemo, useRef, useState, useEffect } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext, useNavigate, useLocation } from 'react-router-dom';
 import type { AppLayoutContext } from '@/layouts/AppLayout';
 import ProfileCard from '@/components/home/ProfileCard';
 import ProfileSettingSheet from '@/components/home/ProfileSettingSheet';
@@ -10,6 +10,7 @@ import AddLetterButton from '@/components/home/AddLetterButton';
 import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import CustomResetSheet from '@/components/home/CustomResetSheet';
 import FriendInviteSheet from '@/components/common/FriendInviteSheet';
+import InviteWelcomeSheet from '@/components/common/InviteWelcomeSheet';
 import CustomizingHeader from '@/components/header/CustomizingHeader';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import { uploadImage } from '@/api/upload';
@@ -22,6 +23,8 @@ import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
 import useToast from '@/hooks/useToast';
 import closeIcon from '@/assets/homePage/closeIcon.svg';
 import PwaRecommendSheet from '@/components/pwa/PwaRecommendSheet';
+import { useInviteLinkCopy } from '@/hooks/useInviteLinkCopy';
+import { useMyMembership } from '@/hooks/queries/useMyMembership';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -39,6 +42,14 @@ const fitToMaxSide = (w: number, h: number, maxSide: number) => {
 };
 
 const cloneStickers = (arr: StickerItem[]) => arr.map((s) => ({ ...s }));
+
+// 변경 여부 비교용
+const stickerSignature = (arr: StickerItem[]) =>
+  JSON.stringify(
+    arr
+      .map((s) => [s.id, s.imageId, s.x, s.y, s.z, s.rotation, s.scale])
+      .sort((a, b) => Number(a[0]) - Number(b[0]))
+  );
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -100,6 +111,25 @@ export default function HomePage() {
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [showResetSheet, setShowResetSheet] = useState(false);
   const [showInviteSheet, setShowInviteSheet] = useState(false);
+
+  // 시트가 열릴 때 미리 초대 링크를 받아 둠 (복사 시 지연/실패 방지)
+  const copyInviteLink = useInviteLinkCopy(showInviteSheet);
+
+  // 잠금 해제 여부
+  const { data: membership } = useMyMembership();
+  const isUnlocked = !!membership?.isPlus;
+
+  // 초대 링크로 가입 완료 -> 환영 시트 노출
+  const location = useLocation();
+  const [showInviteWelcome, setShowInviteWelcome] = useState(
+    () => !!(location.state as { invitedSignup?: boolean } | null)?.invitedSignup
+  );
+
+  useEffect(() => {
+    if (!showInviteWelcome) return;
+    // 새로고침, 뒤로가기로 다시 뜨지 않도록 라우터 state 소비 후 제거
+    navigate('.', { replace: true, state: null });
+  }, [showInviteWelcome, navigate]);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   // 스티커 이동 범위 제한
@@ -225,16 +255,36 @@ export default function HomePage() {
     setBgColorBackup(null);
   };
 
-  const handleCompleteCustomizing = async () => {
-    // 통합 API가 스티커 전체를 덮어쓰므로 추가/수정/삭제를 구분하지 않고 draft를 그대로 전송
-    const saved = draftStickers.filter((s) => s.imageId !== null && s.imageId !== undefined);
-    const droppedCount = draftStickers.length - saved.length;
-
+  const closeEditor = () => {
     setOpenSheet(false);
     setSelectedId(null);
     setPickerOpen(false);
     setShowResetSheet(false);
     setBgColorBackup(null);
+  };
+
+  const handleCompleteCustomizing = async () => {
+    const bgChanged = bgColorBackup !== null && homeBgColor !== bgColorBackup;
+    const stickersChanged = stickerSignature(draftStickers) !== stickerSignature(baseStickers);
+
+    // 변경 사항 없으면 저장, 바텀 시트 X
+    if (!bgChanged && !stickersChanged) {
+      closeEditor();
+      return;
+    }
+
+    // 잠금 해제 전에는 저장할 수 없음
+    // 편집 상태를 그대로 둔 채 초대 시트만 띄움 -> 변경 사항은 저장 X
+    if (!isUnlocked) {
+      setShowInviteSheet(true);
+      return;
+    }
+
+    // 통합 API가 스티커 전체를 덮어쓰므로 추가/수정/삭제를 구분하지 않고 draft를 그대로 전송
+    const saved = draftStickers.filter((s) => s.imageId !== null && s.imageId !== undefined);
+    const droppedCount = draftStickers.length - saved.length;
+
+    closeEditor();
 
     try {
       if (droppedCount > 0) {
@@ -263,15 +313,18 @@ export default function HomePage() {
           scale: s.scale,
         })),
       });
-
-      // 초대 여부 API 연동 후 아직 친구를 초대하지 않은 사용자에게만 노출
-      setShowInviteSheet(true);
     } catch (e) {
       console.error(e);
     }
   };
 
   const toast = useToast();
+
+  // 초대 링크 복사
+  const handleCopyInviteLink = async () => {
+    await copyInviteLink();
+    setShowInviteSheet(false);
+  };
 
   const addStickerFromFile = async (file: File) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -477,9 +530,14 @@ export default function HomePage() {
       <FriendInviteSheet
         open={showInviteSheet}
         onClose={() => setShowInviteSheet(false)}
-        onInvite={() => {
-          // 초대 링크 API 연동 후 클립보드 복사 처리
-          setShowInviteSheet(false);
+        onInvite={handleCopyInviteLink}
+      />
+      <InviteWelcomeSheet
+        open={showInviteWelcome}
+        onClose={() => setShowInviteWelcome(false)}
+        onGoCustomize={() => {
+          setShowInviteWelcome(false);
+          openEditor();
         }}
       />
       <LetterCard

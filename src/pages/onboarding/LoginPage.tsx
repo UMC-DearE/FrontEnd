@@ -4,6 +4,7 @@ import PageAI from '@/components/onboarding/PageAI';
 import PageArchive from '@/components/onboarding/PageArchive';
 import { SocialLoginButton } from '@/components/common/SocialLoginButton';
 import { getOAuthAuthorizeUrl } from '@/api/auth';
+import { readPendingInviteCode } from '@/utils/inviteCode';
 
 export default function LoginPage() {
   const [pageIdx, setPageIdx] = useState(0);
@@ -58,15 +59,15 @@ export default function LoginPage() {
     [activeIdx]
   );
 
-  const onKakaoLogin = async () => {
-    const url = await getOAuthAuthorizeUrl('kakao');
+  // 초대 링크로 진입했다면 보관해 둔 코드를 authorize 요청에 실어 보냄
+  const startOAuth = async (provider: 'kakao' | 'google') => {
+    const inviteCode = readPendingInviteCode() ?? undefined;
+    const url = await getOAuthAuthorizeUrl(provider, inviteCode);
     window.location.href = url;
   };
 
-  const onGoogleLogin = async () => {
-    const url = await getOAuthAuthorizeUrl('google');
-    window.location.href = url;
-  };
+  const onKakaoLogin = () => startOAuth('kakao');
+  const onGoogleLogin = () => startOAuth('google');
 
   return (
     <div className="w-full max-w-[440px] mx-auto flex flex-col min-w-0">

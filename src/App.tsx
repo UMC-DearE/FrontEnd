@@ -2,9 +2,8 @@ import router from '@/routes/router';
 import { RouterProvider } from 'react-router-dom';
 import { ToastProvider } from '@/components/common/ToastProvider';
 import AuthProvider from './providers/AuthProvider';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-const queryClient = new QueryClient();
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from '@/api/queryClient';
 
 function App() {
   return (

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { api } from '@/api/http';
+import { clearPendingInviteCode } from '@/utils/inviteCode';
 
 type ResultType = 'SIGNUP_REQUIRED' | 'REGISTERED';
 
@@ -40,6 +41,8 @@ export default function OAuthCallbackPage() {
       }
 
       if (resultType === 'REGISTERED') {
+        // 기존 회원은 초대 혜택 대상이 아니므로 보관 중인 코드를 정리
+        clearPendingInviteCode();
         setAuthStatus('authenticated');
         navigate('/', { replace: true });
         return;
