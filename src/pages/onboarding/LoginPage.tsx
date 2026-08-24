@@ -74,7 +74,7 @@ export default function LoginPage() {
       const code = isAxiosError<CommonResponse>(e) ? e.response?.data?.code : undefined;
       if (code === 'INVITE_40401') {
         clearPendingInviteCode();
-        navigate('/invite/invalid');
+        navigate('/invite/invalid', { replace: true });
         return;
       }
       throw e;
