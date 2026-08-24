@@ -2,16 +2,26 @@ import { useMemo, useRef, useState } from 'react';
 import PageKeep from '@/components/onboarding/PageKeep';
 import PageAI from '@/components/onboarding/PageAI';
 import PageArchive from '@/components/onboarding/PageArchive';
+import PageAnalyze from '@/components/onboarding/PageAnalyze';
 import { SocialLoginButton } from '@/components/common/SocialLoginButton';
 import { getOAuthAuthorizeUrl } from '@/api/auth';
 import { readPendingInviteCode } from '@/utils/inviteCode';
 
 export default function LoginPage() {
   const [pageIdx, setPageIdx] = useState(0);
-  const [hasSwiped, setHasSwiped] = useState(false);
 
   const startX = useRef<number | null>(null);
   const deltaX = useRef<number>(0);
+
+  const pages = useMemo(
+    () => [
+      { id: 'keep', node: <PageKeep /> },
+      { id: 'ai', node: <PageAI /> },
+      { id: 'home', node: <PageArchive /> },
+      { id: 'analyze', node: <PageAnalyze /> },
+    ],
+    []
+  );
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     startX.current = e.clientX;
@@ -31,33 +41,14 @@ export default function LoginPage() {
     const threshold = 60;
 
     if (dx <= -threshold) {
-      setPageIdx((p) => {
-        const next = p < 2 ? p + 1 : p;
-        if (next !== p) setHasSwiped(true);
-        return next;
-      });
+      setPageIdx((p) => (p < pages.length - 1 ? p + 1 : p));
     } else if (dx >= threshold) {
-      setPageIdx((p) => {
-        const next = p > 0 ? p - 1 : p;
-        if (next !== p) setHasSwiped(true);
-        return next;
-      });
+      setPageIdx((p) => (p > 0 ? p - 1 : p));
     }
 
     startX.current = null;
     deltaX.current = 0;
   };
-
-  const activeIdx = hasSwiped ? pageIdx : 0;
-
-  const pages = useMemo(
-    () => [
-      { id: 'keep', node: <PageKeep active={activeIdx === 0} /> },
-      { id: 'ai', node: <PageAI active={activeIdx === 1} /> },
-      { id: 'archive', node: <PageArchive active={activeIdx === 2} /> },
-    ],
-    [activeIdx]
-  );
 
   // 초대 링크로 진입했다면 보관해 둔 코드를 authorize 요청에 실어 보냄
   const startOAuth = async (provider: 'kakao' | 'google') => {
@@ -71,10 +62,11 @@ export default function LoginPage() {
 
   return (
     <div className="w-full max-w-[440px] mx-auto flex flex-col min-w-0">
-      <div className="flex flex-1 flex-col px-4 pt-4 pb-[59px] min-w-0">
+      <div className="flex flex-1 flex-col pt-4 pb-[59px] min-w-0">
+        {/* 이 안(스와이프 영역)만 캐러셀처럼 넘어가고, 아래 인디케이터/로그인 버튼은 고정 */}
         <div
           style={{ touchAction: 'pan-y' }}
-          className="relative mt-10 w-full overflow-hidden min-w-0"
+          className="relative mt-15 w-full overflow-hidden min-w-0"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
