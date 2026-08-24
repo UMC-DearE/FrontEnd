@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BottomButton } from '@/components/common/BottomButton';
-import { postSignup, postJwtRefresh } from '@/api/authSignup';
+import { postSignup } from '@/api/authSignup';
 import { useAuthStore } from '@/stores/authStore';
 import { clearPendingInviteCode, readPendingInviteCode } from '@/utils/inviteCode';
 
@@ -62,22 +62,15 @@ const SetNamePage = () => {
     try {
       setSubmitting(true);
 
-      // console.log("[Signup] start", { nickname, termIds });
-
       // 회원가입 (signup_token 쿠키 필요)
       await postSignup({ nickname, termIds });
-      // console.log("[Signup] /auth/signup success:", signupRes);
 
-      // JWT 쿠키/토큰 확정 (refresh token 쿠키 필요)
-      await postJwtRefresh();
-      setAuthStatus('authenticated'); // 가입 완료 -> 인증 상태로 업데이트 -> 다시 terms로 안 가고 home으로
-      // console.log("[Signup] /auth/jwt/refresh success:", refreshRes);
+      setAuthStatus('authenticated');
 
       // 초대 링크를 타고 들어와 가입한 경우 홈에서 환영 시트를 띄움
       const invitedSignup = !!readPendingInviteCode();
       clearPendingInviteCode();
 
-      // console.log("[Signup] signup flow completed");
       navigate('/', { replace: true, state: invitedSignup ? { invitedSignup: true } : null });
     } catch (e) {
       console.error(e);
