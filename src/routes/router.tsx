@@ -33,7 +33,6 @@ import EditLetterPage from '@/pages/letter/EditLetterPage';
 import AuthGuard from '@/routes/AuthGuard';
 import LetterSelectPage from '@/pages/letter/LetterSelectPage';
 import InvalidInvitePage from '@/pages/invite/InvalidInvitePage';
-import InviteEntryPage from '@/pages/invite/InviteEntryPage';
 import InviteWelcomeSheet from '@/components/common/InviteWelcomeSheet';
 
 const router = createBrowserRouter([
@@ -50,7 +49,6 @@ const router = createBrowserRouter([
 
           // 초대 링크
           { path: 'invite/invalid', element: <InvalidInvitePage /> },
-          { path: 'invite/:inviteCode', element: <InviteEntryPage /> },
           // 초대 가입 환영 시트 확인용 - 임시
           {
             path: 'invite/welcome-preview',

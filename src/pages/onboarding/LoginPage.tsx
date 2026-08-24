@@ -1,14 +1,23 @@
 import { useMemo, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { isAxiosError } from 'axios';
 import PageKeep from '@/components/onboarding/PageKeep';
 import PageAI from '@/components/onboarding/PageAI';
 import PageArchive from '@/components/onboarding/PageArchive';
 import PageAnalyze from '@/components/onboarding/PageAnalyze';
 import { SocialLoginButton } from '@/components/common/SocialLoginButton';
 import { getOAuthAuthorizeUrl } from '@/api/auth';
-import { readPendingInviteCode } from '@/utils/inviteCode';
+import type { CommonResponse } from '@/types/common';
+import {
+  clearPendingInviteCode,
+  readPendingInviteCode,
+  savePendingInviteCode,
+} from '@/utils/inviteCode';
 
 export default function LoginPage() {
   const [pageIdx, setPageIdx] = useState(0);
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
 
   const startX = useRef<number | null>(null);
   const deltaX = useRef<number>(0);
@@ -50,11 +59,26 @@ export default function LoginPage() {
     deltaX.current = 0;
   };
 
-  // 초대 링크로 진입했다면 보관해 둔 코드를 authorize 요청에 실어 보냄
+  // 서버가 발급하는 초대 링크 -> 쿼리에서 먼저 읽어 보관
   const startOAuth = async (provider: 'kakao' | 'google') => {
-    const inviteCode = readPendingInviteCode() ?? undefined;
-    const url = await getOAuthAuthorizeUrl(provider, inviteCode);
-    window.location.href = url;
+    const fromQuery = params.get('inviteCode')?.trim();
+    if (fromQuery) savePendingInviteCode(fromQuery);
+
+    const inviteCode = fromQuery || readPendingInviteCode() || undefined;
+
+    try {
+      const url = await getOAuthAuthorizeUrl(provider, inviteCode);
+      window.location.href = url;
+    } catch (e) {
+      // 서버가 authorize 단계에서 초대 코드를 검증하므로, 만료/위조된 코드는 여기서 걸림
+      const code = isAxiosError<CommonResponse>(e) ? e.response?.data?.code : undefined;
+      if (code === 'INVITE_40401') {
+        clearPendingInviteCode();
+        navigate('/invite/invalid', { replace: true });
+        return;
+      }
+      throw e;
+    }
   };
 
   const onKakaoLogin = () => startOAuth('kakao');
