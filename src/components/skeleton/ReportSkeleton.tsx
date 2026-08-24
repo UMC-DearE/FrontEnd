@@ -1,46 +1,58 @@
-export default function ReportSkeleton() {
+export default function ReportAnalysisSkeleton() {
   return (
-    <div className="flex flex-col space-y-7">
-      <div className="w-full h-32 rounded-xl bg-[#F4F5F6] animate-pulse" />
+    <div className="flex w-full flex-col pb-6">
+      <section className="flex flex-col">
+        <div className="h-4 w-[60px] animate-pulse rounded bg-[#E7E8EB]" />
 
-      <div className="flex flex-col gap-[20px]">
-        <div className="h-5 w-20 rounded-md bg-[#F4F5F6] animate-pulse" />
-        <div className="bg-white w-full h-[144px] rounded-[12px] border-[#F4F5F6] border-[1.2px] shadow-[0_0_4px_rgba(217,217,217,0.5)] flex flex-col justify-center px-[16px]">
-          <div className="flex flex-col gap-[14px]">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-[10px]">
-                  <div className="w-6 h-6 rounded-full bg-[#F4F5F6] animate-pulse" />
-                  <div className="w-16 h-6 rounded-[6px] bg-[#F4F5F6] animate-pulse" />
-                </div>
-                <div className="w-10 h-4 rounded-md bg-[#F4F5F6] animate-pulse" />
+        <div className="mt-2 rounded-[10px] bg-white px-5 py-5">
+          <div className="h-4 w-[150px] animate-pulse rounded bg-[#E7E8EB]" />
+          <div className="mt-2 h-4 w-[180px] animate-pulse rounded bg-[#E7E8EB]" />
+        </div>
+
+        <div className="mt-2 rounded-[10px] bg-white px-5 py-2">
+          {[1, 2, 3].map((item) => (
+            <div
+              key={item}
+              className="flex items-center justify-between border-b border-[#EBEDF0] py-3 last:border-b-0"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-4 w-3 animate-pulse rounded bg-[#E7E8EB]" />
+                <div className="h-8 w-[70px] animate-pulse rounded-[6px] bg-[#E7E8EB]" />
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
 
-      <div className="flex flex-col gap-[18px]">
-        <div className="h-5 w-32 rounded-md bg-[#F4F5F6] animate-pulse" />
-        <div className="flex gap-[8px] flex-wrap">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="w-24 h-8 rounded-[18.5px] bg-[#F4F5F6] animate-pulse" />
-          ))}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-[18px]">
-        <div className="h-5 w-28 rounded-md bg-[#F4F5F6] animate-pulse" />
-        <div className="w-full h-[118px] bg-white rounded-[16px] border-[#F4F5F6] border-[1.2px] flex justify-around py-[16px] px-[22px]">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="flex flex-col items-center gap-[4px]">
-              <div className="w-6 h-3 rounded-md bg-[#F4F5F6] animate-pulse" />
-              <div className="w-[48px] h-[72px] bg-[#F4F5F6] rounded-[10px] animate-pulse" />
-              <div className="w-10 h-3 rounded-md bg-[#F4F5F6] animate-pulse" />
+              <div className="h-4 w-8 animate-pulse rounded bg-[#E7E8EB]" />
             </div>
           ))}
         </div>
-      </div>
+      </section>
+
+      <section className="flex flex-col">
+        <div className="mt-6 h-4 w-[70px] animate-pulse rounded bg-[#E7E8EB]" />
+
+        <div className="mt-2 rounded-[10px] bg-white px-5 py-5">
+          <div className="rounded-[10px] bg-[#F7F8F9] px-4 pb-5 pt-4">
+            <div className="flex items-center justify-between">
+              <div className="h-4 w-[90px] animate-pulse rounded bg-[#E7E8EB]" />
+              <div className="h-8 w-8 animate-pulse rounded-full bg-[#E7E8EB]" />
+            </div>
+
+            <div className="mt-5 flex flex-col gap-2">
+              <div className="h-3 w-full animate-pulse rounded bg-[#E7E8EB]" />
+              <div className="h-3 w-[92%] animate-pulse rounded bg-[#E7E8EB]" />
+              <div className="h-3 w-[70%] animate-pulse rounded bg-[#E7E8EB]" />
+            </div>
+
+            <div className="mt-5 flex gap-2">
+              <div className="h-7 w-[90px] animate-pulse rounded-[6px] bg-[#E7E8EB]" />
+              <div className="h-7 w-[90px] animate-pulse rounded-[6px] bg-[#E7E8EB]" />
+            </div>
+          </div>
+
+          <p className="mt-4 text-center text-[12px] font-medium text-[#A1A4AA]">
+            나의 캐릭터를 분석하고 있어요
+          </p>
+        </div>
+      </section>
     </div>
   );
 }

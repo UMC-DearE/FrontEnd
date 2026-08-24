@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteLetter } from '@/api/letter';
 import { randomLetterKey } from '@/hooks/queries/useRandomLetterQuery';
+import { REPORT_QUERY_KEY } from '@/hooks/queries/useReport';
 
 export function useDeleteLetter() {
   const queryClient = useQueryClient();
@@ -8,10 +9,13 @@ export function useDeleteLetter() {
   return useMutation({
     mutationFn: (letterId: number) => deleteLetter(letterId),
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['letters'] });
-      // 추첨된 편지를 삭제 -> hasLetter: false로 바뀌므로 홈 카드도 갱신
-      queryClient.invalidateQueries({ queryKey: randomLetterKey });
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['letters'] }),
+        queryClient.invalidateQueries({ queryKey: ['froms'] }),
+        queryClient.invalidateQueries({ queryKey: randomLetterKey }),
+        queryClient.invalidateQueries({ queryKey: REPORT_QUERY_KEY }),
+      ]);
     },
   });
 }
