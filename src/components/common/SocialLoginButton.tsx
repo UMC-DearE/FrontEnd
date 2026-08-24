@@ -40,7 +40,7 @@ export function SocialLoginButton({
     >
       <img src={isKakao ? kakaoIcon : googleIcon} alt="" className="shrink-0" draggable={false} />
       <span className="text-[16px] font-medium leading-none">
-        {isKakao ? 'Kakao 로그인' : 'Google 로그인'}
+        {isKakao ? '카카오로 계속하기' : '구글로 계속하기'}
       </span>
     </button>
   );
