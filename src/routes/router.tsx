@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import { BaseLayout } from '@/layouts/BaseLayout';
 import { AppLayout } from '@/layouts/AppLayout';
-import NotFoundPage from '@/pages/NotFoundPage';
+import RouteErrorPage from '@/pages/error/RouteErrorPage';
 
 import LoginPage from '@/pages/onboarding/LoginPage';
 import OAuthCallbackPage from '@/pages/onboarding/OAuthCallbackPage';
@@ -38,7 +38,7 @@ import InviteWelcomeSheet from '@/components/common/InviteWelcomeSheet';
 const router = createBrowserRouter([
   {
     element: <BaseLayout />,
-    errorElement: <NotFoundPage />,
+    errorElement: <RouteErrorPage />,
     children: [
       /* 헤더 따로 */
       {

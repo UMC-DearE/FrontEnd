@@ -2,7 +2,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { BottomButton } from '@/components/common/BottomButton';
-import ErrorIcon from '@/assets/invite/error.svg';
+import ErrorIcon from '@/assets/common/error.svg';
 
 export default function InvalidInvitePage() {
   const navigate = useNavigate();
