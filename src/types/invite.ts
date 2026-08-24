@@ -5,8 +5,3 @@ export interface InviteLink {
   inviteCode: string;
   inviteUrl: string;
 }
-
-// 초대 코드 유효성 검증
-export interface InviteVerify {
-  inviteCode: string;
-}
