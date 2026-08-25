@@ -43,6 +43,8 @@ export function AppLayout() {
     pathname.startsWith('/my/profile') ||
     pathname.startsWith('/my/account') ||
     pathname.startsWith('/my/style') ||
+    pathname.startsWith('/my/service')||
+    pathname.startsWith('/my/privacy') ||
     pathname.startsWith('/my/from') ||
     pathname.startsWith('/login') ||
     pathname.startsWith('/invite') ||

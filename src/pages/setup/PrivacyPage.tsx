@@ -1,27 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { getTerms } from '@/api/terms';
-
-type Clause = {
-  clauseTitle: string;
-  clauseContent: string;
-};
+import { getTerms, type ApiClause } from '@/api/terms';
 
 type TermDetailState = {
   title?: string;
-  clauses?: Clause[];
+  clauses?: ApiClause[];
 };
 
 export default function PrivacyPage() {
   const { state } = useLocation();
   const stateFromNav = (state ?? {}) as TermDetailState;
 
-  const [clauses, setClauses] = useState<Clause[]>(stateFromNav.clauses ?? []);
-  const [content, setContent] = useState<string>('');
+  const [clauses, setClauses] = useState<ApiClause[]>(stateFromNav.clauses ?? []);
   const [loading, setLoading] = useState(!stateFromNav.clauses);
 
   useEffect(() => {
-    // 이전 화면(약관 동의 페이지)에서 state로 넘겨받은 경우엔 그대로 사용
     if (stateFromNav.clauses) return;
 
     let mounted = true;
@@ -33,13 +26,11 @@ export default function PrivacyPage() {
 
         if (!mounted) return;
 
-        if (found?.clauses?.length) {
+        if (found?.clauses) {
           setClauses(found.clauses);
-        } else {
-          setContent(found?.content ?? '');
         }
       } catch (e) {
-        console.error(e);
+        console.error('개인정보처리방침 조회 실패:', e);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -48,8 +39,7 @@ export default function PrivacyPage() {
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [stateFromNav.clauses]);
 
   if (loading) {
     return <div className="p-4">불러오는 중...</div>;
@@ -57,15 +47,22 @@ export default function PrivacyPage() {
 
   return (
     <div className="min-h-screen">
-      <main className="pb-[110px] pt-[12px]">
+      <main className="pb-[80px] pt-[8px]">
+        {/* 상단 고정 메타 정보 */}
+        <div className="mb-[24px] space-y-[2px] text-[14px] font-medium leading-[150%] text-[#121212]">
+          <p>시행일: 2026년 09월 01일</p>
+          <p>서비스명: dear.e (디어리)</p>
+          <p>운영: 팀 dear.e (비영리 사이드 프로젝트)</p>
+        </div>
+
+        {/* 조항 목록 영역 */}
         {clauses.length > 0 ? (
-          <div className="space-y-[28px]">
+          <div className="space-y-[24px]">
             {clauses.map((clause) => (
               <section key={clause.clauseTitle}>
                 <h2 className="text-[16px] font-semibold leading-[150%] text-[#121212]">
                   {clause.clauseTitle}
                 </h2>
-
                 <p className="mt-[8px] whitespace-pre-line text-[14px] font-normal leading-[150%] text-[#737478]">
                   {clause.clauseContent}
                 </p>
@@ -73,9 +70,7 @@ export default function PrivacyPage() {
             ))}
           </div>
         ) : (
-          <p className="whitespace-pre-line text-[14px] font-normal leading-[150%] text-[#737478]">
-            {content}
-          </p>
+          <p className="p-4 text-[14px] text-[#737478]">등록된 약관 내용이 없습니다.</p>
         )}
       </main>
     </div>
