@@ -5,7 +5,7 @@ import { useOutletContext } from 'react-router-dom';
 import AddTypeTabs from '@/components/create/AddModeTabs';
 import ImageAddSection from '@/components/create/ImageAddSection';
 import TextAddSection from '@/components/create/TextAddSection';
-import LoadingSection from '@/components/create/loading/LoadingSection';
+import LoadingSection from '@/components/common/LoadingSection';
 import { BottomButton } from '@/components/common/BottomButton';
 
 import { postAnalyzeLetter, runOcr } from '@/api/create';
@@ -69,7 +69,7 @@ export default function LetterCreatePage() {
         },
       });
     } catch {
-      toast.show('편지 분석에 실패했어요. 다시 시도해주세요.');
+      toast.show('편지 분석에 실패했어요.\n다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }

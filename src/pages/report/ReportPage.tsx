@@ -1,21 +1,31 @@
 import ReportStatistics from '@/components/report/ReportStatistics';
 import ReportAnalysisCard from '@/components/report/ReportAnalysisCard';
+import LoadingSection from '@/components/common/LoadingSection';
+import ReportSkeleton from '@/components/skeleton/ReportSkeleton';
 
 import { useReport } from '@/hooks/queries/useReport';
+import { useReanalyzeReport } from '@/hooks/mutations/useReanalyzeReport';
+import { useMeQuery } from '@/hooks/queries/useMeQuery';
+
+import useDelayedLoading from '@/hooks/useDelayedLoading';
 
 export default function ReportPage() {
-  const { data: report, isLoading, isError } = useReport();
+  const {
+    data: report,
+    isLoading: isReportLoading,
+    isFetching: isReportFetching,
+    isError: isReportError,
+  } = useReport();
 
-  if (isLoading) {
-    // 이 부분 스켈레톤 넣어야됨
-    return (
-      <div className="flex flex-1 items-center justify-center py-10 text-[14px] text-[#A1A4AA]">
-        리포트를 불러오는 중...
-      </div>
-    );
-  }
+  const { data: me, isLoading: isMeLoading } = useMeQuery();
 
-  if (isError || !report) {
+  const reanalyzeMutation = useReanalyzeReport();
+
+  const isInitialReportLoading = isReportLoading && !report;
+
+  const showAnalysisLoading = useDelayedLoading(isInitialReportLoading, 500);
+
+  if (isReportError) {
     return (
       <div className="flex flex-1 items-center justify-center py-10 text-[14px] text-[#A1A4AA]">
         리포트를 불러오지 못했어요.
@@ -23,24 +33,52 @@ export default function ReportPage() {
     );
   }
 
-  const { nickname, profileImageUrl, totalLetterCount, fromRanking, analysis } = report;
+  // 재분석은 바로 로딩 화면
+  if (reanalyzeMutation.isPending) {
+    return (
+      <LoadingSection
+        title="편지를 분석 중이에요"
+        subtitle="분석에는 최대 1분 정도 소요될 수 있어요."
+      />
+    );
+  }
 
-  const handleReanalyze = () => {
-    console.log('재분석 요청');
-  };
+  // 최초 조회가 500ms 이상 걸릴 때 로딩 화면
+  if (showAnalysisLoading) {
+    return (
+      <LoadingSection
+        title="편지를 분석 중이에요"
+        subtitle="분석에는 최대 1분 정도 소요될 수 있어요."
+      />
+    );
+  }
+
+  // 최초 500ms + 기존 report refetch
+  if (isReportLoading || isReportFetching || isMeLoading || !report || !me) {
+    return (
+      <div className="flex w-full flex-col pb-6">
+        <ReportSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full flex-col pb-6">
-      <ReportStatistics totalLetterCount={totalLetterCount} ranking={fromRanking} />
-
-      <ReportAnalysisCard
-        nickname={nickname}
-        profileImageUrl={profileImageUrl}
-        totalLetterCount={totalLetterCount}
-        analysis={analysis}
-        isPending={isLoading}
-        onReanalyze={handleReanalyze}
+      <ReportStatistics
+        totalLetterCount={report.totalLetterCount}
+        ranking={report.fromRanking ?? []}
       />
+
+      {report.analysis && report.reanalyze && (
+        <ReportAnalysisCard
+          nickname={me.nickname}
+          profileImageUrl={me.profileImageUrl}
+          analysis={report.analysis}
+          reanalyze={report.reanalyze}
+          isPending={reanalyzeMutation.isPending}
+          onReanalyze={() => reanalyzeMutation.mutate()}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
+import { useNavigate } from 'react-router-dom';
+
 import { FromBadge } from '@/components/common/FromBadge';
 import type { ReportFromRanking } from '@/types/report';
-import { useNavigate } from 'react-router-dom';
 
 interface ReportStatisticsProps {
   totalLetterCount: number;
@@ -15,7 +16,7 @@ export default function ReportStatistics({ totalLetterCount, ranking }: ReportSt
     <section className="flex flex-col">
       <h2 className="pt-2 text-[13px] font-semibold text-[#A1A4AA]">나의 통계</h2>
 
-      <div className="mt-2 rounded-[10px] bg-white px-5 py-5">
+      <div className="mt-2 rounded-[10px] bg-white px-5 py-5 shadow-[0_0_4px_0_rgba(231,232,235,0.5)]">
         <p className="text-[16px] font-semibold leading-[24px] text-black">
           지금까지 <span className="text-[#FF5F2F]">{totalLetterCount}통</span>
           의
@@ -26,10 +27,10 @@ export default function ReportStatistics({ totalLetterCount, ranking }: ReportSt
 
       {hasLetters ? (
         ranking.length > 0 && (
-          <div className="mt-2 flex flex-col rounded-[10px] bg-white px-5 py-2">
+          <div className="mt-2 flex flex-col rounded-[10px] bg-white px-5 py-2 shadow-[0_0_4px_0_rgba(231,232,235,0.5)]">
             {ranking.slice(0, 3).map((from, index) => (
               <div
-                key={from.fromId}
+                key={from.rank}
                 className={[
                   'flex items-center justify-between py-3',
                   index !== Math.min(ranking.length, 3) - 1 ? 'border-b border-[#EBEDF0]' : '',
@@ -39,10 +40,10 @@ export default function ReportStatistics({ totalLetterCount, ranking }: ReportSt
                   <span
                     className={[
                       'text-[16px] font-semibold',
-                      index === 0 ? 'text-[#FF5F2F]' : 'text-primary',
+                      from.rank === 1 ? 'text-[#FF5F2F]' : 'text-primary',
                     ].join(' ')}
                   >
-                    {index + 1}
+                    {from.rank}
                   </span>
 
                   <FromBadge
@@ -53,13 +54,13 @@ export default function ReportStatistics({ totalLetterCount, ranking }: ReportSt
                   />
                 </div>
 
-                <span className="text-[16px] font-medium text-[#A1A4AA]">{from.letterCount}통</span>
+                <span className="text-[16px] font-medium text-[#A1A4AA]">{from.count}통</span>
               </div>
             ))}
           </div>
         )
       ) : (
-        <div className="mt-2 flex flex-col items-center rounded-[10px] bg-white px-5 py-5">
+        <div className="mt-2 flex flex-col items-center rounded-[10px] bg-white px-5 py-5 shadow-[0_0_4px_0_rgba(231,232,235,0.5)]">
           <p className="text-[14px] font-medium text-[#A1A4AA]">추가된 편지가 없어요</p>
 
           <button

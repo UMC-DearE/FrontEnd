@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import useObjectUrl from '@/hooks/useObjectUrl';
+import { X } from 'lucide-react';
 
 type ImageSource = File | string;
 
@@ -101,10 +102,15 @@ export function ImageViewer({
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="relative w-full max-w-[440px] h-full bg-black flex items-center justify-center"
-        onClick={onClose}
-      >
+      <div className="relative w-full max-w-[440px] h-full bg-black flex items-center justify-center">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-2 top-[calc(env(safe-area-inset-top,0px)+16px)] z-10 flex h-9 w-9 items-center justify-center text-white"
+          aria-label="이미지 뷰어 닫기"
+        >
+          <X size={28} strokeWidth={1.8} />
+        </button>
         <div
           className="relative w-full flex items-center justify-center overflow-hidden"
           onClick={(e) => e.stopPropagation()}

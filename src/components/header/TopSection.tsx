@@ -15,9 +15,11 @@ export default function TopSection({
       }}
     >
       <div className="h-[78px] px-4 flex items-end pb-[20px]">
-        <div className="w-1/4 min-w-0 flex items-center">{left}</div>
-        <div className="w-2/4 min-w-0 flex justify-center items-center">{center}</div>
-        <div className="w-1/4 min-w-0 flex justify-end items-center">{right}</div>
+        <div className="flex h-9 w-1/4 min-w-0 items-center">{left}</div>
+
+        <div className="flex h-9 w-2/4 min-w-0 items-center justify-center">{center}</div>
+
+        <div className="flex h-9 w-1/4 min-w-0 items-center justify-end">{right}</div>
       </div>
     </header>
   );
