@@ -7,17 +7,23 @@ import { useReport } from '@/hooks/queries/useReport';
 import { useReanalyzeReport } from '@/hooks/mutations/useReanalyzeReport';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
 
-import ProfileDefault from '@/assets/homePage/profile-default.svg';
 import useDelayedLoading from '@/hooks/useDelayedLoading';
 
 export default function ReportPage() {
-  const { data: report, isLoading: isReportLoading, isError: isReportError } = useReport();
+  const {
+    data: report,
+    isLoading: isReportLoading,
+    isFetching: isReportFetching,
+    isError: isReportError,
+  } = useReport();
 
   const { data: me, isLoading: isMeLoading } = useMeQuery();
 
   const reanalyzeMutation = useReanalyzeReport();
 
-  const showAnalysisLoading = useDelayedLoading(isReportLoading, 500);
+  const isInitialReportLoading = isReportLoading && !report;
+
+  const showAnalysisLoading = useDelayedLoading(isInitialReportLoading, 500);
 
   if (isReportError) {
     return (
@@ -27,7 +33,7 @@ export default function ReportPage() {
     );
   }
 
-  // 재분석 버튼 클릭 - 즉시 로딩 화면
+  // 재분석은 바로 로딩 화면
   if (reanalyzeMutation.isPending) {
     return (
       <LoadingSection
@@ -37,7 +43,7 @@ export default function ReportPage() {
     );
   }
 
-  // 최초 조회 오래 걸림(500ms 이상 걸리면) - 실제 AI 분석 중이라고 보고 로딩 화면
+  // 최초 조회가 500ms 이상 걸릴 때 로딩 화면
   if (showAnalysisLoading) {
     return (
       <LoadingSection
@@ -47,8 +53,8 @@ export default function ReportPage() {
     );
   }
 
-  // 일반적인 짧은 조회 - 스켈레톤
-  if (isReportLoading || isMeLoading || !report || !me) {
+  // 최초 500ms + 기존 report refetch
+  if (isReportLoading || isReportFetching || isMeLoading || !report || !me) {
     return (
       <div className="flex w-full flex-col pb-6">
         <ReportSkeleton />
@@ -66,7 +72,7 @@ export default function ReportPage() {
       {report.analysis && report.reanalyze && (
         <ReportAnalysisCard
           nickname={me.nickname}
-          profileImageUrl={me.profileImageUrl ?? ProfileDefault}
+          profileImageUrl={me.profileImageUrl}
           analysis={report.analysis}
           reanalyze={report.reanalyze}
           isPending={reanalyzeMutation.isPending}

@@ -47,10 +47,6 @@ export default function ReportAnalysisSkeleton() {
               <div className="h-7 w-[90px] animate-pulse rounded-[6px] bg-[#E7E8EB]" />
             </div>
           </div>
-
-          <p className="mt-4 text-center text-[12px] font-medium text-[#A1A4AA]">
-            나의 캐릭터를 분석하고 있어요
-          </p>
         </div>
       </section>
     </div>

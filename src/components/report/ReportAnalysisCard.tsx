@@ -3,6 +3,8 @@ import type { ReportAnalysis, ReportReanalyze } from '@/types/report';
 import ReanalysisSection from './ReanalysisSection';
 import ReportHashtags from './ReportHashtags';
 
+import ProfileDefault from '@/assets/report/profile-white.svg';
+
 interface ReportAnalysisCardProps {
   nickname: string;
   profileImageUrl: string | null;
@@ -47,10 +49,12 @@ export default function ReportAnalysisCard({
               TO. {nickname}
             </p>
 
-            <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full border-[1.2px] border-[#E7E8EB]">
-              {profileImageUrl && (
-                <img src={profileImageUrl} alt="프로필" className="h-full w-full object-cover" />
-              )}
+            <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full border-[1.2px] border-[#E7E8EB] bg-white">
+              <img
+                src={profileImageUrl || ProfileDefault}
+                alt="프로필"
+                className="h-full w-full object-cover"
+              />
             </div>
           </div>
 
