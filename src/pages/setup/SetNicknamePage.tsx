@@ -6,6 +6,7 @@ import { BottomButton } from '@/components/common/BottomButton';
 import { postSignup } from '@/api/authSignup';
 import { useAuthStore } from '@/stores/authStore';
 import { clearPendingInviteCode, readPendingInviteCode } from '@/utils/inviteCode';
+import { trackSignUp } from '@/utils/ga';
 
 const NICKNAME_REGEX = /^[A-Za-z0-9가-힣ㄱ-ㅎㅏ-ㅣ ]+$/;
 
@@ -70,6 +71,8 @@ const SetNamePage = () => {
       // 초대 링크를 타고 들어와 가입한 경우 홈에서 환영 시트를 띄움
       const invitedSignup = !!readPendingInviteCode();
       clearPendingInviteCode();
+
+      trackSignUp(invitedSignup ? 'invite' : 'organic');
 
       navigate('/', { replace: true, state: invitedSignup ? { invitedSignup: true } : null });
     } catch (e) {

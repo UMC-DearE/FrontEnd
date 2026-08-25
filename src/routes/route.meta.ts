@@ -170,4 +170,16 @@ export const ROUTE_META: Array<{
     header: 'MY_STYLE',
     bg: 'gray',
   },
+  {
+    match: (pathname) => pathname === '/my/service',
+    header: 'BACK_TITLE',
+    title: '서비스 이용 약관',
+    bg: 'gray',
+  },
+  {
+    match: (pathname) => pathname === '/my/privacy',
+    header: 'BACK_TITLE',
+    title: '개인정보처리방침',
+    bg: 'gray',
+  },
 ];
