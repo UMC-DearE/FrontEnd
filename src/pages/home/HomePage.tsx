@@ -22,6 +22,7 @@ import { useLetterLists } from '@/hooks/queries/useLetterList';
 import { usePinLetter } from '@/hooks/mutations/usePinLetter';
 import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
 import useToast from '@/hooks/useToast';
+import { getErrorCode, PLUS_REQUIRED } from '@/api/errorCode';
 import closeIcon from '@/assets/homePage/closeIcon.svg';
 import PwaRecommendSheet from '@/components/pwa/PwaRecommendSheet';
 import { useInviteLinkCopy } from '@/hooks/useInviteLinkCopy';
@@ -118,7 +119,7 @@ export default function HomePage() {
   const copyInviteLink = useInviteLinkCopy(showInviteSheet);
 
   // 잠금 해제 여부
-  const { data: membership } = useMyMembership();
+  const { data: membership, refetch: refetchMembership } = useMyMembership();
   const isUnlocked = !!membership?.isPlus;
 
   // 초대 링크로 가입 완료 -> 환영 시트 노출
@@ -342,7 +343,14 @@ export default function HomePage() {
         })),
       });
     } catch (e) {
+      // 캐시된 멤버십이 서버와 어긋난 경우 (다른 기기에서 변경 등)
+      if (getErrorCode(e) === PLUS_REQUIRED) {
+        await refetchMembership();
+        setShowInviteSheet(true);
+        return;
+      }
       console.error(e);
+      toast.show('홈 화면 저장에 실패했어요. 잠시 후 다시 시도해 주세요.');
     }
   };
 

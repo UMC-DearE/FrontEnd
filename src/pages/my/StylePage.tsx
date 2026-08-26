@@ -8,6 +8,8 @@ import { FONT_OPTIONS } from '@/utils/fontOptions';
 import { useStyleStore } from '@/stores/styleStores';
 import { BottomButton } from '@/components/common/BottomButton';
 import { patchMyFont, serverFontToClient } from '@/api/theme';
+import { getErrorCode, PLUS_REQUIRED } from '@/api/errorCode';
+import useToast from '@/hooks/useToast';
 import FriendInviteSheet from '@/components/common/FriendInviteSheet';
 import InviteUnlockSheet from '@/components/common/InviteUnlockSheet';
 import { useMyMembership } from '@/hooks/queries/useMyMembership';
@@ -17,8 +19,10 @@ import { useInviteLinkCopy } from '@/hooks/useInviteLinkCopy';
 export default function StylePage() {
   const navigate = useNavigate();
 
+  const toast = useToast();
+
   // 잠금 해제 여부 (초대 성공 시 서버가 isPlus를 켜 줌)
-  const { data: membership } = useMyMembership();
+  const { data: membership, refetch: refetchMembership } = useMyMembership();
   const isUnlocked = !!membership?.isPlus;
 
   const [showInviteSheet, setShowInviteSheet] = useState(false);
@@ -65,10 +69,21 @@ export default function StylePage() {
       return;
     }
 
-    const res = await patchMyFont(pendingFont);
-    setFont(serverFontToClient(res.font));
-    navigate(-1);
-  }, [pendingFont, font, isUnlocked, setFont, navigate]);
+    try {
+      const res = await patchMyFont(pendingFont);
+      setFont(serverFontToClient(res.font));
+      navigate(-1);
+    } catch (e) {
+      // 캐시된 멤버십이 서버와 어긋난 경우 (다른 기기에서 변경 등)
+      if (getErrorCode(e) === PLUS_REQUIRED) {
+        await refetchMembership();
+        setShowInviteSheet(true);
+        return;
+      }
+      console.error(e);
+      toast.show('폰트 변경에 실패했어요. 잠시 후 다시 시도해 주세요.');
+    }
+  }, [pendingFont, font, isUnlocked, setFont, navigate, refetchMembership, toast]);
 
   useEffect(() => {
     if (!setFixedAction) return;
