@@ -1,4 +1,5 @@
 import type { CommonResponse } from './common';
+import type { Letter } from './letter';
 
 export type Folder = {
   id: number;
@@ -31,3 +32,33 @@ export type UpdateFolderRequest = {
 };
 
 export type FolderLetterResponse = CommonResponse<Record<string, never>>;
+
+export type AvailableLettersParams = {
+  page?: number;
+  size?: number;
+  sort?: string;
+  fromId?: number;
+  isLiked?: boolean;
+  keyword?: string;
+};
+
+export type AvailableLettersResult = {
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  content: Letter[];
+};
+
+export type AvailableLettersResponse = CommonResponse<AvailableLettersResult>;
+
+export type AddLettersToFolderRequest = {
+  letterIds: number[];
+};
+
+export type AddLettersToFolderResult = {
+  folderId: number;
+  processedCount: number;
+};
+
+export type AddLettersToFolderResponse = CommonResponse<AddLettersToFolderResult>;
