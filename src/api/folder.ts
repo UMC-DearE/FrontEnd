@@ -4,6 +4,11 @@ import type {
   FolderListResponse,
   FolderLetterResponse,
   UpdateFolderRequest,
+  AvailableLettersParams,
+  AvailableLettersResult,
+  AvailableLettersResponse,
+  AddLettersToFolderResult,
+  AddLettersToFolderResponse,
 } from '@/types/folder';
 import { normalizeImageUrl } from '@/api/upload';
 
@@ -53,4 +58,24 @@ export async function removeLetterFromFolder(
 ): Promise<FolderLetterResponse> {
   const res = await api.delete<FolderLetterResponse>(`/folders/${folderId}/letters/${letterId}`);
   return res.data;
+}
+
+export async function getAvailableLetters(
+  folderId: number,
+  params: AvailableLettersParams
+): Promise<AvailableLettersResult> {
+  const res = await api.get<AvailableLettersResponse>(`/folders/${folderId}/letters/available`, {
+    params,
+  });
+  return res.data.data;
+}
+
+export async function addLettersToFolder(
+  folderId: number,
+  letterIds: number[]
+): Promise<AddLettersToFolderResult> {
+  const res = await api.post<AddLettersToFolderResponse>(`/folders/${folderId}/letters`, {
+    letterIds,
+  });
+  return res.data.data;
 }
