@@ -11,6 +11,7 @@ import ProfileCustomSheet from '@/components/home/ProfileCustomSheet';
 import CustomResetSheet from '@/components/home/CustomResetSheet';
 import FriendInviteSheet from '@/components/common/FriendInviteSheet';
 import InviteWelcomeSheet from '@/components/common/InviteWelcomeSheet';
+import InviteUnlockSheet from '@/components/common/InviteUnlockSheet';
 import CustomizingHeader from '@/components/header/CustomizingHeader';
 import StickerLayer, { type StickerItem } from '@/components/home/StickerLayer';
 import { uploadImage } from '@/api/upload';
@@ -21,10 +22,12 @@ import { useLetterLists } from '@/hooks/queries/useLetterList';
 import { usePinLetter } from '@/hooks/mutations/usePinLetter';
 import { useUnpinLetter } from '@/hooks/mutations/useUnpinLetter';
 import useToast from '@/hooks/useToast';
+import { getErrorCode, PLUS_REQUIRED } from '@/api/errorCode';
 import closeIcon from '@/assets/homePage/closeIcon.svg';
 import PwaRecommendSheet from '@/components/pwa/PwaRecommendSheet';
 import { useInviteLinkCopy } from '@/hooks/useInviteLinkCopy';
 import { useMyMembership } from '@/hooks/queries/useMyMembership';
+import { useCompleteInviteGuide } from '@/hooks/mutations/useCompleteInviteGuide';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -116,14 +119,36 @@ export default function HomePage() {
   const copyInviteLink = useInviteLinkCopy(showInviteSheet);
 
   // 잠금 해제 여부
-  const { data: membership } = useMyMembership();
+  const { data: membership, refetch: refetchMembership } = useMyMembership();
   const isUnlocked = !!membership?.isPlus;
 
   // 초대 링크로 가입 완료 -> 환영 시트 노출
   const location = useLocation();
-  const [showInviteWelcome, setShowInviteWelcome] = useState(
+  const [invitedSignup] = useState(
     () => !!(location.state as { invitedSignup?: boolean } | null)?.invitedSignup
   );
+
+  // 세션 내 재노출 방지 (서버 완료 처리 실패 시에도 다시 뜨지 않도록)
+  const [inviteGuideDismissed, setInviteGuideDismissed] = useState(false);
+  const [inviterGuideOpen, setInviterGuideOpen] = useState(false);
+  const inviteGuideConsumed = useRef(false);
+  const completeInviteGuideMutation = useCompleteInviteGuide();
+
+  // 초대받은 신규 가입자: 홈 진입 즉시 환영 시트
+  const showInviteWelcome =
+    !inviteGuideDismissed && (invitedSignup || !!home?.setting.showDecorationUnlockGuide);
+
+  // 초대한 기존 가입자: 홈 꾸미기 진입 시 해제 안내 시트
+  const showInviterUnlock = !inviteGuideDismissed && inviterGuideOpen;
+
+  const closeInviteGuide = () => {
+    if (!inviteGuideConsumed.current) {
+      inviteGuideConsumed.current = true;
+      completeInviteGuideMutation.mutate();
+    }
+    setInviterGuideOpen(false);
+    setInviteGuideDismissed(true);
+  };
 
   useEffect(() => {
     if (!showInviteWelcome) return;
@@ -238,6 +263,10 @@ export default function HomePage() {
     setSelectedId(null);
     setOpenSheet(true);
     setPickerOpen(false);
+
+    if (membership?.showDecorationUnlockGuide) {
+      setInviterGuideOpen(true);
+    }
   };
 
   const handleRequestClose = () => setConfirmCloseOpen(true);
@@ -314,7 +343,14 @@ export default function HomePage() {
         })),
       });
     } catch (e) {
+      // 캐시된 멤버십이 서버와 어긋난 경우 (다른 기기에서 변경 등)
+      if (getErrorCode(e) === PLUS_REQUIRED) {
+        await refetchMembership();
+        setShowInviteSheet(true);
+        return;
+      }
       console.error(e);
+      toast.show('홈 화면 저장에 실패했어요. 잠시 후 다시 시도해 주세요.');
     }
   };
 
@@ -534,12 +570,13 @@ export default function HomePage() {
       />
       <InviteWelcomeSheet
         open={showInviteWelcome}
-        onClose={() => setShowInviteWelcome(false)}
+        onClose={closeInviteGuide}
         onGoCustomize={() => {
-          setShowInviteWelcome(false);
+          closeInviteGuide();
           openEditor();
         }}
       />
+      <InviteUnlockSheet open={showInviterUnlock} onClose={closeInviteGuide} />
       <LetterCard
         letter={letter}
         isPinned={letter?.id === pinnedLetterId}
@@ -570,7 +607,9 @@ export default function HomePage() {
           <AddLetterButton />
         </div>
       )}
-      {showPwaSheet && <PwaRecommendSheet onClose={handleClosePwaSheet} />}
+      {showPwaSheet && !showInviteWelcome && !showInviterUnlock && !openSheet && (
+        <PwaRecommendSheet onClose={handleClosePwaSheet} />
+      )}
     </div>
   );
 }

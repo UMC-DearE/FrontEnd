@@ -11,6 +11,7 @@ export type HomeUserDto = {
 
 export type HomeSettingDto = {
   homeColor: string;
+  showDecorationUnlockGuide?: boolean;
 };
 
 export type HomeStickerDto = {
@@ -69,4 +70,8 @@ type UpdateHomeResponse = ApiResponse<null>;
 
 export async function updateHome(body: UpdateHomeRequest) {
   await api.put<UpdateHomeResponse>('/home', body);
+}
+
+export async function completeInviteGuide() {
+  await api.patch<ApiResponse<null>>('/home/invite-guide');
 }

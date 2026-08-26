@@ -12,6 +12,7 @@ export type MembershipPlan = 'FREE' | 'PLUS';
 export type MembershipStatusData = {
   membershipPlan: MembershipPlan;
   isPlus: boolean;
+  showDecorationUnlockGuide?: boolean;
 };
 
 export type MembershipPayData = {
