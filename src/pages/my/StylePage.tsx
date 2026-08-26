@@ -1,6 +1,6 @@
 // 마이페이지-스타일 수정 페이지
 
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { FontRow } from '@/components/my/FontRow';
@@ -9,7 +9,9 @@ import { useStyleStore } from '@/stores/styleStores';
 import { BottomButton } from '@/components/common/BottomButton';
 import { patchMyFont, serverFontToClient } from '@/api/theme';
 import FriendInviteSheet from '@/components/common/FriendInviteSheet';
+import InviteUnlockSheet from '@/components/common/InviteUnlockSheet';
 import { useMyMembership } from '@/hooks/queries/useMyMembership';
+import { useCompleteInviteGuide } from '@/hooks/mutations/useCompleteInviteGuide';
 import { useInviteLinkCopy } from '@/hooks/useInviteLinkCopy';
 
 export default function StylePage() {
@@ -21,6 +23,20 @@ export default function StylePage() {
 
   const [showInviteSheet, setShowInviteSheet] = useState(false);
   const copyInviteLink = useInviteLinkCopy(showInviteSheet);
+
+  // 초대한 기존 가입자: 폰트 변경 화면 최초 진입 시 1회 노출
+  const [inviteGuideDismissed, setInviteGuideDismissed] = useState(false);
+  const inviteGuideConsumed = useRef(false);
+  const completeInviteGuideMutation = useCompleteInviteGuide();
+  const showInviterUnlock = !inviteGuideDismissed && !!membership?.showDecorationUnlockGuide;
+
+  const closeInviteGuide = () => {
+    if (!inviteGuideConsumed.current) {
+      inviteGuideConsumed.current = true;
+      completeInviteGuideMutation.mutate();
+    }
+    setInviteGuideDismissed(true);
+  };
 
   const font = useStyleStore((s) => s.font);
   const setFont = useStyleStore((s) => s.setFont);
@@ -123,6 +139,8 @@ export default function StylePage() {
           setShowInviteSheet(false);
         }}
       />
+
+      <InviteUnlockSheet open={showInviterUnlock} onClose={closeInviteGuide} />
     </div>
   );
 }
