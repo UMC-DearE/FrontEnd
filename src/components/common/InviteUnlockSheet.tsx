@@ -1,3 +1,5 @@
+// 초대한 유저 꾸미기 기능 해제 안내 바텀 시트
+
 import BottomSheet from './BottomSheet';
 import Firecracker from '@/assets/bottomSheet/firecracker.svg';
 
