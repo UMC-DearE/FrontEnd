@@ -599,7 +599,9 @@ export default function HomePage() {
           <AddLetterButton />
         </div>
       )}
-      {showPwaSheet && <PwaRecommendSheet onClose={handleClosePwaSheet} />}
+      {showPwaSheet && !showInviteWelcome && !showInviterUnlock && !openSheet && (
+        <PwaRecommendSheet onClose={handleClosePwaSheet} />
+      )}
     </div>
   );
 }
