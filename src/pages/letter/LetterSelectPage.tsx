@@ -5,10 +5,17 @@ import ToolBar from '@/components/letterBox/ToolBar';
 import LetterCard from '@/components/letterBox/letterCard/LetterCard';
 import LetterCardSkeleton from '@/components/skeleton/LetterCardSkeleton';
 import { getFromList } from '@/api/from';
-import { getLetterLists } from '@/api/letter';
-import { addLetterToFolder } from '@/api/folder';
+import {
+  getErrorCode,
+  FOLDER_FORBIDDEN,
+  FOLDER_NOT_FOUND,
+  LETTER_FORBIDDEN,
+  LETTER_NOT_FOUND,
+} from '@/api/errorCode';
+import useToast from '@/hooks/useToast';
+import { useAvailableLetters } from '@/hooks/queries/useAvailableLetters';
+import { useAddLettersToFolder } from '@/hooks/mutations/useAddLettersToFolder';
 import type { From } from '@/types/from';
-import type { Letter } from '@/types/letter';
 
 type LayoutContext = {
   setFixedAction: (payload: { node: React.ReactNode; bgColor?: string } | null) => void;
@@ -20,16 +27,29 @@ export default function LetterSelectPage() {
   const { setFixedAction } = useOutletContext<LayoutContext>();
   const navigate = useNavigate();
   const location = useLocation();
+  const toast = useToast();
   const folderId = (location.state as LocationState)?.folderId;
 
   const [froms, setFroms] = useState<From[]>([]);
   const [selectedFromId, setSelectedFromId] = useState<number | 'all'>('all');
 
-  const [allLetters, setAllLetters] = useState<Letter[]>([]);
-  const [allCount, setAllCount] = useState(0);
-  const [isLettersLoading, setIsLettersLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    data,
+    isLoading: isLettersLoading,
+    refetch,
+  } = useAvailableLetters({
+    page: 0,
+    size: 9999,
+    sort: 'receivedAt,desc',
+  });
+
+  const addLettersMutation = useAddLettersToFolder(folderId);
+  const isSubmitting = addLettersMutation.isPending;
+
+  const allLetters = useMemo(() => data?.content ?? [], [data]);
+  const allCount = data?.totalElements ?? 0;
 
   const toggleSelected = (id: number) => {
     setSelectedIds((prev) => {
@@ -54,40 +74,6 @@ export default function LetterSelectPage() {
     void run();
   }, []);
 
-  useEffect(() => {
-    let alive = true;
-
-    const run = async () => {
-      setIsLettersLoading(true);
-      try {
-        const res = await getLetterLists({
-          page: 0,
-          size: 9999,
-          sort: 'receivedAt,desc',
-        });
-
-        if (!alive) return;
-
-        const unfolderedLetters = (res.data.content ?? []).filter((l) => l.folderId == null);
-        setAllLetters(unfolderedLetters);
-        setAllCount(unfolderedLetters.length);
-      } catch (e) {
-        if (!alive) return;
-        setAllLetters([]);
-        setAllCount(0);
-        console.error(e);
-      } finally {
-        if (alive) setIsLettersLoading(false);
-      }
-    };
-
-    void run();
-
-    return () => {
-      alive = false;
-    };
-  }, []);
-
   const fromCounts = useMemo(() => {
     const counts: Record<number, number> = {};
     for (const l of allLetters) {
@@ -102,19 +88,32 @@ export default function LetterSelectPage() {
     return allLetters.filter((l) => l.from.fromId === selectedFromId);
   }, [allLetters, selectedFromId]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (folderId == null || selectedIds.size === 0 || isSubmitting) return;
 
-    setIsSubmitting(true);
-    try {
-      await Promise.all(
-        Array.from(selectedIds).map((letterId) => addLetterToFolder(folderId, letterId))
-      );
-      navigate('/letter', { state: { selectedFolderId: folderId } });
-    } catch (e) {
-      console.error('addLetterToFolder failed', e);
-      setIsSubmitting(false);
-    }
+    addLettersMutation.mutate(Array.from(selectedIds), {
+      onSuccess: () => {
+        navigate('/letter', { state: { selectedFolderId: folderId } });
+      },
+      onError: (e) => {
+        const code = getErrorCode(e);
+
+        if (code === FOLDER_FORBIDDEN || code === FOLDER_NOT_FOUND) {
+          toast.show('폴더를 찾을 수 없어요.');
+          navigate('/letter');
+          return;
+        }
+
+        if (code === LETTER_FORBIDDEN || code === LETTER_NOT_FOUND) {
+          toast.show('편지 목록이 변경되었어요. 다시 선택해 주세요.');
+          setSelectedIds(new Set());
+          void refetch();
+          return;
+        }
+
+        toast.show('폴더에 추가하지 못했어요.');
+      },
+    });
   };
 
   useEffect(() => {
