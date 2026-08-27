@@ -5,11 +5,10 @@ import { getAvailableLetters } from '@/api/folder';
 import type { AvailableLettersParams } from '@/types/folder';
 import { folderKeys } from './folderKeys';
 
-export function useAvailableLetters(folderId: number | undefined, params: AvailableLettersParams) {
+export function useAvailableLetters(params: AvailableLettersParams) {
   return useQuery({
-    queryKey: folderKeys.available(folderId ?? -1, params),
-    queryFn: () => getAvailableLetters(folderId as number, params),
-    enabled: folderId != null,
+    queryKey: folderKeys.available(params),
+    queryFn: () => getAvailableLetters(params),
     placeholderData: keepPreviousData,
     staleTime: 30_000,
   });

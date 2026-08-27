@@ -61,10 +61,9 @@ export async function removeLetterFromFolder(
 }
 
 export async function getAvailableLetters(
-  folderId: number,
   params: AvailableLettersParams
 ): Promise<AvailableLettersResult> {
-  const res = await api.get<AvailableLettersResponse>(`/folders/${folderId}/letters/available`, {
+  const res = await api.get<AvailableLettersResponse>(`/folders/letters/unassigned`, {
     params,
   });
   return res.data.data;

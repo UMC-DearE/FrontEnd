@@ -42,12 +42,14 @@ export type AvailableLettersParams = {
   keyword?: string;
 };
 
+export type AvailableLetter = Omit<Letter, 'folderId'>;
+
 export type AvailableLettersResult = {
   totalElements: number;
   totalPages: number;
   size: number;
   number: number;
-  content: Letter[];
+  content: AvailableLetter[];
 };
 
 export type AvailableLettersResponse = CommonResponse<AvailableLettersResult>;

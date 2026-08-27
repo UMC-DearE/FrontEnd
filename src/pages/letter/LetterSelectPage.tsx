@@ -39,7 +39,7 @@ export default function LetterSelectPage() {
     data,
     isLoading: isLettersLoading,
     refetch,
-  } = useAvailableLetters(folderId, {
+  } = useAvailableLetters({
     page: 0,
     size: 9999,
     sort: 'receivedAt,desc',
