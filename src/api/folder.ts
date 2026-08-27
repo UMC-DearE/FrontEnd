@@ -3,10 +3,12 @@ import type {
   Folder,
   FolderListResponse,
   FolderLetterResponse,
+  CreateFolderRequest,
   UpdateFolderRequest,
   AvailableLettersParams,
   AvailableLettersResult,
   AvailableLettersResponse,
+  AddLettersToFolderRequest,
   AddLettersToFolderResult,
   AddLettersToFolderResponse,
 } from '@/types/folder';
@@ -23,7 +25,8 @@ export async function getFolderList(): Promise<Folder[]> {
 }
 
 export async function createFolder(folder_name: string, imageId: number | null): Promise<Folder> {
-  const res = await api.post<{ data: Folder }>('/folders', { folder_name, imageId });
+  const body: CreateFolderRequest = { folder_name, imageId };
+  const res = await api.post<{ data: Folder }>('/folders', body);
   const folder = res.data.data;
 
   return {
@@ -73,8 +76,7 @@ export async function addLettersToFolder(
   folderId: number,
   letterIds: number[]
 ): Promise<AddLettersToFolderResult> {
-  const res = await api.post<AddLettersToFolderResponse>(`/folders/${folderId}/letters`, {
-    letterIds,
-  });
+  const body: AddLettersToFolderRequest = { letterIds };
+  const res = await api.post<AddLettersToFolderResponse>(`/folders/${folderId}/letters`, body);
   return res.data.data;
 }

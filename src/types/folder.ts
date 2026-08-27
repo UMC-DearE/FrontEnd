@@ -19,7 +19,7 @@ export type FolderListResponse = {
 };
 
 export type CreateFolderRequest = {
-  name: string;
+  folder_name: string;
   imageId: number | null;
 };
 
