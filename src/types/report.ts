@@ -1,39 +1,44 @@
 import type { CommonResponse } from './common';
-import type { From } from './from';
 
-export interface ReportFromRanking extends Pick<From, 'fromId' | 'name' | 'bgColor' | 'fontColor'> {
-  letterCount: number;
+export type ReportAnalysisStatus = 'NO_LETTER' | 'NOT_ENOUGH_LETTER' | 'AVAILABLE';
+
+export interface ReportFromRanking {
+  rank: number;
+  name: string;
+  count: number;
+  bgColor: string;
+  fontColor: string;
 }
 
 export interface ReportAnalysis {
-  description: string;
+  status: ReportAnalysisStatus;
+  title: string | null;
+  profileImageUrl: string | null;
+  description: string | null;
   hashtags: string[];
-  analyzedAt: string;
+  analyzedAt: string | null;
+}
 
-  // 마지막 분석 이후 새로 받은 편지 수
-  newLetterCount: number;
-
-  // 분석에 필요한 최소 편지 수
-  requiredLetterCount: number;
-
-  // 현재 재분석 버튼 활성화 여부
-  canReanalyze: boolean;
+export interface ReportReanalyze {
+  enabled: boolean;
+  reason: string | null;
+  message: string | null;
 }
 
 export interface ReportData {
-  nickname: string;
-  profileImageUrl: string | null;
   totalLetterCount: number;
   fromRanking: ReportFromRanking[];
-  analysis: ReportAnalysis | null;
+  analysis: ReportAnalysis;
+  reanalyze: ReportReanalyze;
 }
 
 export type ReportResponse = CommonResponse<ReportData>;
 
-export interface ReanalyzeReportResponseData {
+export interface ReanalyzeReportData {
+  title: string;
   description: string;
   hashtags: string[];
   analyzedAt: string;
 }
 
-export type ReanalyzeReportResponse = CommonResponse<ReanalyzeReportResponseData>;
+export type ReanalyzeReportResponse = CommonResponse<ReanalyzeReportData>;

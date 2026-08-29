@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import LetterForm from '@/components/common/LetterForm';
 import EditLetterHeader from '@/components/header/EditLetterHeader';
 import EditLetterSkeleton from '@/components/skeleton/EditLetterSkeleton';
-import LoadingSection from '@/components/create/loading/LoadingSection';
+import LoadingSection from '@/components/common/LoadingSection';
 import { getLetterDetail } from '@/api/letter';
 import type { LetterDetailData } from '@/types/letter';
 import type { CreateFrom } from '@/types/from';
@@ -155,7 +155,7 @@ export default function EditLetterPage() {
         }}
       >
         {showSubmittingLoading ? (
-          <LoadingSection className="pt-25" title="편지를 수정하고 있어요" subtitle="editing" />
+          <LoadingSection />
         ) : (
           <LetterForm
             mode="edit"

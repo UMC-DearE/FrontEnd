@@ -3,7 +3,14 @@ import type {
   Folder,
   FolderListResponse,
   FolderLetterResponse,
+  CreateFolderRequest,
   UpdateFolderRequest,
+  AvailableLettersParams,
+  AvailableLettersResult,
+  AvailableLettersResponse,
+  AddLettersToFolderRequest,
+  AddLettersToFolderResult,
+  AddLettersToFolderResponse,
 } from '@/types/folder';
 import { normalizeImageUrl } from '@/api/upload';
 
@@ -18,7 +25,8 @@ export async function getFolderList(): Promise<Folder[]> {
 }
 
 export async function createFolder(folder_name: string, imageId: number | null): Promise<Folder> {
-  const res = await api.post<{ data: Folder }>('/folders', { folder_name, imageId });
+  const body: CreateFolderRequest = { folder_name, imageId };
+  const res = await api.post<{ data: Folder }>('/folders', body);
   const folder = res.data.data;
 
   return {
@@ -53,4 +61,22 @@ export async function removeLetterFromFolder(
 ): Promise<FolderLetterResponse> {
   const res = await api.delete<FolderLetterResponse>(`/folders/${folderId}/letters/${letterId}`);
   return res.data;
+}
+
+export async function getAvailableLetters(
+  params: AvailableLettersParams
+): Promise<AvailableLettersResult> {
+  const res = await api.get<AvailableLettersResponse>(`/folders/letters/unassigned`, {
+    params,
+  });
+  return res.data.data;
+}
+
+export async function addLettersToFolder(
+  folderId: number,
+  letterIds: number[]
+): Promise<AddLettersToFolderResult> {
+  const body: AddLettersToFolderRequest = { letterIds };
+  const res = await api.post<AddLettersToFolderResponse>(`/folders/${folderId}/letters`, body);
+  return res.data.data;
 }

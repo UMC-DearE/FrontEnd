@@ -151,7 +151,7 @@ export default function TermsPage() {
         ))}
       </div>
 
-      <div className="fixed bottom-0 left-1/2 w-full max-w-[393px] -translate-x-1/2 bg-white px-4 pb-[52px] pt-3">
+      <div className="fixed bottom-0 left-1/2 w-full max-w-[440px] -translate-x-1/2 bg-white px-4 pb-[52px] pt-3">
         <BottomButton disabled={!canProceed} onClick={onNext}>
           다음
         </BottomButton>
