@@ -7,8 +7,6 @@ import { useReport } from '@/hooks/queries/useReport';
 import { useReanalyzeReport } from '@/hooks/mutations/useReanalyzeReport';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
 
-import useDelayedLoading from '@/hooks/useDelayedLoading';
-
 export default function ReportPage() {
   const {
     data: report,
@@ -20,10 +18,6 @@ export default function ReportPage() {
   const { data: me, isLoading: isMeLoading } = useMeQuery();
 
   const reanalyzeMutation = useReanalyzeReport();
-
-  const isInitialReportLoading = isReportLoading && !report;
-
-  const showAnalysisLoading = useDelayedLoading(isInitialReportLoading, 500);
 
   if (isReportError) {
     return (
@@ -43,17 +37,6 @@ export default function ReportPage() {
     );
   }
 
-  // 최초 조회가 500ms 이상 걸릴 때 로딩 화면
-  if (showAnalysisLoading) {
-    return (
-      <LoadingSection
-        title="편지를 분석 중이에요"
-        subtitle="분석에는 최대 1분 정도 소요될 수 있어요."
-      />
-    );
-  }
-
-  // 최초 500ms + 기존 report refetch
   if (isReportLoading || isReportFetching || isMeLoading || !report || !me) {
     return (
       <div className="flex w-full flex-col pb-6">

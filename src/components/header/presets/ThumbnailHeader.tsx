@@ -32,7 +32,9 @@ export default function ThumbnailHeader({
         center={<div className="text-lg font-semibold">{title}</div>}
         right={
           images && images.length > 0 ? (
-            <LetterThumbnail source={images[0]} onClick={() => setOpenViewer(true)} />
+            <div className="translate-y-3">
+              <LetterThumbnail source={images[0]} onClick={() => setOpenViewer(true)} />
+            </div>
           ) : null
         } // 이미지 썸네일 조건부 렌더링 - 텍스트 모드인 경우 null
       />
