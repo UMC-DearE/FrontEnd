@@ -25,7 +25,7 @@ export default function ReanalysisSection({
   return (
     <div className="flex items-center justify-end gap-3">
       {reanalyze.message && (
-        <p className="whitespace-nowrap text-[11px] font-medium text-[#F02E2E]">
+        <p className="whitespace-nowrap text-[12px] font-medium text-[#F02E2E]">
           {reanalyze.message.replace(/\.$/, '')}
         </p>
       )}
