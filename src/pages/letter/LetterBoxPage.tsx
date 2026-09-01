@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import FolderList from '@/components/letterBox/letterFolder/FolderList';
 import FolderSettingSheet from '@/components/letterBox/letterFolder/FolderSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
@@ -86,6 +86,7 @@ export default function LetterBoxPage() {
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const searchBarRef = useRef<HTMLDivElement>(null);
 
   const trimmedQuery = query.trim();
   const isQueryTooShort = trimmedQuery.length > 0 && trimmedQuery.length < MIN_SEARCH_LENGTH;
@@ -188,6 +189,24 @@ export default function LetterBoxPage() {
     setQuery('');
   }, [selectedFolderId]);
 
+  useEffect(() => {
+    if (!isSearchOpen) return;
+
+    const handleOutsidePointerDown = (e: Event) => {
+      if (searchBarRef.current?.contains(e.target as Node)) return;
+      setQuery('');
+      setIsSearchOpen(false);
+    };
+
+    document.addEventListener('mousedown', handleOutsidePointerDown);
+    document.addEventListener('touchstart', handleOutsidePointerDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsidePointerDown);
+      document.removeEventListener('touchstart', handleOutsidePointerDown);
+    };
+  }, [isSearchOpen]);
+
   const editingFolder = useMemo(() => {
     if (editingFolderId == null) return null;
     return folders.find((f) => f.id === editingFolderId) ?? null;
@@ -285,7 +304,7 @@ export default function LetterBoxPage() {
             top: `calc(${HEADER_SAFE_AREA} + ${SEARCH_BAR_TOP}px)`,
           }}
         >
-          <div className="w-full max-w-[440px] px-4">
+          <div ref={searchBarRef} className="w-full max-w-[440px] px-4">
             <SearchBar
               value={query}
               onChange={setQuery}
