@@ -17,6 +17,9 @@ interface ProfileCustomSheetProps {
   bottomBarRef?: React.Ref<HTMLDivElement>;
 }
 
+const BOTTOM_BAR_HEIGHT = 126;
+const PICKER_GAP = 12;
+
 const normalizeHex = (v: string) => {
   const t = v.trim();
   if (!t) return '#F7F8F9';
@@ -36,15 +39,11 @@ export default function ProfileCustomSheet({
   bottomBarRef,
 }: ProfileCustomSheetProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const bgButtonRef = useRef<HTMLButtonElement>(null);
   const [showPicker, setShowPicker] = useState(false);
 
   const safeBgColor = useMemo(() => normalizeHex(bgColor), [bgColor]);
-
-  const [hexDraft, setHexDraft] = useState(safeBgColor);
-
-  useEffect(() => {
-    setHexDraft(safeBgColor);
-  }, [safeBgColor]);
 
   const handleClickSticker = () => {
     setShowPicker(false);
@@ -68,10 +67,23 @@ export default function ProfileCustomSheet({
     }
   };
 
-  const handleClosePicker = () => {
-    setShowPicker(false);
-    onPickerStateChange?.(false);
-  };
+  useEffect(() => {
+    if (!showPicker) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (pickerRef.current?.contains(target)) return;
+      if (bgButtonRef.current?.contains(target)) return;
+      setShowPicker(false);
+      onPickerStateChange?.(false);
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showPicker, onPickerStateChange]);
 
   if (!open) return null;
 
@@ -83,7 +95,8 @@ export default function ProfileCustomSheet({
       >
         <div
           ref={bottomBarRef}
-          className="pointer-events-auto fixed bottom-0 left-1/2 h-[126px] w-full max-w-[440px] -translate-x-1/2 bg-white"
+          className="pointer-events-auto fixed bottom-0 left-1/2 w-full max-w-[440px] -translate-x-1/2 bg-white"
+          style={{ height: `${BOTTOM_BAR_HEIGHT}px` }}
         >
           <div className="flex h-full flex-col items-center">
             <div className="mt-[20px] flex items-start justify-center gap-[54px]">
@@ -115,6 +128,7 @@ export default function ProfileCustomSheet({
 
               <div className="flex flex-col items-center gap-[14px]">
                 <button
+                  ref={bgButtonRef}
                   type="button"
                   onClick={handleToggleBgPicker}
                   className="flex h-[48px] w-[48px] items-center justify-center rounded-[6px] bg-[#F4F5F6] cursor-pointer"
@@ -130,26 +144,17 @@ export default function ProfileCustomSheet({
         </div>
 
         {showPicker && (
-          <div className="absolute left-1/2 bottom-[235px] z-[60] -translate-x-1/2 pointer-events-auto">
-            <div className="rounded-lg bg-white p-3 shadow-lg">
-              <HexColorPicker color={safeBgColor} onChange={onChangeBgColor} />
-              <div className="mt-2 flex items-center justify-between gap-2">
-                <input
-                  value={hexDraft}
-                  onChange={(e) => setHexDraft(e.target.value)}
-                  className="w-28 rounded border px-2 py-1 text-sm"
-                />
-                <button
-                  onClick={() => {
-                    onChangeBgColor(normalizeHex(hexDraft));
-                    handleClosePicker();
-                  }}
-                  className="rounded bg-gray-100 px-3 py-1 text-sm"
-                  type="button"
-                >
-                  선택
-                </button>
-              </div>
+          <div
+            ref={pickerRef}
+            className="pointer-events-auto fixed left-1/2 z-[60] -translate-x-1/2"
+            style={{ bottom: `${BOTTOM_BAR_HEIGHT + PICKER_GAP}px` }}
+          >
+            <div className="w-[240px] rounded-[10px] bg-white p-2 shadow-[0_2px_8px_rgba(0,0,0,0.12)]">
+              <HexColorPicker
+                color={safeBgColor}
+                onChange={onChangeBgColor}
+                className="custom-color-picker !h-[200px] !w-full"
+              />
             </div>
           </div>
         )}
