@@ -220,18 +220,29 @@ input[type='date']::-webkit-calendar-picker-indicator {
   transform: rotate(45deg);
 }
 
-.custom-color-picker .react-colorful__hue {
-  height: 18px;
+.custom-color-picker {
+  gap: 0 !important;
 }
 
-.custom-color-picker .react-colorful__hue-pointer {
-  width: 16px;
-  height: 16px;
+.custom-color-picker .react-colorful__saturation {
+  border-bottom: none !important;
+  border-radius: 8px 8px 0 0 !important;
+}
+
+.custom-color-picker .react-colorful__hue {
+  height: 18px;
+  border-top: none !important;
+  border-radius: 0 0 8px 8px !important;
 }
 
 .custom-color-picker .react-colorful__saturation-pointer {
-  width: 23px;
-  height: 23px;
+  width: 22px;
+  height: 22px;
+}
+
+.custom-color-picker .react-colorful__hue-pointer {
+  width: 18px;
+  height: 18px;
 }
 
 /* 편지함 폴더 스크롤 바 */
