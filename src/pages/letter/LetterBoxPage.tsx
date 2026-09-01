@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import FolderList from '@/components/letterBox/letterFolder/FolderList';
 import FolderSettingSheet from '@/components/letterBox/letterFolder/FolderSettingSheet';
 import ConfirmModal from '@/components/common/ConfirmModal';
@@ -24,6 +24,7 @@ import type { From } from '@/types/from';
 import { uploadImage as uploadImageApi } from '@/api/upload';
 import { getFromList } from '@/api/from';
 import LetterCardSkeleton from '@/components/skeleton/LetterCardSkeleton';
+import useDebouncedValue from '@/hooks/useDebouncedValue';
 
 type FolderSelectId = 'all' | 'like' | number;
 type ViewMode = '기본 보기' | '간편 보기';
@@ -31,6 +32,9 @@ type ViewMode = '기본 보기' | '간편 보기';
 type LocationState = { selectedFolderId?: FolderSelectId } | null;
 
 const VIEW_MODE_KEY = 'letterbox:viewMode';
+const MIN_SEARCH_LENGTH = 2;
+const UNPAGED_SIZE = 9999;
+const EMPTY_FROM_COUNTS: Record<number, number> = {};
 
 const isViewMode = (v: unknown): v is ViewMode => v === '기본 보기' || v === '간편 보기';
 
@@ -82,6 +86,12 @@ export default function LetterBoxPage() {
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const searchBarRef = useRef<HTMLDivElement>(null);
+
+  const trimmedQuery = query.trim();
+  const isQueryTooShort = trimmedQuery.length > 0 && trimmedQuery.length < MIN_SEARCH_LENGTH;
+  const debouncedQuery = useDebouncedValue(trimmedQuery);
+  const keyword = debouncedQuery.length >= MIN_SEARCH_LENGTH ? debouncedQuery : undefined;
 
   const [allFroms, setAllFroms] = useState<From[]>([]);
 
@@ -115,10 +125,11 @@ export default function LetterBoxPage() {
       try {
         const res = await getLetterLists({
           page: 0,
-          size: 9999,
+          size: UNPAGED_SIZE,
           sort: 'receivedAt,desc',
           folderId,
           isLiked,
+          keyword,
         });
 
         setAllLetters(res.data.content ?? []);
@@ -131,11 +142,11 @@ export default function LetterBoxPage() {
     };
 
     void run();
-  }, [selectedFolderId]);
+  }, [selectedFolderId, keyword]);
 
   useEffect(() => {
     setPage(0);
-  }, [selectedFolderId, selectedFromId]);
+  }, [selectedFolderId, selectedFromId, keyword]);
 
   useEffect(() => {
     let alive = true;
@@ -150,11 +161,12 @@ export default function LetterBoxPage() {
       try {
         const res = await getLetterLists({
           page,
-          size,
+          size: keyword ? UNPAGED_SIZE : size,
           sort: 'createdAt,desc',
           folderId,
           fromId,
           isLiked,
+          keyword,
         });
 
         if (!alive) return;
@@ -171,11 +183,29 @@ export default function LetterBoxPage() {
     return () => {
       alive = false;
     };
-  }, [selectedFolderId, selectedFromId, page, size]);
+  }, [selectedFolderId, selectedFromId, page, size, keyword]);
 
   useEffect(() => {
     setQuery('');
   }, [selectedFolderId]);
+
+  useEffect(() => {
+    if (!isSearchOpen) return;
+
+    const handleOutsidePointerDown = (e: Event) => {
+      if (searchBarRef.current?.contains(e.target as Node)) return;
+      setQuery('');
+      setIsSearchOpen(false);
+    };
+
+    document.addEventListener('mousedown', handleOutsidePointerDown);
+    document.addEventListener('touchstart', handleOutsidePointerDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsidePointerDown);
+      document.removeEventListener('touchstart', handleOutsidePointerDown);
+    };
+  }, [isSearchOpen]);
 
   const editingFolder = useMemo(() => {
     if (editingFolderId == null) return null;
@@ -218,48 +248,6 @@ export default function LetterBoxPage() {
     return counts;
   }, [allLetters]);
 
-  const folderTotalCount = useMemo(() => totalElements, [totalElements]);
-
-  const searchedLetters = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return allLetters;
-    return allLetters.filter((l) => {
-      const excerpt = (l.excerpt ?? '').toLowerCase();
-      const fromName = (l.from?.name ?? '').toLowerCase();
-      return excerpt.includes(q) || fromName.includes(q);
-    });
-  }, [allLetters, query]);
-
-  const filteredLetters = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (q) {
-      let result = searchedLetters;
-      if (selectedFromId !== 'all') {
-        result = result.filter((l) => l.from.fromId === selectedFromId);
-      }
-      return result;
-    }
-    return letters;
-  }, [searchedLetters, letters, query, selectedFromId]);
-
-  const displayCount = useMemo(() => {
-    if (!query.trim()) return folderTotalCount;
-    if (selectedFromId !== 'all') return filteredLetters.length;
-    return searchedLetters.length;
-  }, [query, selectedFromId, filteredLetters, searchedLetters, folderTotalCount]);
-
-  const displayAllCount = query.trim() ? searchedLetters.length : allCount;
-
-  const displayFromCounts = useMemo(() => {
-    if (!query.trim()) return fromCounts;
-    const counts: Record<number, number> = {};
-    for (const l of searchedLetters) {
-      const id = l.from.fromId;
-      counts[id] = (counts[id] ?? 0) + 1;
-    }
-    return counts;
-  }, [query, searchedLetters, fromCounts]);
-
   const isDefaultFolder = selectedFolderId === 'all' || selectedFolderId === 'like';
 
   const selectedFolderName = useMemo(() => {
@@ -284,11 +272,12 @@ export default function LetterBoxPage() {
   };
 
   const emptyMessage = useMemo(() => {
-    if (query.trim()) return '검색 결과가 없어요.';
+    if (isQueryTooShort) return `검색어를 ${MIN_SEARCH_LENGTH}자 이상 입력해 주세요.`;
+    if (keyword) return '검색 결과가 없어요.';
     if (selectedFromId !== 'all') return '필터링 결과가 없어요.';
-    if (isDefaultFolder) return '추가된 편지가 없어요';
-    return '저장된 편지가 없어요';
-  }, [query, selectedFromId, isDefaultFolder]);
+    if (isDefaultFolder) return '추가된 편지가 없어요.';
+    return '저장된 편지가 없어요.';
+  }, [isQueryTooShort, keyword, selectedFromId, isDefaultFolder]);
 
   return (
     <>
@@ -315,7 +304,7 @@ export default function LetterBoxPage() {
             top: `calc(${HEADER_SAFE_AREA} + ${SEARCH_BAR_TOP}px)`,
           }}
         >
-          <div className="w-full max-w-[440px] px-4">
+          <div ref={searchBarRef} className="w-full max-w-[440px] px-4">
             <SearchBar
               value={query}
               onChange={setQuery}
@@ -360,10 +349,10 @@ export default function LetterBoxPage() {
 
         <div className="flex flex-col gap-3 mb-3">
           <ToolBar
-            folderTotalCount={displayCount}
-            allCount={displayAllCount}
+            folderTotalCount={isQueryTooShort ? 0 : totalElements}
+            allCount={isQueryTooShort ? 0 : allCount}
             froms={allFroms}
-            fromCounts={displayFromCounts}
+            fromCounts={isQueryTooShort ? EMPTY_FROM_COUNTS : fromCounts}
             selectedFromId={selectedFromId}
             onFromSelect={setSelectedFromId}
             view={viewMode}
@@ -376,38 +365,38 @@ export default function LetterBoxPage() {
                 <LetterCardSkeleton key={i} viewMode={viewMode} />
               ))}
             </div>
-          ) : filteredLetters.length === 0 ? (
+          ) : isQueryTooShort || letters.length === 0 ? (
             <div className="flex flex-col py-[147px] text-center text-[#A1A4AA] text-[15px] justify-center items-center gap-4">
               {emptyMessage}
-              {isDefaultFolder ? (
-                <button
-                  onClick={() => navigate('/create')}
-                  className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
-                >
-                  편지 추가
-                </button>
-              ) : (
-                !query.trim() &&
-                selectedFromId === 'all' && (
+              {!trimmedQuery &&
+                (isDefaultFolder ? (
                   <button
-                    onClick={() =>
-                      navigate('/letter/select', {
-                        state: {
-                          folderId: selectedFolderId,
-                          folderName: selectedFolderName,
-                        },
-                      })
-                    }
-                    type="button"
+                    onClick={() => navigate('/create')}
                     className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
                   >
-                    폴더에 추가
+                    편지 추가
                   </button>
-                )
-              )}
+                ) : (
+                  selectedFromId === 'all' && (
+                    <button
+                      onClick={() =>
+                        navigate('/letter/select', {
+                          state: {
+                            folderId: selectedFolderId,
+                            folderName: selectedFolderName,
+                          },
+                        })
+                      }
+                      type="button"
+                      className="w-[125px] h-[38px] bg-white rounded-[8px] border-[#E7E8EB] border-[1.2px] text-[#585A5F] cursor-pointer"
+                    >
+                      폴더에 추가
+                    </button>
+                  )
+                ))}
             </div>
           ) : (
-            filteredLetters.map((letter) => (
+            letters.map((letter) => (
               <div
                 key={letter.id}
                 role="button"
@@ -421,7 +410,7 @@ export default function LetterBoxPage() {
                   isLiked={letter.isLiked}
                   receivedAt={letter.receivedAt}
                   from={letter.from}
-                  searchQuery={query.trim() || undefined}
+                  searchQuery={keyword}
                   onLikeToggle={(next) => handleLikeToggle(letter.id, next)}
                 />
               </div>

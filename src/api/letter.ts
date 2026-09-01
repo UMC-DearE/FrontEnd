@@ -21,6 +21,7 @@ export type GetLetterListsParams = {
   folderId?: number;
   fromId?: number;
   isLiked?: boolean;
+  keyword?: string;
 };
 
 export const getLetterDetail = async (letterId: number): Promise<LetterDetailResponse> => {
