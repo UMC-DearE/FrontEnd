@@ -19,6 +19,8 @@ interface Props {
   setImages: React.Dispatch<React.SetStateAction<File[]>>;
 }
 
+const getFileKey = (file: File) => `${file.name}_${file.size}_${file.lastModified}`;
+
 export default function ImagePreviewList({ images, setImages }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
@@ -35,11 +37,15 @@ export default function ImagePreviewList({ images, setImages }: Props) {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+
     if (!over || active.id === over.id) return;
 
     setImages((prev) => {
-      const oldIndex = prev.findIndex((_, i) => i.toString() === active.id);
-      const newIndex = prev.findIndex((_, i) => i.toString() === over.id);
+      const oldIndex = prev.findIndex((file) => getFileKey(file) === active.id);
+
+      const newIndex = prev.findIndex((file) => getFileKey(file) === over.id);
+
+      if (oldIndex === -1 || newIndex === -1) return prev;
 
       return arrayMove(prev, oldIndex, newIndex);
     });
@@ -57,17 +63,19 @@ export default function ImagePreviewList({ images, setImages }: Props) {
         return prev;
       }
 
-      const existingKeySet = new Set(prev.map((f) => `${f.name}_${f.size}_${f.lastModified}`));
+      const existingKeySet = new Set(prev.map(getFileKey));
 
       const uniqueNewFiles: File[] = [];
       let hasDuplicate = false;
 
       for (const file of files) {
-        const key = `${file.name}_${file.size}_${file.lastModified}`;
+        const key = getFileKey(file);
+
         if (existingKeySet.has(key)) {
           hasDuplicate = true;
           continue;
         }
+
         existingKeySet.add(key);
         uniqueNewFiles.push(file);
       }
@@ -98,10 +106,7 @@ export default function ImagePreviewList({ images, setImages }: Props) {
       />
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext
-          items={images.map((_, i) => i.toString())}
-          strategy={horizontalListSortingStrategy}
-        >
+        <SortableContext items={images.map(getFileKey)} strategy={horizontalListSortingStrategy}>
           <div className="flex gap-2 mt-[24px] overflow-x-auto thin-scrollbar pb-1">
             <button
               type="button"
@@ -121,15 +126,19 @@ export default function ImagePreviewList({ images, setImages }: Props) {
               </div>
             </button>
 
-            {images.map((file, index) => (
-              <ImagePreviewItem
-                key={index}
-                id={index.toString()}
-                file={file}
-                onDelete={() => setImages((prev) => prev.filter((_, i) => i !== index))}
-                onPreview={() => setPreviewIndex(index)}
-              />
-            ))}
+            {images.map((file, index) => {
+              const fileKey = getFileKey(file);
+
+              return (
+                <ImagePreviewItem
+                  key={fileKey}
+                  id={fileKey}
+                  file={file}
+                  onDelete={() => setImages((prev) => prev.filter((_, i) => i !== index))}
+                  onPreview={() => setPreviewIndex(index)}
+                />
+              );
+            })}
 
             {previewIndex !== null && (
               <ImageViewer
