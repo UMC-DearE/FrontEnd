@@ -72,6 +72,7 @@ export default function CreateDetailPage() {
             navigate('/create/from', {
               state: {
                 ...(state ?? {}),
+                content,
                 selectedFromDraft: fromDraft,
                 date,
                 unknownDate,
