@@ -26,8 +26,6 @@ export function ImageViewer({
   const source = images[currentIndex];
   const url = useObjectUrl(source);
 
-  if (!url) return null;
-
   type TouchPoint = {
     clientX: number;
     clientY: number;
@@ -106,10 +104,13 @@ export function ImageViewer({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-2 top-[calc(env(safe-area-inset-top,0px)+16px)] z-10 flex h-9 w-9 items-center justify-center text-white"
+          className="absolute right-4 z-[100] flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white"
+          style={{
+            top: 'max(16px, env(safe-area-inset-top, 16px))',
+          }}
           aria-label="이미지 뷰어 닫기"
         >
-          <X size={28} strokeWidth={1.8} />
+          <X size={26} strokeWidth={2} />
         </button>
         <div
           className="relative w-full flex items-center justify-center overflow-hidden"

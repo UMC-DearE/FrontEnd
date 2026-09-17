@@ -13,6 +13,7 @@ import { usePatchLetter } from '@/hooks/mutations/usePatchLetter';
 
 type EditPageLocationState = {
   selectedFromDraft?: CreateFrom;
+  content?: string;
   date?: string;
   unknownDate?: boolean;
   imageUrls?: string[];
@@ -34,7 +35,7 @@ export default function EditLetterPage() {
 
   // 실제로 LetterForm에 내려줄 from (초기값 + 수정 반영용)
   const [fromDraft, setFromDraft] = useState<CreateFrom | undefined>(undefined);
-  const [content, setContent] = useState<string>('');
+  const [content, setContent] = useState<string>(locationState?.content ?? '');
   const [date, setDate] = useState<string>(locationState?.date ?? '');
   const [unknownDate, setUnknownDate] = useState<boolean>(locationState?.unknownDate ?? false);
 
@@ -53,7 +54,10 @@ export default function EditLetterPage() {
         }
 
         setData(res.data);
-        setContent(res.data.content ?? '');
+
+        if (locationState?.content === undefined) {
+          setContent(res.data.content ?? '');
+        }
 
         // 최초 진입 시 기본 from / 날짜 세팅
         setFromDraft((prev: CreateFrom | undefined) => {
@@ -175,6 +179,7 @@ export default function EditLetterPage() {
                 state: {
                   mode: 'edit',
                   letterId: id,
+                  content,
                   selectedFromDraft: fromDraft,
                   date,
                   unknownDate,
