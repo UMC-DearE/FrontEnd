@@ -54,6 +54,11 @@ export function AppLayout() {
   const useHomeBg = pathname === '/' || pathname.startsWith('/home');
 
   const bgClass = matched?.bg === 'white' ? 'bg-[#FFFFFF]' : 'bg-[#F7F8F9]';
+  const pageBgColor = useHomeBg ? homeBgColor : matched?.bg === 'white' ? '#FFFFFF' : '#F7F8F9';
+
+  useEffect(() => {
+    document.body.style.backgroundColor = pageBgColor;
+  }, [pageBgColor]);
 
   const NO_MAIN_PADDING_PATHS = ['/my', '/my/account', '/letterbox', '/create/detail'];
   const noMainPadding =
@@ -105,7 +110,10 @@ export function AppLayout() {
       </main>
 
       {fixedAction && (
-        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-40 flex justify-center pointer-events-none">
+        <div
+          className="fixed bottom-0 left-1/2 w-full max-w-[440px] z-40 flex justify-center pointer-events-none"
+          style={{ transform: 'translate(-50%, var(--vp-gap, 0px))' }}
+        >
           <div
             className="w-full max-w-[440px] pt-3 pointer-events-auto"
             style={{
@@ -119,7 +127,10 @@ export function AppLayout() {
       )}
 
       {!hideBottomNav && !fixedAction && (
-        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-40 bg-[#FFFFFF]">
+        <nav
+          className="fixed bottom-0 left-1/2 w-full max-w-[440px] z-40 bg-[#FFFFFF]"
+          style={{ transform: 'translate(-50%, var(--vp-gap, 0px))' }}
+        >
           <BottomNav />
         </nav>
       )}
