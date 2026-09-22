@@ -54,7 +54,7 @@ export default function CreateDetailPage() {
       <div
         className="flex-1 px-4"
         style={{
-          marginTop: 98,
+          marginTop: 'calc(var(--app-header-h) + 20px)',
         }}
       >
         <LetterForm
