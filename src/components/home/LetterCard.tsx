@@ -43,29 +43,31 @@ export default function LetterCard({
     <div className="relative mt-5 flex w-full max-w-[440px] min-h-[97px] items-center rounded-[10px] bg-white shadow-[0_0_4px_0_rgba(0,0,0,0.12)]">
       {/* 날짜 뱃지 */}
       <div className="mx-3 flex h-[57px] w-[47px] shrink-0 flex-col items-center justify-center rounded-[10px] bg-[#FF4F18]/10">
-        <p className="text-[10px] font-medium text-[#FF5F2F]">{letter?.month ?? ''}</p>
+        <p className="text-[10px] font-normal text-[#FF5F2F]">{letter?.month ?? ''}</p>
         <p className="text-[15px] font-bold text-[#FF5F2F]">{letter?.day ?? ''}</p>
         <p className="text-[12px] font-medium text-[#FF5F2F]">{letter?.dayOfWeek ?? ''}</p>
       </div>
 
       {/* 편지 내용 */}
-      <div className="flex-1 pr-8 py-4 w-[226px] text-[13px] leading-[20px]">
+      <div className="min-w-0 flex-1 py-4 pr-3">
         {isEmpty ? (
           waiting ? (
-            <p className="break-keep text-[#A1A4AA]">
+            <p className="break-keep text-[min(13px,4.74vw_-_5.45px)] leading-[1.5] tracking-[-0.01em] text-[#A1A4AA]">
               매일 자정에 초기화되는 랜덤 편지를 불러오고 있어요.
               <br />
               잠시만 기다려 주세요!
             </p>
           ) : (
-            <p className="break-keep text-[#A1A4AA]">
+            <p className="break-keep text-[min(13px,4.74vw_-_5.45px)] leading-[1.5] tracking-[-0.01em] text-[#A1A4AA]">
               아직 추가한 편지가 없어요.
               <br />
               하단 편지 추가 버튼을 눌러 편지를 추가해 보세요!
             </p>
           )
         ) : (
-          <p className="line-clamp-2 break-all font-medium text-[#585A5F]">{letter.excerpt}</p>
+          <p className="line-clamp-2 break-all pr-3 text-[13px] leading-[1.5] tracking-[-0.01em] font-medium text-[#585A5F]">
+            {letter.excerpt}
+          </p>
         )}
       </div>
 
