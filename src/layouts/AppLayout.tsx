@@ -54,11 +54,6 @@ export function AppLayout() {
   const useHomeBg = pathname === '/' || pathname.startsWith('/home');
 
   const bgClass = matched?.bg === 'white' ? 'bg-[#FFFFFF]' : 'bg-[#F7F8F9]';
-  const pageBgColor = useHomeBg ? homeBgColor : matched?.bg === 'white' ? '#FFFFFF' : '#F7F8F9';
-
-  useEffect(() => {
-    document.body.style.backgroundColor = pageBgColor;
-  }, [pageBgColor]);
 
   const NO_MAIN_PADDING_PATHS = ['/my', '/my/account', '/letterbox', '/create/detail'];
   const noMainPadding =
@@ -66,22 +61,18 @@ export function AppLayout() {
     (pathname.startsWith('/letter/') && pathname.endsWith('/edit'));
 
   const HEADER_HEIGHT = 78;
-  const HEADER_SAFE_AREA = 'min(env(safe-area-inset-top, 0px), 32px)';
   const HEADER_CONTENT_GAP = 20;
 
   const BOTTOM_NAV_HEIGHT = 95;
   const FIXED_ACTION_HEIGHT = 52 + 20 + 16;
   const bottomInset = fixedAction ? FIXED_ACTION_HEIGHT : hideBottomNav ? 0 : BOTTOM_NAV_HEIGHT;
-  const needsBottomSafeArea = !!fixedAction || hideBottomNav;
 
   return (
     <div
-      className={`min-h-[max(700px,var(--app-vh))] flex flex-col ${bgClass}`}
+      className={`min-h-[max(700px,100dvh)] flex flex-col ${bgClass}`}
       style={{
         ...(useHomeBg ? { backgroundColor: homeBgColor } : {}),
-        paddingBottom: needsBottomSafeArea
-          ? `calc(${bottomInset}px + env(safe-area-inset-bottom, 0px))`
-          : `${bottomInset}px`,
+        paddingBottom: `${bottomInset}px`,
       }}
     >
       {shouldShowHeader && (
@@ -98,7 +89,7 @@ export function AppLayout() {
         className="min-w-0 flex-1 flex flex-col"
         style={{
           paddingTop: shouldShowHeader
-            ? `calc(${HEADER_SAFE_AREA} + ${HEADER_HEIGHT}px + ${HEADER_CONTENT_GAP}px)`
+            ? HEADER_HEIGHT + HEADER_CONTENT_GAP
             : noMainPadding
               ? 0
               : HEADER_CONTENT_GAP,
@@ -110,10 +101,7 @@ export function AppLayout() {
       </main>
 
       {fixedAction && (
-        <div
-          className="fixed bottom-0 left-1/2 w-full max-w-[440px] z-40 flex justify-center pointer-events-none"
-          style={{ transform: 'translate(-50%, var(--vp-gap, 0px))' }}
-        >
+        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-40 flex justify-center pointer-events-none">
           <div
             className="w-full max-w-[440px] pt-3 pointer-events-auto"
             style={{
@@ -127,10 +115,7 @@ export function AppLayout() {
       )}
 
       {!hideBottomNav && !fixedAction && (
-        <nav
-          className="fixed bottom-0 left-1/2 w-full max-w-[440px] z-40 bg-[#FFFFFF]"
-          style={{ transform: 'translate(-50%, var(--vp-gap, 0px))' }}
-        >
+        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-40 bg-[#FFFFFF]">
           <BottomNav />
         </nav>
       )}
