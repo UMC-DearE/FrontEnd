@@ -67,13 +67,16 @@ export function AppLayout() {
   const BOTTOM_NAV_HEIGHT = 95;
   const FIXED_ACTION_HEIGHT = 52 + 20 + 16;
   const bottomInset = fixedAction ? FIXED_ACTION_HEIGHT : hideBottomNav ? 0 : BOTTOM_NAV_HEIGHT;
+  const needsBottomSafeArea = !!fixedAction || hideBottomNav;
 
   return (
     <div
       className={`min-h-[max(700px,var(--app-vh))] flex flex-col ${bgClass}`}
       style={{
         ...(useHomeBg ? { backgroundColor: homeBgColor } : {}),
-        paddingBottom: `calc(${bottomInset}px + env(safe-area-inset-bottom, 0px))`,
+        paddingBottom: needsBottomSafeArea
+          ? `calc(${bottomInset}px + env(safe-area-inset-bottom, 0px))`
+          : `${bottomInset}px`,
       }}
     >
       {shouldShowHeader && (
@@ -116,7 +119,7 @@ export function AppLayout() {
       )}
 
       {!hideBottomNav && !fixedAction && (
-        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-40 bg-[#FFFFFF] pb-safe-bottom">
+        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-40 bg-[#FFFFFF]">
           <BottomNav />
         </nav>
       )}
