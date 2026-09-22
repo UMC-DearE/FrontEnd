@@ -10,7 +10,7 @@ export default function LoadingSection({
 }: LoadingSectionProps) {
   return (
     <div className="fixed inset-0 z-[100] flex justify-center bg-[#F7F8F9]">
-      <div className="flex min-h-[100dvh] w-full max-w-[440px] items-center justify-center">
+      <div className="flex min-h-[var(--app-vh)] w-full max-w-[440px] items-center justify-center">
         <div className="flex -translate-y-[45px] flex-col items-center">
           <div className="h-[50px] w-[50px] animate-spin rounded-full border-[4px] border-[#E7E8EB] border-t-[#FF5F2F]" />
 

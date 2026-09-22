@@ -43,7 +43,7 @@ export function AppLayout() {
     pathname.startsWith('/my/profile') ||
     pathname.startsWith('/my/account') ||
     pathname.startsWith('/my/style') ||
-    pathname.startsWith('/my/service')||
+    pathname.startsWith('/my/service') ||
     pathname.startsWith('/my/privacy') ||
     pathname.startsWith('/my/from') ||
     pathname.startsWith('/login') ||
@@ -70,7 +70,7 @@ export function AppLayout() {
 
   return (
     <div
-      className={`min-h-[max(700px,100dvh)] flex flex-col ${bgClass}`}
+      className={`min-h-[max(700px,var(--app-vh))] flex flex-col ${bgClass}`}
       style={{
         ...(useHomeBg ? { backgroundColor: homeBgColor } : {}),
         paddingBottom: `calc(${bottomInset}px + env(safe-area-inset-bottom, 0px))`,
