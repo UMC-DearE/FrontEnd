@@ -66,8 +66,6 @@
 @layer base {
   :root {
     --app-font: 'Pretendard';
-    --app-vh: 100dvh;
-    --vp-gap: 0px;
   }
 
   html {
@@ -260,10 +258,4 @@ input[type='date']::-webkit-calendar-picker-indicator {
 /* 프로필 이미지 크롭 시 원형 선택 영역 */
 .profile-cropper .reactEasyCrop_CropArea {
   border-radius: 9999px !important;
-}
-
-/* PWA 좌우 safe area (상단은 헤더에서 처리) */
-html {
-  padding-right: env(safe-area-inset-right);
-  padding-left: env(safe-area-inset-left);
 }

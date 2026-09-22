@@ -234,7 +234,7 @@ export default function ProfilePage() {
           <div className="relative w-full max-w-[440px] h-full bg-black flex flex-col">
             <div
               className="flex items-center justify-between px-4 mb-2 text-white text-base font-normal"
-              style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)' }}
+              style={{ paddingTop: 16 }}
             >
               <button type="button" onClick={handleCropCancel} className="py-1 px-2 -ml-2">
                 취소
@@ -343,7 +343,13 @@ export default function ProfilePage() {
                     'flex items-center justify-center',
                   ].join(' ')}
                 >
-                  <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path
                       d="M1 1L11 11M11 1L1 11"
                       stroke="white"

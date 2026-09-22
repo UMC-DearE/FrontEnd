@@ -11,7 +11,7 @@ export default function TopSection({
     <header
       className="w-full bg-[#FFFFFF] border-b border-[#E7E8EB]"
       style={{
-        paddingTop: 'min(env(safe-area-inset-top), 32px)',
+        paddingTop: 0,
       }}
     >
       <div className="h-[78px] px-4 flex items-end pb-[20px]">

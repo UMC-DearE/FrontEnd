@@ -106,7 +106,7 @@ export function ImageViewer({
           onClick={onClose}
           className="absolute right-4 z-[100] flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white"
           style={{
-            top: 'max(16px, env(safe-area-inset-top, 16px))',
+            top: 16,
           }}
           aria-label="이미지 뷰어 닫기"
         >
