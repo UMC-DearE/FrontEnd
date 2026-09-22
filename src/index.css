@@ -67,6 +67,7 @@
   :root {
     --app-font: 'Pretendard';
     --app-vh: 100dvh;
+    --vp-gap: 0px;
   }
 
   html {
