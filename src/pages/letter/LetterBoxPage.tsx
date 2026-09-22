@@ -39,9 +39,6 @@ const EMPTY_FROM_COUNTS: Record<number, number> = {};
 const isViewMode = (v: unknown): v is ViewMode => v === '기본 보기' || v === '간편 보기';
 
 export default function LetterBoxPage() {
-  const HEADER_HEIGHT = 78;
-  const SEARCH_BAR_TOP = 34;
-
   const navigate = useNavigate();
   const location = useLocation();
   const initialFolderId = (location.state as LocationState)?.selectedFolderId ?? 'all';
@@ -300,7 +297,7 @@ export default function LetterBoxPage() {
         <div
           className="fixed left-0 right-0 z-50 flex justify-center"
           style={{
-            top: SEARCH_BAR_TOP,
+            top: `calc(var(--app-header-h) - 44px)`,
           }}
         >
           <div ref={searchBarRef} className="w-full max-w-[440px] px-4">
@@ -318,7 +315,7 @@ export default function LetterBoxPage() {
 
       <div
         style={{
-          marginTop: HEADER_HEIGHT,
+          marginTop: 'var(--app-header-h)',
         }}
       >
         <FolderList
