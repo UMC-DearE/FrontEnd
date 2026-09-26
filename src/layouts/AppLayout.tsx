@@ -32,18 +32,6 @@ export function AppLayout() {
   }, [pathname]);
 
   useEffect(() => {
-    const raf = requestAnimationFrame(() => {
-      window.scrollTo(0, 1);
-
-      requestAnimationFrame(() => {
-        window.scrollTo(0, 0);
-      });
-    });
-
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  useEffect(() => {
     const debug = document.createElement('div');
 
     debug.style.position = 'fixed';
@@ -132,7 +120,7 @@ export function AppLayout() {
 
   return (
     <div
-      className={`min-h-[100dvh] flex flex-col ${bgClass}`}
+      className={`min-h-screen flex flex-col ${bgClass}`}
       style={{
         ...(useHomeBg ? { backgroundColor: homeBgColor } : {}),
         paddingBottom: `${bottomInset}px`,
