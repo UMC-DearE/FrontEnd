@@ -31,6 +31,56 @@ export function AppLayout() {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [pathname]);
 
+  useEffect(() => {
+    const debug = document.createElement('div');
+
+    debug.style.position = 'fixed';
+    debug.style.top = '0';
+    debug.style.left = '0';
+    debug.style.zIndex = '999999';
+    debug.style.background = 'red';
+    debug.style.color = 'white';
+    debug.style.fontSize = '10px';
+    debug.style.padding = '2px 4px';
+    debug.style.pointerEvents = 'none';
+
+    const probe = document.createElement('div');
+    probe.style.position = 'fixed';
+    probe.style.visibility = 'hidden';
+    probe.style.paddingTop = 'env(safe-area-inset-top, 0px)';
+    probe.style.paddingBottom = 'env(safe-area-inset-bottom, 0px)';
+
+    document.body.appendChild(probe);
+    document.body.appendChild(debug);
+
+    const update = () => {
+      const style = getComputedStyle(probe);
+
+      debug.textContent = [
+        `top=${style.paddingTop}`,
+        `bottom=${style.paddingBottom}`,
+        `innerH=${window.innerHeight}`,
+        `vvH=${window.visualViewport?.height ?? 'none'}`,
+        `vvTop=${window.visualViewport?.offsetTop ?? 'none'}`,
+      ].join(' | ');
+    };
+
+    update();
+
+    window.addEventListener('resize', update);
+    window.visualViewport?.addEventListener('resize', update);
+    window.visualViewport?.addEventListener('scroll', update);
+
+    return () => {
+      window.removeEventListener('resize', update);
+      window.visualViewport?.removeEventListener('resize', update);
+      window.visualViewport?.removeEventListener('scroll', update);
+
+      probe.remove();
+      debug.remove();
+    };
+  }, []);
+
   const matched = ROUTE_META.find((r) => r.match(pathname));
   const Header = matched ? HEADER_REGISTRY[matched.header] : null;
 
@@ -78,11 +128,7 @@ export function AppLayout() {
     >
       {shouldShowHeader && (
         <Suspense fallback={null}>
-          <div className="fixed top-0 left-0 right-0 z-50 flex justify-center">
-            <div className="w-full max-w-[440px]">
-              <Header title={matched?.title} />
-            </div>
-          </div>
+          <Header title={matched?.title} />
         </Suspense>
       )}
 
