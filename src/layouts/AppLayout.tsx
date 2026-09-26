@@ -115,14 +115,7 @@ export function AppLayout() {
         </div>
       )}
 
-      {!hideBottomNav && !fixedAction && (
-        <nav
-          className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[440px] bg-[#FFFFFF]"
-          style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-        >
-          <BottomNav />
-        </nav>
-      )}
+      {!hideBottomNav && !fixedAction && <BottomNav />}
     </div>
   );
 }
