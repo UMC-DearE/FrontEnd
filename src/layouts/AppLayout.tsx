@@ -70,7 +70,7 @@ export function AppLayout() {
 
   return (
     <div
-      className={`min-h-[max(700px,100dvh)] flex flex-col ${bgClass}`}
+      className={`min-h-[100dvh] flex flex-col ${bgClass}`}
       style={{
         ...(useHomeBg ? { backgroundColor: homeBgColor } : {}),
         paddingBottom: `${bottomInset}px`,
@@ -116,8 +116,10 @@ export function AppLayout() {
       )}
 
       {!hideBottomNav && !fixedAction && (
-        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-40 bg-[#FFFFFF]">
-          <BottomNav />
+        <nav className="fixed inset-x-0 bottom-0 z-40">
+          <div className="mx-auto w-full max-w-[440px] bg-[#FFFFFF]">
+            <BottomNav />
+          </div>
         </nav>
       )}
     </div>
