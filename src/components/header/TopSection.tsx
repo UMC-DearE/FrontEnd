@@ -8,8 +8,13 @@ export default function TopSection({
   right?: React.ReactNode;
 }) {
   return (
-    <header className="w-full bg-[#FFFFFF] border-b border-[#E7E8EB]">
-      <div className="h-[var(--app-header-h)] px-4 flex items-end pb-[20px]">
+    <header
+      className="w-full bg-[#FFFFFF] border-b border-[#E7E8EB]"
+      style={{
+        paddingTop: 'min(env(safe-area-inset-top, 0px), 32px)',
+      }}
+    >
+      <div className="h-[78px] px-4 flex items-end pb-[20px]">
         <div className="w-1/4 min-w-0 flex items-center">{left}</div>
         <div className="w-2/4 min-w-0 flex justify-center items-center">{center}</div>
         <div className="w-1/4 min-w-0 flex justify-end items-center">{right}</div>

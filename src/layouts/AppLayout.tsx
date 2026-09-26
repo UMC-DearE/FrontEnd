@@ -60,6 +60,8 @@ export function AppLayout() {
     NO_MAIN_PADDING_PATHS.includes(pathname) ||
     (pathname.startsWith('/letter/') && pathname.endsWith('/edit'));
 
+  const HEADER_HEIGHT = 78;
+  const HEADER_SAFE_AREA = 'min(env(safe-area-inset-top, 0px), 32px)';
   const HEADER_CONTENT_GAP = 20;
 
   const BOTTOM_NAV_HEIGHT = 95;
@@ -88,7 +90,7 @@ export function AppLayout() {
         className="min-w-0 flex-1 flex flex-col"
         style={{
           paddingTop: shouldShowHeader
-            ? `calc(var(--app-header-h) + ${HEADER_CONTENT_GAP}px)`
+            ? `calc(${HEADER_SAFE_AREA} + ${HEADER_HEIGHT}px + ${HEADER_CONTENT_GAP}px)`
             : noMainPadding
               ? 0
               : HEADER_CONTENT_GAP,

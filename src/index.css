@@ -66,14 +66,6 @@
 @layer base {
   :root {
     --app-font: 'Pretendard';
-    --app-header-h: 78px;
-  }
-
-  /* 홈 화면 앱은 상태바 영역이 따로 확보되므로 헤더 상단 여백을 줄인다 */
-  @media (display-mode: standalone) {
-    :root {
-      --app-header-h: 48px;
-    }
   }
 
   html {
