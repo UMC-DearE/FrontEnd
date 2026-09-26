@@ -9,7 +9,7 @@ export default function TopSection({
 }) {
   return (
     <header
-      className="w-full bg-[#FFFFFF] border-b border-[#E7E8EB]"
+      className="fixed inset-x-0 top-0 z-50 mx-auto w-full max-w-[440px] bg-[#FFFFFF] border-b border-[#E7E8EB]"
       style={{
         paddingTop: 'min(env(safe-area-inset-top, 0px), 32px)',
       }}
