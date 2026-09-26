@@ -32,6 +32,18 @@ export function AppLayout() {
   }, [pathname]);
 
   useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      window.scrollTo(0, 1);
+
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+      });
+    });
+
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  useEffect(() => {
     const debug = document.createElement('div');
 
     debug.style.position = 'fixed';
