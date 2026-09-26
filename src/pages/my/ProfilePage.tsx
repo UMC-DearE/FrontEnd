@@ -234,7 +234,7 @@ export default function ProfilePage() {
           <div className="relative w-full max-w-[440px] h-full bg-black flex flex-col">
             <div
               className="flex items-center justify-between px-4 mb-2 text-white text-base font-normal"
-              style={{ paddingTop: 16 }}
+              style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 16px)' }}
             >
               <button type="button" onClick={handleCropCancel} className="py-1 px-2 -ml-2">
                 취소
