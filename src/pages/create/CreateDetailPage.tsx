@@ -7,6 +7,7 @@ import useToast from '@/hooks/useToast';
 import { useCreateLetter } from '@/hooks/mutations/useCreateLetter';
 import { useCreateFrom } from '@/hooks/mutations/useCreateFrom';
 import CreateDetailHeader from '@/components/header/CreateDetailHeader';
+import { trackLetterSaveComplete } from '@/utils/ga';
 
 type LocationState =
   | (CreateResultPayload & {
@@ -122,6 +123,7 @@ export default function CreateDetailPage() {
                 return;
               }
 
+              trackLetterSaveComplete(!!state.aiResult?.summary);
               navigate(`/letter/${letterRes.data.letterId}`, { replace: true });
             } catch {
               toast.show('편지 생성 중 오류가 발생했습니다.');
