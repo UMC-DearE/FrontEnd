@@ -28,6 +28,7 @@ import PwaRecommendSheet from '@/components/pwa/PwaRecommendSheet';
 import { useInviteLinkCopy } from '@/hooks/useInviteLinkCopy';
 import { useMyMembership } from '@/hooks/queries/useMyMembership';
 import { useCompleteInviteGuide } from '@/hooks/mutations/useCompleteInviteGuide';
+import { trackHomeStickerAttach } from '@/utils/ga';
 
 const loadImageSize = (src: string) =>
   new Promise<{ w: number; h: number }>((resolve, reject) => {
@@ -342,6 +343,10 @@ export default function HomePage() {
           scale: s.scale,
         })),
       });
+
+      if (stickersChanged) {
+        trackHomeStickerAttach(saved.length);
+      }
     } catch (e) {
       // 캐시된 멤버십이 서버와 어긋난 경우 (다른 기기에서 변경 등)
       if (getErrorCode(e) === PLUS_REQUIRED) {

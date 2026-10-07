@@ -46,3 +46,33 @@ export function trackSignUp(method: SignUpMethod) {
 
   window.gtag?.('event', 'sign_up', { method });
 }
+
+function trackEvent(name: string, params: Record<string, string | number>) {
+  if (!isEnabled()) return;
+
+  window.gtag?.('event', name, params);
+}
+
+export type UploadType = 'image' | 'text';
+
+export function trackLetterUploadAttempt(uploadType: UploadType) {
+  trackEvent('letter_upload_attempt', { upload_type: uploadType });
+}
+
+export type AnalysisStatus = 'success' | 'error';
+
+export function trackAiAnalysisComplete(status: AnalysisStatus) {
+  trackEvent('ai_analysis_complete', { status });
+}
+
+export function trackLetterSaveComplete(isAiUsed: boolean) {
+  trackEvent('letter_save_complete', { is_ai_used: String(isAiUsed) });
+}
+
+export function trackReportGenerated(isFirstReport: boolean) {
+  trackEvent('report_generated', { is_first_report: String(isFirstReport) });
+}
+
+export function trackHomeStickerAttach(stickerCount: number) {
+  trackEvent('home_sticker_attach', { sticker_count: stickerCount });
+}
