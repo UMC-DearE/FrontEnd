@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import ReportStatistics from '@/components/report/ReportStatistics';
 import ReportAnalysisCard from '@/components/report/ReportAnalysisCard';
 import LoadingSection from '@/components/common/LoadingSection';
@@ -6,6 +8,9 @@ import ReportSkeleton from '@/components/skeleton/ReportSkeleton';
 import { useReport } from '@/hooks/queries/useReport';
 import { useReanalyzeReport } from '@/hooks/mutations/useReanalyzeReport';
 import { useMeQuery } from '@/hooks/queries/useMeQuery';
+import { trackReportGenerated } from '@/utils/ga';
+
+const REPORT_SEEN_KEY = 'ga_last_report_analyzed_at';
 
 export default function ReportPage() {
   const {
@@ -18,6 +23,27 @@ export default function ReportPage() {
   const { data: me, isLoading: isMeLoading } = useMeQuery();
 
   const reanalyzeMutation = useReanalyzeReport();
+
+  const analyzedAt = report?.analysis?.status === 'AVAILABLE' ? report.analysis.analyzedAt : null;
+
+  useEffect(() => {
+    if (!analyzedAt || isReportFetching) return;
+
+    let prev: string | null = null;
+    try {
+      prev = localStorage.getItem(REPORT_SEEN_KEY);
+    } catch {
+      return;
+    }
+    if (prev === analyzedAt) return;
+
+    trackReportGenerated(prev === null);
+    try {
+      localStorage.setItem(REPORT_SEEN_KEY, analyzedAt);
+    } catch {
+      return;
+    }
+  }, [analyzedAt, isReportFetching]);
 
   if (isReportError) {
     return (
